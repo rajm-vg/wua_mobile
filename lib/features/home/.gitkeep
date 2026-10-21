@@ -1,0 +1,11 @@
+// Home feature — placeholder for future implementation.
+// Structure:
+//   domain/entities/
+//   domain/repositories/
+//   domain/usecases/
+//   data/models/
+//   data/datasources/
+//   data/repositories/
+//   presentation/bloc/
+//   presentation/pages/
+//   presentation/widgets/
