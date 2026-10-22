@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 
-import '../errors/exceptions.dart';
-import 'api_constants.dart';
+import 'package:wua_mobile/core/errors/exceptions.dart';
+import 'package:wua_mobile/core/network/api_constants.dart';
 
 /// Maps [DioException] and HTTP status codes into domain-specific exceptions.
 /// Called by [ApiClient] so repositories never see raw Dio errors.

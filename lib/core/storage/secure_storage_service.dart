@@ -1,6 +1,6 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-import '../constants/app_constants.dart';
+import 'package:wua_mobile/core/constants/app_constants.dart';
 
 /// Abstraction over [FlutterSecureStorage] for sensitive data.
 /// Stores access tokens, refresh tokens, and user credentials.

@@ -125,4 +125,17 @@ class AppTypography {
     letterSpacing: 0.5,
     height: 1.45,
   );
+
+  // ─── Semantic Shortcuts ─────────────────────────────────────
+  static TextStyle get pageTitle => headlineMedium;
+  static TextStyle get sectionTitle => titleMedium;
+  static TextStyle get cardTitle => titleSmall;
+  static TextStyle get caption => bodySmall;
+  static TextStyle get badge => labelSmall.copyWith(
+        fontWeight: FontWeight.w600,
+        letterSpacing: 0.8,
+      );
+  static TextStyle get button => labelLarge.copyWith(
+        fontWeight: FontWeight.w600,
+      );
 }

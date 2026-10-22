@@ -1,13 +1,12 @@
 import 'package:dio/dio.dart';
-
-import '../constants/env_config.dart';
-import '../storage/secure_storage_service.dart';
-import 'api_client.dart';
-import 'api_constants.dart';
-import 'interceptors/auth_interceptor.dart';
-import 'interceptors/logging_interceptor.dart';
-import 'interceptors/refresh_token_interceptor.dart';
-import 'interceptors/retry_interceptor.dart';
+import 'package:wua_mobile/core/constants/env_config.dart';
+import 'package:wua_mobile/core/network/api_client.dart';
+import 'package:wua_mobile/core/network/api_constants.dart';
+import 'package:wua_mobile/core/network/interceptors/auth_interceptor.dart';
+import 'package:wua_mobile/core/network/interceptors/logging_interceptor.dart';
+import 'package:wua_mobile/core/network/interceptors/refresh_token_interceptor.dart';
+import 'package:wua_mobile/core/network/interceptors/retry_interceptor.dart';
+import 'package:wua_mobile/core/storage/secure_storage_service.dart';
 
 /// Configures and provides the fully-assembled [ApiClient] with all
 /// interceptors wired up. This is the single composition point for

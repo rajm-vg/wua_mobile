@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
 
-import '../../../../core/errors/failures.dart';
-import '../entities/auth_tokens.dart';
-import '../entities/user_entity.dart';
+import 'package:wua_mobile/core/errors/failures.dart';
+import 'package:wua_mobile/features/authentication/domain/entities/auth_tokens.dart';
+import 'package:wua_mobile/features/authentication/domain/entities/user_entity.dart';
 
 /// Authentication repository contract.
 /// Implemented in the data layer — consumed by use cases only.

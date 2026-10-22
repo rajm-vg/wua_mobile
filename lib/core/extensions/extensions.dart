@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+export '../l10n/l10n.dart';
+export '../theme/theme.dart';
+
 /// Extension methods on [BuildContext] for cleaner widget code.
 extension BuildContextExtensions on BuildContext {
   // ─── Theme Shortcuts ────────────────────────────────────────

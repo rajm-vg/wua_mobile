@@ -1,14 +1,13 @@
 import 'package:dartz/dartz.dart';
-
-import '../../../../core/errors/exceptions.dart';
-import '../../../../core/errors/failures.dart';
-import '../../../../core/logger/app_logger.dart';
-import '../../../../core/network/network_info.dart';
-import '../../domain/entities/auth_tokens.dart';
-import '../../domain/entities/user_entity.dart';
-import '../../domain/repositories/auth_repository.dart';
-import '../datasources/auth_local_datasource.dart';
-import '../datasources/auth_remote_datasource.dart';
+import 'package:wua_mobile/core/errors/exceptions.dart';
+import 'package:wua_mobile/core/errors/failures.dart';
+import 'package:wua_mobile/core/logger/app_logger.dart';
+import 'package:wua_mobile/core/network/network_info.dart';
+import 'package:wua_mobile/features/authentication/data/datasources/auth_local_datasource.dart';
+import 'package:wua_mobile/features/authentication/data/datasources/auth_remote_datasource.dart';
+import 'package:wua_mobile/features/authentication/domain/entities/auth_tokens.dart';
+import 'package:wua_mobile/features/authentication/domain/entities/user_entity.dart';
+import 'package:wua_mobile/features/authentication/domain/repositories/auth_repository.dart';
 
 /// Concrete implementation of [AuthRepository].
 ///

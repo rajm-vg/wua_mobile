@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../core/theme/colors.dart';
-import '../../core/theme/spacing.dart';
+import 'package:wua_mobile/core/theme/colors.dart';
+import 'package:wua_mobile/core/theme/spacing.dart';
 
 /// Reusable primary button following the design system.
 class AppPrimaryButton extends StatelessWidget {

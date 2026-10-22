@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 
-import '../../logger/app_logger.dart';
+import 'package:wua_mobile/core/logger/app_logger.dart';
 
 /// Interceptor that logs all HTTP requests and responses.
 /// Automatically disabled in release builds via [AppLogger].

@@ -1,6 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../constants/app_constants.dart';
+import 'package:wua_mobile/core/constants/app_constants.dart';
 
 /// Non-sensitive preference storage using [SharedPreferences].
 /// Stores theme, language, feature flags, and first-launch state.

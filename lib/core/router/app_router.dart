@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-import '../logger/app_logger.dart';
-import '../storage/secure_storage_service.dart';
-import 'route_names.dart';
+import 'package:wua_mobile/core/logger/app_logger.dart';
+import 'package:wua_mobile/core/router/route_names.dart';
+import 'package:wua_mobile/core/storage/secure_storage_service.dart';
+import 'package:wua_mobile/features/authentication/authentication.dart';
+import 'package:wua_mobile/features/splash/splash.dart';
 
 /// Application router configuration using go_router.
 ///
@@ -25,7 +26,8 @@ class AppRouter {
       GoRoute(
         path: '/splash',
         name: RouteNames.splash,
-        builder: (context, state) => const _PlaceholderPage(title: 'Splash'),
+        builder: (context, state) => const AnimatedSplashPage(),
+        // builder: (context, state) => const SplashPage(),
       ),
       GoRoute(
         path: '/onboarding',
@@ -38,7 +40,7 @@ class AppRouter {
       GoRoute(
         path: '/login',
         name: RouteNames.login,
-        builder: (context, state) => const _PlaceholderPage(title: 'Login'),
+        builder: (context, state) => const LoginPage(),
       ),
       GoRoute(
         path: '/register',

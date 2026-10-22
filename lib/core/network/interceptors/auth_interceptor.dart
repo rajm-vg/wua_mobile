@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
-
-import '../../storage/secure_storage_service.dart';
-import '../api_constants.dart';
+import 'package:wua_mobile/core/network/api_constants.dart';
+import 'package:wua_mobile/core/storage/secure_storage_service.dart';
 
 /// Interceptor that attaches the Bearer token to every outgoing request.
 /// Reads the access token from secure storage.

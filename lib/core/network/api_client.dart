@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 
-import 'api_constants.dart';
-import 'dio_error_mapper.dart';
+import 'package:wua_mobile/core/network/api_constants.dart';
+import 'package:wua_mobile/core/network/dio_error_mapper.dart';
 
 /// Production-grade HTTP client wrapping [Dio].
 ///

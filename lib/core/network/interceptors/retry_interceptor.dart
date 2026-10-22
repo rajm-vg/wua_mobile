@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 
-import '../../constants/app_constants.dart';
-import '../../logger/app_logger.dart';
+import 'package:wua_mobile/core/constants/app_constants.dart';
+import 'package:wua_mobile/core/logger/app_logger.dart';
 
 /// Interceptor that retries failed requests due to transient errors.
 /// Retries on 5xx server errors, timeouts, and connection errors.

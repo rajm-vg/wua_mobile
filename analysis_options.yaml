@@ -49,5 +49,5 @@ linter:
     # Readability
     annotate_overrides: true
     prefer_relative_imports: false
+    always_use_package_imports: true
     directives_ordering: true
-    always_use_package_imports: false

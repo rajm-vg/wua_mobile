@@ -1,11 +1,11 @@
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 
-import '../../../../core/errors/failures.dart';
-import '../../../../core/usecases/usecase.dart';
-import '../entities/auth_tokens.dart';
-import '../entities/user_entity.dart';
-import '../repositories/auth_repository.dart';
+import 'package:wua_mobile/core/errors/failures.dart';
+import 'package:wua_mobile/core/usecases/usecase.dart';
+import 'package:wua_mobile/features/authentication/domain/entities/auth_tokens.dart';
+import 'package:wua_mobile/features/authentication/domain/entities/user_entity.dart';
+import 'package:wua_mobile/features/authentication/domain/repositories/auth_repository.dart';
 
 /// Registers a new user account.
 class RegisterUseCase

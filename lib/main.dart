@@ -3,23 +3,29 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-import 'core/constants/env_config.dart';
-import 'core/di/injection_container.dart';
-import 'core/logger/app_logger.dart';
-import 'core/router/app_router.dart';
-import 'core/theme/app_theme.dart';
+import 'package:wua_mobile/core/constants/env_config.dart';
+import 'package:wua_mobile/core/di/injection_container.dart';
+import 'package:wua_mobile/core/errors/errors.dart';
+import 'package:wua_mobile/core/l10n/l10n.dart';
+import 'package:wua_mobile/core/logger/app_logger.dart';
+import 'package:wua_mobile/core/router/app_router.dart';
+import 'package:wua_mobile/core/theme/app_theme.dart';
 
 /// Application entry point.
 ///
 /// Startup sequence:
 /// 1. Ensure Flutter binding
-/// 2. Load environment configuration
-/// 3. Initialize dependency injection
-/// 4. Configure Bloc observer
-/// 5. Lock orientation
-/// 6. Run app
+/// 2. Initialize global error handling
+/// 3. Load environment configuration
+/// 4. Initialize dependency injection
+/// 5. Configure Bloc observer
+/// 6. Lock orientation
+/// 7. Run app
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // ── Global Error Handling ───────────────────────────────────
+  GlobalErrorHandler.initialize();
 
   // ── Environment ─────────────────────────────────────────────
   // Change this to switch environments:
@@ -62,17 +68,27 @@ class WuaApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final appRouter = sl<AppRouter>();
 
-    return MaterialApp.router(
-      title: 'WUA Mobile',
-      debugShowCheckedModeBanner: false,
+    return ValueListenableBuilder<Locale?>(
+      valueListenable: appLocaleNotifier,
+      builder: (context, currentLocale, _) {
+        return MaterialApp.router(
+          title: 'WUA Mobile',
+          debugShowCheckedModeBanner: false,
+          locale: currentLocale,
 
-      // Theme
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
+          // Localization
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
 
-      // Router
-      routerConfig: appRouter.router,
+          // Theme
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: ThemeMode.system,
+
+          // Router
+          routerConfig: appRouter.router,
+        );
+      },
     );
   }
 }

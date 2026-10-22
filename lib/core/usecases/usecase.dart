@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
 
-import '../errors/failures.dart';
+import 'package:wua_mobile/core/errors/failures.dart';
 
 /// Base UseCase contract enforcing single-responsibility.
 /// Each use case encapsulates exactly one business action.

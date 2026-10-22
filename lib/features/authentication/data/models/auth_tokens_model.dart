@@ -1,4 +1,4 @@
-import '../../domain/entities/auth_tokens.dart';
+import 'package:wua_mobile/features/authentication/domain/entities/auth_tokens.dart';
 
 /// Data Transfer Object for authentication tokens.
 class AuthTokensModel {

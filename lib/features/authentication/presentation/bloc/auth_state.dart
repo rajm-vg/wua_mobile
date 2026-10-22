@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-import '../../domain/entities/user_entity.dart';
+import 'package:wua_mobile/features/authentication/domain/entities/user_entity.dart';
 
 /// States emitted by [AuthBloc].
 abstract class AuthState extends Equatable {

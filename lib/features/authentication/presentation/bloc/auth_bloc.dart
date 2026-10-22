@@ -1,12 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../core/usecases/usecase.dart';
-import '../../domain/usecases/get_cached_user_usecase.dart';
-import '../../domain/usecases/login_usecase.dart';
-import '../../domain/usecases/logout_usecase.dart';
-import '../../domain/usecases/register_usecase.dart';
-import 'auth_event.dart';
-import 'auth_state.dart';
+import 'package:wua_mobile/core/usecases/usecase.dart';
+import 'package:wua_mobile/features/authentication/domain/usecases/get_cached_user_usecase.dart';
+import 'package:wua_mobile/features/authentication/domain/usecases/login_usecase.dart';
+import 'package:wua_mobile/features/authentication/domain/usecases/logout_usecase.dart';
+import 'package:wua_mobile/features/authentication/domain/usecases/register_usecase.dart';
+import 'package:wua_mobile/features/authentication/presentation/bloc/auth_event.dart';
+import 'package:wua_mobile/features/authentication/presentation/bloc/auth_state.dart';
 
 /// Authentication Bloc.
 ///
@@ -18,7 +18,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required this._registerUseCase,
     required this._logoutUseCase,
     required this._getCachedUserUseCase,
-  }) : super(const AuthInitial()) {
+  })  : super(const AuthInitial()) {
     on<AuthLoginRequested>(_onLoginRequested);
     on<AuthRegisterRequested>(_onRegisterRequested);
     on<AuthLogoutRequested>(_onLogoutRequested);

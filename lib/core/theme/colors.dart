@@ -69,4 +69,15 @@ class AppColors {
   static const Color textDisabled = Color(0xFFBDBDBD);
   static const Color textPrimaryDark = Color(0xFFE0E0E0);
   static const Color textSecondaryDark = Color(0xFF9CA3AF);
+
+  // ─── Domain: Water, Irrigation & Government Branding ───────
+  static const Color gold = Color(0xFFFFD54F); // Government / Emblem Gold
+  static const Color harvestAmber = Color(0xFFFFB300); // Harvest / Wheat
+  static const Color waterCyan = Color(0xFF80DEEA); // Flowing water
+  static const Color waterCyanLight = Color(0xFFB2EBF2);
+  static const Color sproutGreen = Color(0xFF81C784); // Agricultural sprout
+  static const Color navyDark = Color(0xFF0A2240); // Deep official navy
+  static const Color abyss = Color(0xFF071426); // Midnight backdrop
+  static const Color reservoirTeal = Color(0xFF032B2F); // Canal reservoir
+  static const Color darkCanal = Color(0xFF02171A);
 }

@@ -1,4 +1,4 @@
-import '../../domain/entities/user_entity.dart';
+import 'package:wua_mobile/features/authentication/domain/entities/user_entity.dart';
 
 /// Data Transfer Object for User.
 /// Handles JSON serialization/deserialization.

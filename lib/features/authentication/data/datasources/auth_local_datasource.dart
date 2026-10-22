@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import '../../../../core/errors/exceptions.dart';
-import '../../../../core/storage/secure_storage_service.dart';
-import '../models/user_model.dart';
+import 'package:wua_mobile/core/errors/exceptions.dart';
+import 'package:wua_mobile/core/storage/secure_storage_service.dart';
+import 'package:wua_mobile/features/authentication/data/models/user_model.dart';
 
 /// Contract for local authentication data operations.
 abstract class AuthLocalDataSource {

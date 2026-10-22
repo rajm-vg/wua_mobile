@@ -1,9 +1,8 @@
 import 'package:dio/dio.dart';
-
-import '../../logger/app_logger.dart';
-import '../../storage/secure_storage_service.dart';
-import '../api_constants.dart';
-import '../api_endpoints.dart';
+import 'package:wua_mobile/core/logger/app_logger.dart';
+import 'package:wua_mobile/core/network/api_constants.dart';
+import 'package:wua_mobile/core/network/api_endpoints.dart';
+import 'package:wua_mobile/core/storage/secure_storage_service.dart';
 
 /// Interceptor that handles 401 responses by refreshing the token
 /// and retrying the original request exactly once.

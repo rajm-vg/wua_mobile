@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'colors.dart';
-import 'radius.dart';
-import 'typography.dart';
+import 'package:wua_mobile/core/theme/colors.dart';
+import 'package:wua_mobile/core/theme/radius.dart';
+import 'package:wua_mobile/core/theme/typography.dart';
 
 /// Application theme configuration built with Material 3.
 /// Provides both light and dark [ThemeData] from a single source of truth.
