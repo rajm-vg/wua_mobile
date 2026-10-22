@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wua_mobile/core/di/injection_container.dart';
 import 'package:wua_mobile/core/extensions/extensions.dart';
-import 'package:wua_mobile/core/router/route_names.dart';
 import 'package:wua_mobile/core/storage/secure_storage_service.dart';
 import 'package:wua_mobile/features/splash/presentation/widgets/water_ripple_background.dart';
 import 'package:wua_mobile/features/splash/presentation/widgets/wrd_emblem.dart';
@@ -148,9 +147,9 @@ class _AnimatedSplashPageState extends State<AnimatedSplashPage>
 
     if (GoRouter.maybeOf(context) != null) {
       if (hasToken) {
-        context.go(RouteNames.home);
+        context.go('/');
       } else {
-        context.go(RouteNames.login);
+        context.go('/login');
       }
     }
   }

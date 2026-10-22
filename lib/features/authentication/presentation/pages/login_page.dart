@@ -136,7 +136,7 @@ class _LoginPageViewState extends State<_LoginPageView> {
             ),
           );
         } else if (state is AuthAuthenticated) {
-          context.go(RouteNames.home);
+          context.go('/');
         }
       },
       builder: (context, state) {

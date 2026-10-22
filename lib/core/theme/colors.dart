@@ -50,11 +50,11 @@ class AppColors {
   static const Color onSurfaceLight = Color(0xFF1A1A2E);
 
   // ─── Surface / Background (Dark) ───────────────────────────
-  static const Color backgroundDark = Color(0xFF121212);
-  static const Color surfaceDark = Color(0xFF1E1E2D);
-  static const Color surfaceVariantDark = Color(0xFF2A2A3D);
-  static const Color onBackgroundDark = Color(0xFFE0E0E0);
-  static const Color onSurfaceDark = Color(0xFFE0E0E0);
+  static const Color backgroundDark = Color(0xFF08191E); // Nocturnal irrigation midnight
+  static const Color surfaceDark = Color(0xFF11282E); // Deep oceanic teal-slate
+  static const Color surfaceVariantDark = Color(0xFF16343C);
+  static const Color onBackgroundDark = Color(0xFFF1F5F9);
+  static const Color onSurfaceDark = Color(0xFFF1F5F9);
 
   // ─── Neutral ────────────────────────────────────────────────
   static const Color divider = Color(0xFFE0E0E0);
@@ -67,8 +67,8 @@ class AppColors {
   static const Color textSecondary = Color(0xFF6B7280);
   static const Color textHint = Color(0xFF9CA3AF);
   static const Color textDisabled = Color(0xFFBDBDBD);
-  static const Color textPrimaryDark = Color(0xFFE0E0E0);
-  static const Color textSecondaryDark = Color(0xFF9CA3AF);
+  static const Color textPrimaryDark = Color(0xFFF1F5F9);
+  static const Color textSecondaryDark = Color(0xFFA0B4B9);
 
   // ─── Domain: Water, Irrigation & Government Branding ───────
   static const Color gold = Color(0xFFFFD54F); // Government / Emblem Gold
@@ -79,5 +79,11 @@ class AppColors {
   static const Color navyDark = Color(0xFF0A2240); // Deep official navy
   static const Color abyss = Color(0xFF071426); // Midnight backdrop
   static const Color reservoirTeal = Color(0xFF032B2F); // Canal reservoir
-  static const Color darkCanal = Color(0xFF02171A);
+  static const Color darkCanal = Color(0xFF0F3A3F); // Rich peacock teal header for dark mode
+  static const Color headerTeal = Color(0xFF16474A); // Deep rich header teal
+  static const Color canalGreen = Color(0xFF00897B); // Canal Wari emerald green
+  static const Color mintBorder = Color(0xFFA7F3D0); // Light mint border for turn card
+  static const Color mintSurface = Color(0xFFF0FDF9); // Soft mint card tint
+  static const Color amberBadgeBg = Color(0xFFFEF3C7); // Due date light badge
+  static const Color amberBadgeText = Color(0xFFB45309); // Due date text
 }

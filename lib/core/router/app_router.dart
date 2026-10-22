@@ -4,7 +4,9 @@ import 'package:wua_mobile/core/logger/app_logger.dart';
 import 'package:wua_mobile/core/router/route_names.dart';
 import 'package:wua_mobile/core/storage/secure_storage_service.dart';
 import 'package:wua_mobile/features/authentication/authentication.dart';
+import 'package:wua_mobile/features/home/home.dart';
 import 'package:wua_mobile/features/splash/splash.dart';
+import 'package:wua_mobile/shared/widgets/widgets.dart';
 
 /// Application router configuration using go_router.
 ///
@@ -57,14 +59,13 @@ class AppRouter {
       // ─── Main Shell (authenticated) ────────────────────────
       ShellRoute(
         builder: (context, state, child) {
-          // TODO: Replace with MainShell / ScaffoldWithNavBar
-          return child;
+          return MainShell(child: child);
         },
         routes: [
           GoRoute(
             path: '/',
             name: RouteNames.home,
-            builder: (context, state) => const _PlaceholderPage(title: 'Home'),
+            builder: (context, state) => const HomePage(),
             routes: [
               // Profile
               GoRoute(
@@ -153,6 +154,10 @@ class AppRouter {
               ),
             ],
           ),
+          GoRoute(
+            path: '/home',
+            redirect: (context, state) => '/',
+          ),
         ],
       ),
     ],
@@ -194,8 +199,9 @@ class _PlaceholderPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(title)),
+    return WuaScaffold(
+      title: title,
+      showLanguageToggle: true,
       body: Center(
         child: Text(title, style: Theme.of(context).textTheme.headlineMedium),
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter/services.dart';
+import 'package:wua_mobile/core/theme/app_theme_colors.dart';
 import 'package:wua_mobile/core/theme/colors.dart';
 import 'package:wua_mobile/core/theme/radius.dart';
 import 'package:wua_mobile/core/theme/typography.dart';
@@ -29,6 +30,7 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
+      extensions: const [AppThemeColors.light],
       scaffoldBackgroundColor: AppColors.backgroundLight,
       textTheme: _textTheme(AppColors.onSurfaceLight),
       appBarTheme: AppBarTheme(
@@ -36,6 +38,11 @@ class AppTheme {
         centerTitle: true,
         backgroundColor: colorScheme.surface,
         foregroundColor: colorScheme.onSurface,
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark,
+          statusBarBrightness: Brightness.light,
+        ),
         titleTextStyle: AppTypography.titleLarge.copyWith(
           color: colorScheme.onSurface,
         ),
@@ -115,12 +122,12 @@ class AppTheme {
     final colorScheme = ColorScheme.fromSeed(
       seedColor: AppColors.primarySeed,
       brightness: Brightness.dark,
-      primary: AppColors.primaryLight,
-      onPrimary: AppColors.primaryDark,
-      secondary: AppColors.secondaryLight,
-      onSecondary: AppColors.secondaryDark,
-      tertiary: AppColors.tertiary,
-      onTertiary: AppColors.onTertiary,
+      primary: const Color(0xFF26E6C8), // Luminous emerald-cyan
+      onPrimary: const Color(0xFF042F2E),
+      secondary: const Color(0xFF80DEEA), // Water cyan
+      onSecondary: const Color(0xFF042F2E),
+      tertiary: const Color(0xFFFBBF24), // Harvest gold
+      onTertiary: const Color(0xFF1E1B4B),
       error: AppColors.errorLight,
       onError: AppColors.onError,
       surface: AppColors.surfaceDark,
@@ -130,6 +137,7 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
+      extensions: const [AppThemeColors.dark],
       scaffoldBackgroundColor: AppColors.backgroundDark,
       textTheme: _textTheme(AppColors.onSurfaceDark),
       appBarTheme: AppBarTheme(
@@ -137,6 +145,11 @@ class AppTheme {
         centerTitle: true,
         backgroundColor: colorScheme.surface,
         foregroundColor: colorScheme.onSurface,
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.dark,
+        ),
         titleTextStyle: AppTypography.titleLarge.copyWith(
           color: colorScheme.onSurface,
         ),

@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wua_mobile/core/di/injection_container.dart';
 import 'package:wua_mobile/core/extensions/extensions.dart';
-import 'package:wua_mobile/core/router/route_names.dart';
 import 'package:wua_mobile/core/storage/secure_storage_service.dart';
 
 /// Represents a single stage in the startup bootstrapping sequence.
@@ -83,10 +82,7 @@ class _SplashPageState extends State<SplashPage>
     );
 
     _scaleAnimation = Tween<double>(begin: 0.94, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _entranceController,
-        curve: Curves.easeOutCubic,
-      ),
+      CurvedAnimation(parent: _entranceController, curve: Curves.easeOutCubic),
     );
 
     _entranceController.forward();
@@ -119,9 +115,9 @@ class _SplashPageState extends State<SplashPage>
 
     if (GoRouter.maybeOf(context) != null) {
       if (hasToken) {
-        context.go(RouteNames.home);
+        context.go('/');
       } else {
-        context.go(RouteNames.login);
+        context.go('/login');
       }
     }
   }
@@ -211,7 +207,9 @@ class _SplashPageState extends State<SplashPage>
                       Text(
                         'Water User Association',
                         textAlign: TextAlign.center,
-                        style: context.headlineMedium.bold.white.withSpacing(0.2),
+                        style: context.headlineMedium.bold.white.withSpacing(
+                          0.2,
+                        ),
                       ),
 
                       const SizedBox(height: 6),
@@ -349,16 +347,14 @@ class _SplashPageState extends State<SplashPage>
                           ),
                   ),
                   const SizedBox(width: 10),
-                  Text(
-                    stage.title,
-                    style: context.bodyMedium.medium.white,
-                  ),
+                  Text(stage.title, style: context.bodyMedium.medium.white),
                 ],
               ),
               Text(
                 '${(_stages[_currentStageIndex].progress * 100).toInt()}%',
-                style: context.labelSmall.medium
-                    .withColor(AppColors.textSecondaryDark),
+                style: context.labelSmall.medium.withColor(
+                  AppColors.textSecondaryDark,
+                ),
               ),
             ],
           ),
@@ -390,8 +386,8 @@ class _SplashPageState extends State<SplashPage>
                     borderRadius: BorderRadius.circular(2),
                     color: isFilled
                         ? (isCurrent
-                            ? AppColors.primaryLight
-                            : AppColors.secondary)
+                              ? AppColors.primaryLight
+                              : AppColors.secondary)
                         : Colors.white.withValues(alpha: 0.10),
                     boxShadow: isFilled
                         ? [

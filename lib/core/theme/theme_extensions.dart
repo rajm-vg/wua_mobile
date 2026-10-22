@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:wua_mobile/core/theme/app_theme_colors.dart';
 import 'package:wua_mobile/core/theme/colors.dart';
 
 /// Context extensions providing direct, ergonomic access to the application's
@@ -43,19 +44,19 @@ extension TypographyContextExtensions on BuildContext {
 
   // ─── Semantic Typography Shortcuts ──────────────────────────
   /// Standard screen / page title.
-  TextStyle get pageTitle => headlineSmall.semiBold;
+  TextStyle get pageTitle => headlineSmall.semiBold.withColor(colors.textPrimary);
 
   /// Section heading inside a screen.
-  TextStyle get sectionTitle => titleMedium.semiBold;
+  TextStyle get sectionTitle => titleMedium.semiBold.withColor(colors.textPrimary);
 
   /// Card / dialog title.
-  TextStyle get cardTitle => titleSmall.medium;
+  TextStyle get cardTitle => titleSmall.medium.withColor(colors.textPrimary);
 
   /// Secondary caption / timestamp / hint text.
-  TextStyle get caption => bodySmall.withColor(AppColors.textSecondary);
+  TextStyle get caption => bodySmall.withColor(colors.textSecondary);
 
   /// Small badge / tag label text with letter spacing.
-  TextStyle get badgeText => labelSmall.semiBold.withSpacing(0.6);
+  TextStyle get badgeText => labelSmall.semiBold.withSpacing(0.6).withColor(colors.textSecondary);
 
   /// Action button text.
   TextStyle get buttonText => labelLarge.semiBold;
@@ -97,30 +98,40 @@ extension TextStyleModifiers on TextStyle {
 }
 
 /// Context extensions providing direct access to the application's
-/// colors and theme mode without repetitive `Theme.of(context)` lookups.
+/// theme-aware semantic colors without repetitive `Theme.of(context)` or `isDark` checks.
 extension ThemeColorContextExtensions on BuildContext {
+  /// Theme-aware semantic colors for the active theme (light or dark).
+  /// Query colors directly from context: `context.colors.cardBackground`,
+  /// `context.colors.textPrimary`, `context.colors.turnCardBorder`, etc.
+  AppThemeColors get colors =>
+      Theme.of(this).extension<AppThemeColors>() ??
+      (isDarkMode ? AppThemeColors.dark : AppThemeColors.light);
+
+  /// Ergonomic shorthand alias for [colors].
+  AppThemeColors get appColors => colors;
+
+  /// Underlying Material 3 [ColorScheme].
+  ColorScheme get colorScheme => Theme.of(this).colorScheme;
+
   /// Whether dark mode is currently active.
   bool get isDarkMode => Theme.of(this).brightness == Brightness.dark;
 
-  /// Current [ColorScheme].
-  ColorScheme get colors => Theme.of(this).colorScheme;
-
   /// Primary brand color.
   Color get primaryColor => colors.primary;
-  Color get onPrimaryColor => colors.onPrimary;
+  Color get onPrimaryColor => colorScheme.onPrimary;
 
   /// Secondary brand color (Teal / Irrigation).
   Color get secondaryColor => colors.secondary;
-  Color get onSecondaryColor => colors.onSecondary;
+  Color get onSecondaryColor => colorScheme.onSecondary;
 
   /// Surface color for cards, dialogs, sheets.
   Color get surfaceColor => colors.surface;
-  Color get onSurfaceColor => colors.onSurface;
+  Color get onSurfaceColor => colorScheme.onSurface;
 
   /// Main background color.
-  Color get backgroundColor => Theme.of(this).scaffoldBackgroundColor;
+  Color get backgroundColor => colors.background;
 
   /// Semantic error color.
   Color get errorColor => colors.error;
-  Color get onErrorColor => colors.onError;
+  Color get onErrorColor => colorScheme.onError;
 }
