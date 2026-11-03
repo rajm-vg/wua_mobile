@@ -10,6 +10,7 @@ import 'package:wua_mobile/core/l10n/l10n.dart';
 import 'package:wua_mobile/core/logger/app_logger.dart';
 import 'package:wua_mobile/core/router/app_router.dart';
 import 'package:wua_mobile/core/theme/app_theme.dart';
+import 'package:wua_mobile/core/theme/colors.dart';
 
 /// Application entry point.
 ///
@@ -51,8 +52,9 @@ Future<void> main() async {
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
+      statusBarColor: AppColors.headerTeal,
+      statusBarIconBrightness: Brightness.light,
+      statusBarBrightness: Brightness.dark,
     ),
   );
 
@@ -71,22 +73,27 @@ class WuaApp extends StatelessWidget {
     return ValueListenableBuilder<Locale?>(
       valueListenable: appLocaleNotifier,
       builder: (context, currentLocale, _) {
-        return MaterialApp.router(
-          title: 'WUA Mobile',
-          debugShowCheckedModeBanner: false,
-          locale: currentLocale,
+        return ValueListenableBuilder<ThemeMode>(
+          valueListenable: appThemeModeNotifier,
+          builder: (context, currentThemeMode, _) {
+            return MaterialApp.router(
+              title: 'WUA Mobile',
+              debugShowCheckedModeBanner: false,
+              locale: currentLocale,
 
-          // Localization
-          localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
+              // Localization
+              localizationsDelegates: AppLocalizations.localizationsDelegates,
+              supportedLocales: AppLocalizations.supportedLocales,
 
-          // Theme
-          theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
-          themeMode: ThemeMode.system,
+              // Theme
+              theme: AppTheme.lightTheme,
+              darkTheme: AppTheme.darkTheme,
+              themeMode: currentThemeMode,
 
-          // Router
-          routerConfig: appRouter.router,
+              // Router
+              routerConfig: appRouter.router,
+            );
+          },
         );
       },
     );

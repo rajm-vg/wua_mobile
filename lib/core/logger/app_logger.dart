@@ -19,12 +19,12 @@ class AppLoggerAnsi {
   static const String green = '\x1B[32m'; // Info
   static const String yellow = '\x1B[33m'; // Warning
   static const String blue = '\x1B[34m'; // Navigation
-  static const String purple = '\x1B[35m'; // Debug / Bloc
+  static const String purple = '\x1B[35m'; // Bloc / State
   static const String cyan = '\x1B[36m'; // Network
   static const String white = '\x1B[37m';
 
   // High-Intensity / Bright Colors
-  static const String brightGray = '\x1B[90m';
+  static const String brightGray = '\x1B[90m'; // Debug / Trace
   static const String brightRed = '\x1B[91m';
   static const String brightGreen = '\x1B[92m';
   static const String brightYellow = '\x1B[93m';
@@ -32,6 +32,9 @@ class AppLoggerAnsi {
   static const String brightPurple = '\x1B[95m';
   static const String brightCyan = '\x1B[96m';
   static const String brightWhite = '\x1B[97m';
+
+  // Extended Colors (ANSI 256)
+  static const String orange = '\x1B[38;5;208m'; // Repository / Storage
 
   /// Wraps [text] in the given [ansiCode] and appends [reset].
   static String colorize(String text, String ansiCode) =>
@@ -44,18 +47,21 @@ class AppLoggerAnsi {
   static String yellowText(String text) => colorize(text, brightYellow);
   static String cyanText(String text) => colorize(text, brightCyan);
   static String blueText(String text) => colorize(text, brightBlue);
+  static String grayText(String text) => colorize(text, brightGray);
+  static String orangeText(String text) => colorize(text, orange);
 }
 
 /// Centralized logging service with custom ANSI colorized levels and tags.
 ///
 /// Log Levels & Colors:
-/// • [error]   -> 🔴 Red (ANSI 196 / bright red)
-/// • [debug]   -> 🟣 Purple (ANSI 135 / magenta)
-/// • [info]    -> 🟢 Green (ANSI 40 / bright green)
-/// • [warning] -> 🟡 Yellow (ANSI 214 / amber)
-/// • [network] -> 🌐 Cyan (ANSI 36)
-/// • [bloc]    -> ⚡ Purple (ANSI 35)
-/// • [navigation] -> 🧭 Blue (ANSI 34)
+/// • [error]      -> 🔴 Red (ANSI 196 / bright red)
+/// • [warning]    -> 🟡 Yellow (ANSI 214 / amber)
+/// • [info]       -> 🟢 Green (ANSI 40 / bright green)
+/// • [debug]      -> ⚙️ Gray (ANSI 90 / bright gray)
+/// • [bloc]       -> ⚡ Purple (ANSI 95 / vibrant purple)
+/// • [network]    -> 🌐 Cyan (ANSI 96 / bright cyan)
+/// • [navigation] -> 🧭 Blue (ANSI 94 / bright blue)
+/// • [repository] -> 📦 Orange (ANSI 208 / warm amber orange)
 ///
 /// All verbose debug logs are automatically suppressed in release builds.
 class AppLogger {
@@ -71,7 +77,7 @@ class AppLogger {
       dateTimeFormat: DateTimeFormat.onlyTimeAndSinceStart,
       levelColors: {
         Level.trace: const AnsiColor.fg(8), // Dim gray
-        Level.debug: const AnsiColor.fg(135), // Vibrant Purple
+        Level.debug: const AnsiColor.fg(245), // Subtle gray
         Level.info: const AnsiColor.fg(40), // Bright Green
         Level.warning: const AnsiColor.fg(214), // Amber / Yellow
         Level.error: const AnsiColor.fg(196), // Vibrant Red
@@ -79,7 +85,7 @@ class AppLogger {
       },
       levelEmojis: {
         Level.trace: '🔍 ',
-        Level.debug: '🟣 ',
+        Level.debug: '⚙️ ',
         Level.info: '🟢 ',
         Level.warning: '🟡 ',
         Level.error: '🔴 ',
@@ -89,10 +95,10 @@ class AppLogger {
     level: kReleaseMode ? Level.warning : Level.trace,
   );
 
-  /// General debug output (Purple 🟣) — suppressed in release.
+  /// General debug output (Gray ⚙️) — suppressed in release.
   static void debug(String message, [String? tag]) {
     if (kReleaseMode) return;
-    _logger.d(_format(message, tag, AppLoggerAnsi.brightPurple));
+    _logger.d(_format(message, tag, AppLoggerAnsi.brightGray));
   }
 
   /// Informational messages (Green 🟢) — suppressed in release.
@@ -133,15 +139,15 @@ class AppLogger {
     _logger.d(_format(message, 'NAV', AppLoggerAnsi.brightBlue));
   }
 
-  /// Repository-specific logging (Yellow 📦) — suppressed in release.
+  /// Repository-specific logging (Orange 📦) — suppressed in release.
   static void repository(String message) {
     if (kReleaseMode) return;
-    _logger.d(_format(message, 'REPO', AppLoggerAnsi.brightYellow));
+    _logger.d(_format(message, 'REPO', AppLoggerAnsi.orange));
   }
 
   static String _format(String message, String? tag, [String? tagAnsiColor]) {
     if (tag != null) {
-      final color = tagAnsiColor ?? AppLoggerAnsi.brightPurple;
+      final color = tagAnsiColor ?? AppLoggerAnsi.brightGray;
       return '${AppLoggerAnsi.bold}$color[$tag]${AppLoggerAnsi.reset} $message';
     }
     return message;

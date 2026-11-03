@@ -5,6 +5,11 @@ import 'package:wua_mobile/core/theme/colors.dart';
 import 'package:wua_mobile/core/theme/radius.dart';
 import 'package:wua_mobile/core/theme/typography.dart';
 
+/// Global notifier for controlling app theme mode dynamically.
+final ValueNotifier<ThemeMode> appThemeModeNotifier = ValueNotifier<ThemeMode>(
+  ThemeMode.light,
+);
+
 /// Application theme configuration built with Material 3.
 /// Provides both light and dark [ThemeData] from a single source of truth.
 class AppTheme {

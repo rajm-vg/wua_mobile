@@ -10,6 +10,9 @@ import 'package:wua_mobile/core/storage/preference_storage_service.dart';
 import 'package:wua_mobile/core/storage/secure_storage_service.dart';
 // Feature imports — uncomment as features are implemented.
 import 'package:wua_mobile/features/authentication/authentication.dart';
+import 'package:wua_mobile/features/bills/bills.dart';
+import 'package:wua_mobile/features/payments/payments.dart';
+import 'package:wua_mobile/features/water_usage/water_usage.dart';
 
 /// Global service locator instance.
 final GetIt sl = GetIt.instance;
@@ -56,10 +59,10 @@ Future<void> initDependencies() async {
   // await _initProfileFeature();
 
   // ─── Feature: Bills ────────────────────────────────────────
-  // await _initBillsFeature();
+  await _initBillsFeature();
 
   // ─── Feature: Payments ─────────────────────────────────────
-  // await _initPaymentsFeature();
+  await _initPaymentsFeature();
 
   // ─── Feature: Transactions ─────────────────────────────────
   // await _initTransactionsFeature();
@@ -68,7 +71,7 @@ Future<void> initDependencies() async {
   // await _initNotificationsFeature();
 
   // ─── Feature: Water Usage ──────────────────────────────────
-  // await _initWaterUsageFeature();
+  await _initWaterUsageFeature();
 
   AppLogger.info('Dependencies initialized ✓');
 }
@@ -108,6 +111,87 @@ Future<void> _initAuthenticationFeature() async {
       registerUseCase: sl(),
       logoutUseCase: sl(),
       getCachedUserUseCase: sl(),
+    ),
+  );
+}
+
+Future<void> _initBillsFeature() async {
+  // Data Sources
+  sl.registerLazySingleton<BillRemoteDataSource>(
+    () => BillRemoteDataSourceImpl(apiClient: sl()),
+  );
+
+  // Repository
+  sl.registerLazySingleton<BillRepository>(
+    () => BillRepositoryImpl(
+      remoteDataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+
+  // Use Cases
+  sl.registerLazySingleton(() => GetBillsUseCase(sl()));
+  sl.registerLazySingleton(() => GetBillByIdUseCase(sl()));
+
+  // Bloc
+  sl.registerFactory(
+    () => BillsBloc(
+      getBillsUseCase: sl(),
+      getBillByIdUseCase: sl(),
+    ),
+  );
+}
+
+Future<void> _initPaymentsFeature() async {
+  // Data Sources
+  sl.registerLazySingleton<PaymentRemoteDataSource>(
+    () => PaymentRemoteDataSourceImpl(apiClient: sl()),
+  );
+
+  // Repository
+  sl.registerLazySingleton<PaymentRepository>(
+    () => PaymentRepositoryImpl(
+      remoteDataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+
+  // Use Cases
+  sl.registerLazySingleton(() => GetPaymentsUseCase(sl()));
+  sl.registerLazySingleton(() => GetPaymentByIdUseCase(sl()));
+
+  // Bloc
+  sl.registerFactory(
+    () => PaymentsBloc(
+      getPaymentsUseCase: sl(),
+      getPaymentByIdUseCase: sl(),
+    ),
+  );
+}
+
+Future<void> _initWaterUsageFeature() async {
+  // Data Sources
+  sl.registerLazySingleton<WaterUsageRemoteDataSource>(
+    () => WaterUsageRemoteDataSourceImpl(apiClient: sl()),
+  );
+
+  // Repository
+  sl.registerLazySingleton<WaterUsageRepository>(
+    () => WaterUsageRepositoryImpl(
+      remoteDataSource: sl(),
+      networkInfo: sl(),
+    ),
+  );
+
+  // Use Cases
+  sl.registerLazySingleton(() => GetWaterUsageUseCase(sl()));
+  sl.registerLazySingleton(() => RequestTurnSwapUseCase(sl()));
+
+  // Bloc
+  sl.registerFactory(
+    () => WaterUsageBloc(
+      getWaterUsageUseCase: sl(),
+      requestTurnSwapUseCase: sl(),
     ),
   );
 }

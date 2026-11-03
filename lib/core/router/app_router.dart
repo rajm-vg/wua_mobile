@@ -4,8 +4,12 @@ import 'package:wua_mobile/core/logger/app_logger.dart';
 import 'package:wua_mobile/core/router/route_names.dart';
 import 'package:wua_mobile/core/storage/secure_storage_service.dart';
 import 'package:wua_mobile/features/authentication/authentication.dart';
+import 'package:wua_mobile/features/bills/bills.dart';
 import 'package:wua_mobile/features/home/home.dart';
+import 'package:wua_mobile/features/payments/payments.dart';
+import 'package:wua_mobile/features/profile/profile.dart';
 import 'package:wua_mobile/features/splash/splash.dart';
+import 'package:wua_mobile/features/water_usage/water_usage.dart';
 import 'package:wua_mobile/shared/widgets/widgets.dart';
 
 /// Application router configuration using go_router.
@@ -71,23 +75,27 @@ class AppRouter {
               GoRoute(
                 path: 'profile',
                 name: RouteNames.profile,
-                builder: (context, state) =>
-                    const _PlaceholderPage(title: 'Profile'),
+                builder: (context, state) => const ProfilePage(),
               ),
 
               // Bills
               GoRoute(
                 path: 'bills',
                 name: RouteNames.bills,
-                builder: (context, state) =>
-                    const _PlaceholderPage(title: 'Bills'),
+                builder: (context, state) => const BillsPage(),
                 routes: [
                   GoRoute(
                     path: ':id',
                     name: RouteNames.billDetail,
                     builder: (context, state) {
                       final id = state.pathParameters['id']!;
-                      return _PlaceholderPage(title: 'Bill $id');
+                      final initialBill = state.extra is BillEntity
+                          ? state.extra as BillEntity
+                          : null;
+                      return BillDetailPage(
+                        billId: id,
+                        initialBill: initialBill,
+                      );
                     },
                   ),
                 ],
@@ -97,15 +105,20 @@ class AppRouter {
               GoRoute(
                 path: 'payments',
                 name: RouteNames.payments,
-                builder: (context, state) =>
-                    const _PlaceholderPage(title: 'Payments'),
+                builder: (context, state) => const PaymentsPage(),
                 routes: [
                   GoRoute(
                     path: ':id',
                     name: RouteNames.paymentDetail,
                     builder: (context, state) {
                       final id = state.pathParameters['id']!;
-                      return _PlaceholderPage(title: 'Payment $id');
+                      final initialPayment = state.extra is PaymentEntity
+                          ? state.extra as PaymentEntity
+                          : null;
+                      return PaymentDetailPage(
+                        paymentId: id,
+                        initialPayment: initialPayment,
+                      );
                     },
                   ),
                 ],
@@ -141,8 +154,7 @@ class AppRouter {
               GoRoute(
                 path: 'water-usage',
                 name: RouteNames.waterUsage,
-                builder: (context, state) =>
-                    const _PlaceholderPage(title: 'Water Usage'),
+                builder: (context, state) => const WaterUsagePage(),
               ),
 
               // Settings
@@ -154,10 +166,7 @@ class AppRouter {
               ),
             ],
           ),
-          GoRoute(
-            path: '/home',
-            redirect: (context, state) => '/',
-          ),
+          GoRoute(path: '/home', redirect: (context, state) => '/'),
         ],
       ),
     ],

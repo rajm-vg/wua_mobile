@@ -16,11 +16,13 @@ class HomeHeader extends StatelessWidget {
     super.key,
     this.user,
     this.onNotificationPressed,
+    this.onAvatarPressed,
     this.showTopUtilities = false,
   });
 
   final UserEntity? user;
   final VoidCallback? onNotificationPressed;
+  final VoidCallback? onAvatarPressed;
   final bool showTopUtilities;
 
   String _getGreeting() {
@@ -37,11 +39,11 @@ class HomeHeader extends StatelessWidget {
 
     final displayName = user?.name.isNotEmpty == true
         ? user!.name
-        : 'Ramesh Patil';
+        : 'Hello User';
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: const SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
+      value: SystemUiOverlayStyle(
+        statusBarColor: colors.headerBackground,
         statusBarIconBrightness: Brightness.light,
         statusBarBrightness: Brightness.dark,
       ),
@@ -74,7 +76,8 @@ class HomeHeader extends StatelessWidget {
               clipBehavior: Clip.none,
               children: [
                 GestureDetector(
-                  onTap: () => context.push(RouteNames.profile),
+                  onTap:
+                      onAvatarPressed ?? () => context.push(RouteNames.profile),
                   child: Container(
                     width: 50,
                     height: 50,

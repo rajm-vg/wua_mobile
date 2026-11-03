@@ -29,8 +29,7 @@ class EnvConfig {
 
   static String get apiKey => dotenv.env['API_KEY'] ?? '';
 
-  static String get buildFlavor =>
-      dotenv.env['BUILD_FLAVOR'] ?? 'development';
+  static String get buildFlavor => dotenv.env['BUILD_FLAVOR'] ?? 'development';
 
   static int get connectTimeout =>
       int.tryParse(dotenv.env['CONNECT_TIMEOUT'] ?? '30000') ?? 30000;
@@ -45,9 +44,4 @@ class EnvConfig {
   static bool get isDevelopment => buildFlavor == 'development';
 }
 
-enum AppEnvironment {
-  development,
-  qa,
-  uat,
-  production,
-}
+enum AppEnvironment { development, qa, uat, production }

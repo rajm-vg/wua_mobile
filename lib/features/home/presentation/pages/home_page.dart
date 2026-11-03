@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wua_mobile/core/di/injection_container.dart';
 import 'package:wua_mobile/core/theme/spacing.dart';
+import 'package:wua_mobile/core/theme/theme_extensions.dart';
 import 'package:wua_mobile/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:wua_mobile/features/authentication/presentation/bloc/auth_event.dart';
 import 'package:wua_mobile/features/authentication/presentation/bloc/auth_state.dart';
@@ -37,6 +38,7 @@ class _HomePageView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         final user = state is AuthAuthenticated ? state.user : null;
@@ -46,8 +48,8 @@ class _HomePageView extends StatelessWidget {
           useSafeArea: false,
           padding: EdgeInsets.zero,
           scrollable: true,
-          systemUiOverlayStyle: const SystemUiOverlayStyle(
-            statusBarColor: Colors.transparent,
+          systemUiOverlayStyle: SystemUiOverlayStyle(
+            statusBarColor: colors.headerBackground,
             statusBarIconBrightness: Brightness.light,
             statusBarBrightness: Brightness.dark,
           ),

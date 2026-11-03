@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:wua_mobile/core/theme/spacing.dart';
 import 'package:wua_mobile/core/theme/theme_extensions.dart';
 
@@ -12,12 +11,20 @@ class MainShell extends StatelessWidget {
   final Widget child;
 
   int _calculateSelectedIndex(BuildContext context) {
-    final location = GoRouterState.of(context).matchedLocation;
-    if (location.startsWith('/bills') || location.startsWith('/transactions')) {
+    final config = GoRouter.of(context).routerDelegate.currentConfiguration;
+    final location = config.lastOrNull?.matchedLocation ?? config.uri.path;
+    final normalized = location.startsWith('/') ? location : '/$location';
+
+    if (normalized.startsWith('/bills')) {
       return 1;
     }
-    if (location.startsWith('/water-usage')) return 2;
-    if (location.startsWith('/profile')) return 3;
+    if (normalized.startsWith('/payments') ||
+        normalized.startsWith('/transactions')) {
+      return 2;
+    }
+    if (normalized.startsWith('/profile')) {
+      return 3;
+    }
     return 0; // Default to Dashboard (Home)
   }
 
@@ -30,7 +37,7 @@ class MainShell extends StatelessWidget {
         context.go('/bills');
         break;
       case 2:
-        context.go('/water-usage');
+        context.go('/payments');
         break;
       case 3:
         context.go('/profile');
@@ -40,70 +47,73 @@ class MainShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = context.colors;
-    final selectedIndex = _calculateSelectedIndex(context);
+    return ListenableBuilder(
+      listenable: GoRouter.of(context).routerDelegate,
+      builder: (context, _) {
+        final colors = context.colors;
+        final selectedIndex = _calculateSelectedIndex(context);
 
-    return Scaffold(
-      backgroundColor: colors.background,
-      extendBody: true,
-      body: child,
-      bottomNavigationBar: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.md,
-            0,
-            AppSpacing.md,
-            AppSpacing.sm,
-          ),
-          child: Container(
-            height: 64,
-            decoration: BoxDecoration(
-              color: colors.navBarBg,
-              borderRadius: BorderRadius.circular(32),
-              border: Border.all(
-                color: colors.navBarBorder,
+        return Scaffold(
+          backgroundColor: colors.background,
+          extendBody: true,
+          body: child,
+          bottomNavigationBar: SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.md,
+                0,
+                AppSpacing.md,
+                AppSpacing.sm,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: colors.navBarShadow,
-                  blurRadius: 20,
-                  offset: const Offset(0, 4),
+              child: Container(
+                height: 64,
+                decoration: BoxDecoration(
+                  color: colors.navBarBg,
+                  borderRadius: BorderRadius.circular(32),
+                  border: Border.all(color: colors.navBarBorder),
+                  boxShadow: [
+                    BoxShadow(
+                      color: colors.navBarShadow,
+                      blurRadius: 20,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _NavItem(
-                  icon: Icons.grid_view_rounded,
-                  label: 'Dashboard',
-                  isSelected: selectedIndex == 0,
-                  onTap: () => _onItemTapped(0, context),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _NavItem(
+                      icon: Icons.grid_view_rounded,
+                      label: 'Dashboard',
+                      isSelected: selectedIndex == 0,
+                      onTap: () => _onItemTapped(0, context),
+                    ),
+                    _NavItem(
+                      icon: Icons.credit_card_outlined,
+                      label: 'Bills',
+                      isSelected: selectedIndex == 1,
+                      onTap: () => _onItemTapped(1, context),
+                    ),
+                    _NavItem(
+                      icon: Icons.receipt_long_rounded,
+                      label: 'Payments',
+                      isSelected: selectedIndex == 2,
+                      onTap: () => _onItemTapped(2, context),
+                    ),
+                    _NavItem(
+                      icon: Icons.person_outline_rounded,
+                      label: 'Profile',
+                      isSelected: selectedIndex == 3,
+                      onTap: () => _onItemTapped(3, context),
+                    ),
+                  ],
                 ),
-                _NavItem(
-                  icon: Icons.credit_card_outlined,
-                  label: 'Bills',
-                  isSelected: selectedIndex == 1,
-                  onTap: () => _onItemTapped(1, context),
-                ),
-                _NavItem(
-                  icon: Icons.schedule_rounded,
-                  label: 'Schedule',
-                  isSelected: selectedIndex == 2,
-                  onTap: () => _onItemTapped(2, context),
-                ),
-                _NavItem(
-                  icon: Icons.person_outline_rounded,
-                  label: 'Profile',
-                  isSelected: selectedIndex == 3,
-                  onTap: () => _onItemTapped(3, context),
-                ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
