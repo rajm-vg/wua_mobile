@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wua_mobile/core/di/injection_container.dart';
+import 'package:wua_mobile/core/l10n/l10n.dart';
 import 'package:wua_mobile/core/theme/colors.dart';
 import 'package:wua_mobile/core/theme/spacing.dart';
 import 'package:wua_mobile/core/theme/theme_extensions.dart';
@@ -48,9 +49,11 @@ class _BillsPageViewState extends State<_BillsPageView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return WuaScaffold(
-      title: 'Pani Patti Bills',
-      subtitle: 'Water Users Association • जल उपभोक्ता संस्था',
+      title: l10n.paniPattiBills,
+      subtitle: l10n.wuaSubtitle,
       showBackButton: true,
       scrollable: false,
       padding: EdgeInsets.zero,
@@ -58,7 +61,7 @@ class _BillsPageViewState extends State<_BillsPageView> {
       maxWidth: 850.0, // Optimized for responsive tablet/desktop web display
       actions: [
         IconButton(
-          tooltip: 'Refresh Bills',
+          tooltip: l10n.refresh,
           icon: const Icon(Icons.refresh_rounded),
           onPressed: () => _onRefresh(context),
         ),

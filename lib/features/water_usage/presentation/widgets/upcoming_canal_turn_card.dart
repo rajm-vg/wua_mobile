@@ -60,12 +60,25 @@ class UpcomingCanalTurnCard extends StatelessWidget {
               style: context.caption.withColor(colors.textSecondary),
             ),
             const SizedBox(height: AppSpacing.md),
-            _PassRow(label: 'Turn Number', value: 'Turn #${turn.turnNumber} (Wari)'),
+            _PassRow(
+              label: 'Turn Number',
+              value: 'Turn #${turn.turnNumber} (Wari)',
+            ),
             _PassRow(label: 'Date', value: turn.formattedDate),
             _PassRow(label: 'Time Slot', value: turn.formattedTimeRange),
-            _PassRow(label: 'Sluice Gate & Outlet', value: '${turn.gateNo} • ${turn.outletNo}'),
-            _PassRow(label: 'Discharge Quota', value: '${turn.dischargeCusecs} Cusecs (~${turn.waterDeliveredHaCm} ha-cm)'),
-            _PassRow(label: 'Crop & Land Parcel', value: '${turn.crop} • ${turn.fieldParcel}'),
+            _PassRow(
+              label: 'Sluice Gate & Outlet',
+              value: '${turn.gateNo} • ${turn.outletNo}',
+            ),
+            _PassRow(
+              label: 'Discharge Quota',
+              value:
+                  '${turn.dischargeCusecs} Cusecs (~${turn.waterDeliveredHaCm} ha-cm)',
+            ),
+            _PassRow(
+              label: 'Crop & Land Parcel',
+              value: '${turn.crop} • ${turn.fieldParcel}',
+            ),
             _PassRow(label: 'Supervising Patkari', value: turn.inspectorName),
             const SizedBox(height: AppSpacing.lg),
             SizedBox(
@@ -99,10 +112,7 @@ class UpcomingCanalTurnCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.cardBackground,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: colors.turnCardBorder,
-          width: 1.4,
-        ),
+        border: Border.all(color: colors.turnCardBorder, width: 1.4),
         boxShadow: [
           BoxShadow(
             color: colors.cardShadow,
@@ -166,9 +176,9 @@ class UpcomingCanalTurnCard extends StatelessWidget {
                     const SizedBox(width: 4),
                     Text(
                       'In 2 Days',
-                      style: context.labelSmall.bold.withColor(
-                        colors.turnCardBadgeText,
-                      ).withSize(11),
+                      style: context.labelSmall.bold
+                          .withColor(colors.turnCardBadgeText)
+                          .withSize(11),
                     ),
                   ],
                 ),
@@ -186,7 +196,9 @@ class UpcomingCanalTurnCard extends StatelessWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF16343C) : const Color(0xFFE0F2F1),
+                  color: isDark
+                      ? const Color(0xFF16343C)
+                      : const Color(0xFFE0F2F1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(
@@ -273,7 +285,7 @@ class UpcomingCanalTurnCard extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
+                const Icon(
                   Icons.info_outline_rounded,
                   size: 15,
                   color: AppColors.harvestAmber,
@@ -368,7 +380,9 @@ class _SpecTile extends StatelessWidget {
               const SizedBox(width: 4),
               Text(
                 label,
-                style: context.caption.bold.withColor(colors.textSecondary).withSize(9.5),
+                style: context.caption.bold
+                    .withColor(colors.textSecondary)
+                    .withSize(9.5),
               ),
             ],
           ),
@@ -413,4 +427,3 @@ class _PassRow extends StatelessWidget {
     );
   }
 }
-

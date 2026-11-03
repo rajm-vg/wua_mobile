@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:wua_mobile/core/l10n/l10n.dart';
 import 'package:wua_mobile/core/theme/radius.dart';
 import 'package:wua_mobile/core/theme/spacing.dart';
 import 'package:wua_mobile/core/theme/theme_extensions.dart';
@@ -12,6 +13,7 @@ class WaterMetricsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final l10n = context.l10n;
 
     return Row(
       children: [
@@ -40,7 +42,7 @@ class WaterMetricsRow extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'WATER BALANCE',
+                      l10n.waterBalance,
                       style: context.labelSmall.bold.withColor(
                         colors.waterDropIconColor,
                       ).withSize(11),
@@ -80,7 +82,7 @@ class WaterMetricsRow extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.xxs),
                 Text(
-                  '79% used of 23,500 L',
+                  l10n.waterUsedSummary,
                   style: context.caption.withSize(11),
                 ),
               ],
@@ -115,7 +117,7 @@ class WaterMetricsRow extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'TOTAL DUES',
+                      l10n.totalDues,
                       style: context.labelSmall.bold.withColor(
                         colors.duesWarningIcon,
                       ).withSize(11),
@@ -143,7 +145,7 @@ class WaterMetricsRow extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
-                  'No late surcharge yet',
+                  l10n.noLateSurcharge,
                   style: context.caption.medium
                       .withColor(colors.duesSubtitle)
                       .withSize(11.5),

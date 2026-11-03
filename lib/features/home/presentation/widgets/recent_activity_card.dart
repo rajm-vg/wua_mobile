@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:wua_mobile/core/l10n/l10n.dart';
 import 'package:wua_mobile/core/router/route_names.dart';
 import 'package:wua_mobile/core/theme/radius.dart';
 import 'package:wua_mobile/core/theme/spacing.dart';
@@ -14,6 +15,7 @@ class RecentActivityCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final l10n = context.l10n;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -22,13 +24,13 @@ class RecentActivityCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'RECENT ACTIVITY',
+              l10n.recentActivity,
               style: context.badgeText,
             ),
             GestureDetector(
               onTap: () => context.push(RouteNames.transactions),
               child: Text(
-                'View All',
+                l10n.viewAll,
                 style: context.labelSmall.bold.withColor(
                   colors.turnCardTimelineText,
                 ),
@@ -93,7 +95,7 @@ class RecentActivityCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          '12 Oct 2024 • Paid via UPI',
+                          '12 Oct 2024 • ${l10n.paidViaUpi}',
                           style: context.caption.withSize(12),
                         ),
                       ],
@@ -123,7 +125,7 @@ class RecentActivityCard extends StatelessWidget {
                           borderRadius: AppRadius.borderRadiusFull,
                         ),
                         child: Text(
-                          'Paid',
+                          l10n.paid,
                           style: context.labelSmall.bold.withColor(
                             colors.activityPaidBadgeText,
                           ).withSize(10),

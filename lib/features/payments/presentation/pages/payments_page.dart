@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wua_mobile/core/di/injection_container.dart';
+import 'package:wua_mobile/core/l10n/l10n.dart';
 import 'package:wua_mobile/core/theme/colors.dart';
 import 'package:wua_mobile/core/theme/spacing.dart';
 import 'package:wua_mobile/core/theme/theme_extensions.dart';
@@ -49,9 +50,11 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return WuaScaffold(
-      title: 'Payment History',
-      subtitle: 'Irrigation Dues & Transactions • भरणा इतिहास',
+      title: l10n.paymentHistory,
+      subtitle: l10n.paymentSubtitle,
       showBackButton: false,
       scrollable: false,
       padding: EdgeInsets.zero,
@@ -59,7 +62,7 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
       maxWidth: 850.0,
       actions: [
         IconButton(
-          tooltip: 'Refresh Payments',
+          tooltip: l10n.refresh,
           icon: const Icon(Icons.refresh_rounded),
           onPressed: () => _onRefresh(context),
         ),

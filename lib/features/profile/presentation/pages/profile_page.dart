@@ -48,6 +48,7 @@ class _ProfilePageView extends StatelessWidget {
 
   void _showLogoutDialog(BuildContext context) {
     final colors = context.colors;
+    final l10n = context.l10n;
 
     showDialog<void>(
       context: context,
@@ -55,18 +56,18 @@ class _ProfilePageView extends StatelessWidget {
         backgroundColor: colors.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
-          'Logout',
+          l10n.logoutConfirmTitle,
           style: context.titleLarge.bold.withColor(colors.textPrimary),
         ),
         content: Text(
-          'Are you sure you want to log out of your WUA account?',
+          l10n.logoutConfirmMessage,
           style: context.bodyMedium.regular.withColor(colors.textSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
             child: Text(
-              'Cancel',
+              l10n.cancel,
               style: TextStyle(color: colors.textSecondary),
             ),
           ),
@@ -84,7 +85,7 @@ class _ProfilePageView extends StatelessWidget {
               ),
               elevation: 0,
             ),
-            child: const Text('Logout'),
+            child: Text(l10n.logout),
           ),
         ],
       ),
@@ -193,7 +194,7 @@ class _ProfilePageView extends StatelessWidget {
                         // Notifications
                         ProfileMenuItem(
                           icon: Icons.notifications_none_rounded,
-                          title: 'Notifications',
+                          title: context.l10n.notifications,
                           onTap: () {
                             try {
                               context.pushNamed(RouteNames.notifications);
@@ -206,14 +207,14 @@ class _ProfilePageView extends StatelessWidget {
                         // App Settings
                         ProfileMenuItem(
                           icon: Icons.settings_outlined,
-                          title: 'App Settings',
+                          title: context.l10n.appSettings,
                           onTap: () => AppSettingsBottomSheet.show(context),
                         ),
 
                         // Help & Support
                         ProfileMenuItem(
                           icon: Icons.help_outline_rounded,
-                          title: 'Help & Support',
+                          title: context.l10n.helpAndSupport,
                           onTap: () => HelpSupportBottomSheet.show(context),
                         ),
 
@@ -221,7 +222,7 @@ class _ProfilePageView extends StatelessWidget {
                         ProfileMenuItem(
                           icon: Icons.logout_rounded,
                           iconColor: const Color(0xFFEF4444),
-                          title: 'Logout',
+                          title: context.l10n.logout,
                           titleColor: const Color(0xFFEF4444),
                           trailing: const SizedBox.shrink(),
                           showDivider: false,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:wua_mobile/core/l10n/l10n.dart';
 import 'package:wua_mobile/core/router/route_names.dart';
 import 'package:wua_mobile/core/theme/colors.dart';
 import 'package:wua_mobile/core/theme/radius.dart';
@@ -29,30 +30,31 @@ class FarmerServicesGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final l10n = context.l10n;
 
     final services = [
-      const _ServiceItem(
-        title: 'Pay Bill',
+      _ServiceItem(
+        title: l10n.payBill,
         icon: Icons.credit_card_rounded,
         iconBgColor: AppColors.headerTeal,
         route: RouteNames.bills,
       ),
-      const _ServiceItem(
-        title: 'Canal Wari',
+      _ServiceItem(
+        title: l10n.canalWari,
         icon: Icons.schedule_rounded,
         iconBgColor: AppColors.canalGreen,
         route: RouteNames.waterUsage,
       ),
-      const _ServiceItem(
-        title: 'All Bills',
+      _ServiceItem(
+        title: l10n.allBills,
         icon: Icons.description_rounded,
-        iconBgColor: Color(0xFFE65100),
+        iconBgColor: const Color(0xFFE65100),
         route: RouteNames.bills,
       ),
-      const _ServiceItem(
-        title: 'My Farm',
+      _ServiceItem(
+        title: l10n.myFarm,
         icon: Icons.people_alt_rounded,
-        iconBgColor: Color(0xFF0288D1),
+        iconBgColor: const Color(0xFF0288D1),
         route: RouteNames.profile,
       ),
     ];
@@ -61,7 +63,7 @@ class FarmerServicesGrid extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'FARMER SERVICES',
+          l10n.farmerServices,
           style: context.badgeText,
         ),
         const SizedBox(height: AppSpacing.sm),

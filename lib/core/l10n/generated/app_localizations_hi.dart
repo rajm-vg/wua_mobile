@@ -119,6 +119,9 @@ class AppLocalizationsHi extends AppLocalizations {
   String get english => 'English';
 
   @override
+  String get marathi => 'मराठी';
+
+  @override
   String get hindi => 'हिन्दी';
 
   @override
@@ -194,4 +197,182 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get somethingWentWrong => 'कुछ गलत हो गया';
+
+  @override
+  String get goodMorning => 'शुभ प्रभात';
+
+  @override
+  String get goodAfternoon => 'शुभ दोपहर';
+
+  @override
+  String get goodEvening => 'शुभ संध्या';
+
+  @override
+  String get helloUser => 'नमस्ते किसान';
+
+  @override
+  String get gatNoMulshi => 'गट सं. 142 • मुल्शी डब्ल्यू.यू.ए.';
+
+  @override
+  String get nextCanalTurnTitle => 'अगला नहर चक्र • वारी';
+
+  @override
+  String get inDays => '2 दिनों में';
+
+  @override
+  String get timeline => 'समय-सारणी';
+
+  @override
+  String get gateNumber => 'गेट सं. 4';
+
+  @override
+  String get outletFlow => 'आउटलेट सं. 12 • 50 क्यूसेक प्रवाह';
+
+  @override
+  String get turnDuration => 'प्रातः 08:00 – सायं 08:00 (12 घंटे)';
+
+  @override
+  String get waterBalance => 'जल संतुलन';
+
+  @override
+  String get totalDues => 'कुल बकाया';
+
+  @override
+  String get waterUsedSummary => '23,500 L में से 79% उपयोग';
+
+  @override
+  String get noLateSurcharge => 'अभी कोई विलंब शुल्क नहीं';
+
+  @override
+  String get currentPaniPattiBill => 'वर्तमान पानी पट्टी बिल';
+
+  @override
+  String get rabiSeason => 'रबी मौसम (2024-25)';
+
+  @override
+  String get kharifSeason => 'खरीफ मौसम (2024-25)';
+
+  @override
+  String get due25Nov => '25 नवंबर तक देय';
+
+  @override
+  String get waterPerAcreLand => '4.5 एकड़ भूमि हेतु 18,500 L जल';
+
+  @override
+  String get payViaUpi => 'UPI द्वारा भुगतान करें';
+
+  @override
+  String get baseWater => 'मूल जल प्रभार';
+
+  @override
+  String get govtCessTax => 'सरकारी उपकर व कर';
+
+  @override
+  String get wuaMaintenance => 'संस्था रखरखाव';
+
+  @override
+  String get farmerServices => 'किसान सेवाएं';
+
+  @override
+  String get payBill => 'बिल भुगतान';
+
+  @override
+  String get canalWari => 'नहर वारी';
+
+  @override
+  String get allBills => 'सभी बिल';
+
+  @override
+  String get myFarm => 'मेरा खेत';
+
+  @override
+  String get recentActivity => 'हालिया गतिविधियां';
+
+  @override
+  String get viewAll => 'सभी देखें';
+
+  @override
+  String get paidViaUpi => 'UPI द्वारा भुगतान किया';
+
+  @override
+  String get navDashboard => 'डैशबोर्ड';
+
+  @override
+  String get navBills => 'बिल';
+
+  @override
+  String get navPayments => 'भुगतान';
+
+  @override
+  String get navProfile => 'प्रोफ़ाइल';
+
+  @override
+  String get waterQuotaOverview => 'जल कोटा और नहर आबंटन';
+
+  @override
+  String get rotationalCanalTurns => 'चक्रीय नहर चक्र • वारी';
+
+  @override
+  String get cropConsumption => 'फसलवार जल उपभोग';
+
+  @override
+  String get upcomingTurn => 'आगामी सिंचाई चक्र';
+
+  @override
+  String get requestTurnSwap => 'वारी अदला-बदली अनुरोध';
+
+  @override
+  String get canalHelpline => 'नहर नियंत्रण व वारी हेल्पलाइन';
+
+  @override
+  String get failedToLoadWater => 'जल उपयोग लोड करने में विफल';
+
+  @override
+  String get noTurnsFound => 'कोई चक्र नहीं मिला';
+
+  @override
+  String get paniPattiBills => 'पानी पट्टी बिल';
+
+  @override
+  String get wuaSubtitle => 'जल उपभोक्ता संस्था • नियामक प्राधिकरण';
+
+  @override
+  String get paymentHistory => 'भुगतान इतिहास';
+
+  @override
+  String get paymentSubtitle => 'सिंचाई बकाया और लेन-देन इतिहास';
+
+  @override
+  String get filterAll => 'सभी';
+
+  @override
+  String get filterPending => 'लंबित';
+
+  @override
+  String get filterOverdue => 'अतिदेय';
+
+  @override
+  String get filterPaid => 'भुगतान पूर्ण';
+
+  @override
+  String get downloadReceipt => 'रसीद डाउनलोड करें';
+
+  @override
+  String get markAllAsRead => 'सभी को पढ़ा हुआ चिह्नित करें';
+
+  @override
+  String get unread => 'अपठित';
+
+  @override
+  String get appSettings => 'ऐप सेटिंग्स';
+
+  @override
+  String get helpAndSupport => 'सहायता और समर्थन';
+
+  @override
+  String get logoutConfirmTitle => 'लॉग आउट करें';
+
+  @override
+  String get logoutConfirmMessage =>
+      'क्या आप निश्चित रूप से अपने खाते से लॉग आउट करना चाहते हैं?';
 }

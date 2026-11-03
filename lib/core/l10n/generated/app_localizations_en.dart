@@ -119,6 +119,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get english => 'English';
 
   @override
+  String get marathi => 'Marathi';
+
+  @override
   String get hindi => 'Hindi';
 
   @override
@@ -193,4 +196,182 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get somethingWentWrong => 'Something went wrong';
+
+  @override
+  String get goodMorning => 'Good Morning';
+
+  @override
+  String get goodAfternoon => 'Good Afternoon';
+
+  @override
+  String get goodEvening => 'Good Evening';
+
+  @override
+  String get helloUser => 'Hello User';
+
+  @override
+  String get gatNoMulshi => 'Gat No. 142 • Mulshi WUA';
+
+  @override
+  String get nextCanalTurnTitle => 'NEXT CANAL TURN • WARI';
+
+  @override
+  String get inDays => 'In 2 Days';
+
+  @override
+  String get timeline => 'Timeline';
+
+  @override
+  String get gateNumber => 'Gate #4';
+
+  @override
+  String get outletFlow => 'Outlet No. 12 • 50 Cusecs Flow';
+
+  @override
+  String get turnDuration => '08:00 AM – 08:00 PM (12 Hours)';
+
+  @override
+  String get waterBalance => 'WATER BALANCE';
+
+  @override
+  String get totalDues => 'TOTAL DUES';
+
+  @override
+  String get waterUsedSummary => '79% used of 23,500 L';
+
+  @override
+  String get noLateSurcharge => 'No late surcharge yet';
+
+  @override
+  String get currentPaniPattiBill => 'CURRENT PANI PATTI BILL';
+
+  @override
+  String get rabiSeason => 'Rabi Season (2024-25)';
+
+  @override
+  String get kharifSeason => 'Kharif Season (2024-25)';
+
+  @override
+  String get due25Nov => 'Due 25 Nov';
+
+  @override
+  String get waterPerAcreLand => '18,500 L water for 4.5 Acres land';
+
+  @override
+  String get payViaUpi => 'Pay via UPI';
+
+  @override
+  String get baseWater => 'Base Water';
+
+  @override
+  String get govtCessTax => 'Govt Cess & Tax';
+
+  @override
+  String get wuaMaintenance => 'WUA Maintenance';
+
+  @override
+  String get farmerServices => 'FARMER SERVICES';
+
+  @override
+  String get payBill => 'Pay Bill';
+
+  @override
+  String get canalWari => 'Canal Wari';
+
+  @override
+  String get allBills => 'All Bills';
+
+  @override
+  String get myFarm => 'My Farm';
+
+  @override
+  String get recentActivity => 'RECENT ACTIVITY';
+
+  @override
+  String get viewAll => 'View All';
+
+  @override
+  String get paidViaUpi => 'Paid via UPI';
+
+  @override
+  String get navDashboard => 'Dashboard';
+
+  @override
+  String get navBills => 'Bills';
+
+  @override
+  String get navPayments => 'Payments';
+
+  @override
+  String get navProfile => 'Profile';
+
+  @override
+  String get waterQuotaOverview => 'Water Quota & Canal Allocation';
+
+  @override
+  String get rotationalCanalTurns => 'ROTATIONAL CANAL TURNS • वारी';
+
+  @override
+  String get cropConsumption => 'Crop Consumption Breakdown';
+
+  @override
+  String get upcomingTurn => 'Upcoming Irrigation Turn';
+
+  @override
+  String get requestTurnSwap => 'Request Turn Swap';
+
+  @override
+  String get canalHelpline => 'Canal Control & Wari Helpline';
+
+  @override
+  String get failedToLoadWater => 'Failed to load water usage';
+
+  @override
+  String get noTurnsFound => 'No turns match the selected filter';
+
+  @override
+  String get paniPattiBills => 'Pani Patti Bills';
+
+  @override
+  String get wuaSubtitle => 'Water Users Association • जल उपभोक्ता संस्था';
+
+  @override
+  String get paymentHistory => 'Payment History';
+
+  @override
+  String get paymentSubtitle => 'Irrigation Dues & Transactions • भरणा इतिहास';
+
+  @override
+  String get filterAll => 'All';
+
+  @override
+  String get filterPending => 'Pending';
+
+  @override
+  String get filterOverdue => 'Overdue';
+
+  @override
+  String get filterPaid => 'Paid';
+
+  @override
+  String get downloadReceipt => 'Download Receipt';
+
+  @override
+  String get markAllAsRead => 'Mark all as read';
+
+  @override
+  String get unread => 'Unread';
+
+  @override
+  String get appSettings => 'App Settings';
+
+  @override
+  String get helpAndSupport => 'Help & Support';
+
+  @override
+  String get logoutConfirmTitle => 'Logout';
+
+  @override
+  String get logoutConfirmMessage =>
+      'Are you sure you want to log out of your WUA account?';
 }

@@ -6,6 +6,7 @@ import 'package:wua_mobile/core/storage/secure_storage_service.dart';
 import 'package:wua_mobile/features/authentication/authentication.dart';
 import 'package:wua_mobile/features/bills/bills.dart';
 import 'package:wua_mobile/features/home/home.dart';
+import 'package:wua_mobile/features/notifications/notifications.dart';
 import 'package:wua_mobile/features/payments/payments.dart';
 import 'package:wua_mobile/features/profile/profile.dart';
 import 'package:wua_mobile/features/splash/splash.dart';
@@ -146,8 +147,7 @@ class AppRouter {
               GoRoute(
                 path: 'notifications',
                 name: RouteNames.notifications,
-                builder: (context, state) =>
-                    const _PlaceholderPage(title: 'Notifications'),
+                builder: (context, state) => const NotificationsPage(),
               ),
 
               // Water Usage

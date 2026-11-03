@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:wua_mobile/core/l10n/l10n.dart';
 import 'package:wua_mobile/core/router/route_names.dart';
 import 'package:wua_mobile/core/theme/radius.dart';
 import 'package:wua_mobile/core/theme/spacing.dart';
@@ -14,6 +15,7 @@ class NextCanalTurnCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final l10n = context.l10n;
 
     return Container(
       decoration: BoxDecoration(
@@ -51,7 +53,7 @@ class NextCanalTurnCard extends StatelessWidget {
                   ),
                   const SizedBox(width: AppSpacing.xs),
                   Text(
-                    'NEXT CANAL TURN • WARI',
+                    l10n.nextCanalTurnTitle,
                     style: context.labelMedium.extraBold.withColor(
                       colors.turnCardTitle,
                     ),
@@ -68,7 +70,7 @@ class NextCanalTurnCard extends StatelessWidget {
                   borderRadius: AppRadius.borderRadiusFull,
                 ),
                 child: Text(
-                  'In 2 Days',
+                  l10n.inDays,
                   style: context.labelSmall.bold.withColor(
                     colors.turnCardBadgeText,
                   ).withSize(11),
@@ -125,7 +127,7 @@ class NextCanalTurnCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Timeline',
+                      l10n.timeline,
                       style: context.labelSmall.bold.withColor(
                         colors.turnCardTimelineText,
                       ),
@@ -154,7 +156,7 @@ class NextCanalTurnCard extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.xs),
               Text(
-                '08:00 AM – 08:00 PM (12 Hours)',
+                l10n.turnDuration,
                 style: context.bodyMedium.medium.withColor(
                   colors.textPrimary,
                 ),
@@ -179,7 +181,7 @@ class NextCanalTurnCard extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  'Gate  #4',
+                  l10n.gateNumber,
                   style: context.labelSmall.bold.withColor(
                     colors.textPrimary,
                   ),
@@ -188,7 +190,7 @@ class NextCanalTurnCard extends StatelessWidget {
               const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(
-                  'Outlet No. 12 • 50 Cusecs Flow',
+                  l10n.outletFlow,
                   style: context.caption.medium.withColor(
                     colors.textSecondary,
                   ),

@@ -5,7 +5,9 @@ import 'package:wua_mobile/features/water_usage/data/models/water_usage_model.da
 import 'package:wua_mobile/features/water_usage/domain/entities/water_usage_entity.dart';
 
 abstract class WaterUsageRemoteDataSource {
-  Future<WaterUsageSummaryModel> getWaterUsageSummary({bool forceRefresh = false});
+  Future<WaterUsageSummaryModel> getWaterUsageSummary({
+    bool forceRefresh = false,
+  });
   Future<IrrigationTurnModel> getTurnById(String turnId);
   Future<bool> requestTurnSwap({
     required String turnId,
@@ -21,7 +23,7 @@ class WaterUsageRemoteDataSourceImpl implements WaterUsageRemoteDataSource {
   final ApiClient apiClient;
 
   // In-memory simulated stateful store matching home page widgets
-  late WaterQuotaModel _mockQuota = WaterQuotaModel(
+  late final WaterQuotaModel _mockQuota = WaterQuotaModel(
     season: 'Rabi Season (2024-25)',
     totalQuotaHaCm: 20.0,
     usedQuotaHaCm: 14.2,
@@ -65,7 +67,7 @@ class WaterUsageRemoteDataSourceImpl implements WaterUsageRemoteDataSource {
     ],
   );
 
-  late List<IrrigationTurnModel> _mockTurns = [
+  late final List<IrrigationTurnModel> _mockTurns = [
     // Turn 4: Upcoming / Next active wari (matches NextCanalTurnCard on home)
     IrrigationTurnModel(
       id: 'turn_rabi_04',
@@ -83,8 +85,7 @@ class WaterUsageRemoteDataSourceImpl implements WaterUsageRemoteDataSource {
       fieldParcel: 'Survey No. 42/1A (3.5 Acres)',
       inspectorName: 'S. K. Deshmukh (Patkari)',
       isVerified: false,
-      notes:
-          'Sluice gate will open at 08:00 AM sharp. Please verify sub-minor field channels (चार्या) are desilted and clear of weeds.',
+      notes: 'Sluice gate will open at 08:00 AM sharp. Please verify sub-minor field channels (चार्या) are desilted and clear of weeds.',
       canRequestSwap: true,
     ),
 
@@ -128,7 +129,8 @@ class WaterUsageRemoteDataSourceImpl implements WaterUsageRemoteDataSource {
       fieldParcel: 'Survey No. 42/1A (3.5 Acres)',
       inspectorName: 'S. K. Deshmukh (Patkari)',
       isVerified: true,
-      notes: 'Flow maintained consistently at 50 Cusecs. Water delivery verified.',
+      notes:
+          'Flow maintained consistently at 50 Cusecs. Water delivery verified.',
       canRequestSwap: false,
     ),
 
@@ -247,7 +249,9 @@ class WaterUsageRemoteDataSourceImpl implements WaterUsageRemoteDataSource {
         return true;
       }
     } catch (e) {
-      AppLogger.warning('Turn swap API failed ($e), executing local mock swap.');
+      AppLogger.warning(
+        'Turn swap API failed ($e), executing local mock swap.',
+      );
     }
 
     // Local simulated update
@@ -260,7 +264,9 @@ class WaterUsageRemoteDataSourceImpl implements WaterUsageRemoteDataSource {
         season: old.season,
         status: TurnStatus.swapped,
         scheduledStartTime: preferredDate,
-        scheduledEndTime: preferredDate.add(Duration(hours: old.durationHours.toInt())),
+        scheduledEndTime: preferredDate.add(
+          Duration(hours: old.durationHours.toInt()),
+        ),
         durationHours: old.durationHours,
         outletNo: old.outletNo,
         gateNo: old.gateNo,
@@ -277,4 +283,3 @@ class WaterUsageRemoteDataSourceImpl implements WaterUsageRemoteDataSource {
     return true;
   }
 }
-

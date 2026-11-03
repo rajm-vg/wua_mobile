@@ -38,7 +38,7 @@ void main() {
             body: Center(
               child: LanguageToggle(
                 firstLabel: 'English',
-                secondLabel: 'हिन्दी',
+                secondLabel: 'मराठी',
                 isSecondActive: false,
                 onChanged: (selected) {
                   isSecondSelected = selected;
@@ -51,15 +51,15 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('English'), findsOneWidget);
-      expect(find.text('हिन्दी'), findsOneWidget);
+      expect(find.text('मराठी'), findsOneWidget);
 
-      await tester.tap(find.text('हिन्दी'));
+      await tester.tap(find.text('मराठी'));
       await tester.pumpAndSettle();
 
       expect(isSecondSelected, isTrue);
     });
 
-    testWidgets('toggles appLocaleNotifier when tapped without explicit callback', (
+    testWidgets('toggles appLocaleNotifier to mr and en when tapped', (
       tester,
     ) async {
       appLocaleNotifier.value = const Locale('en');
@@ -77,7 +77,7 @@ void main() {
                 body: Center(
                   child: LanguageToggle(
                     firstLabel: 'En',
-                    secondLabel: 'HI',
+                    secondLabel: 'MR',
                   ),
                 ),
               ),
@@ -88,15 +88,15 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('En'), findsOneWidget);
-      expect(find.text('HI'), findsOneWidget);
+      expect(find.text('MR'), findsOneWidget);
 
-      // Tap second language
-      await tester.tap(find.text('HI'));
+      // Tap second language (MR -> Marathi)
+      await tester.tap(find.text('MR'));
       await tester.pumpAndSettle();
 
-      expect(appLocaleNotifier.value?.languageCode, 'hi');
+      expect(appLocaleNotifier.value?.languageCode, 'mr');
 
-      // Tap first language
+      // Tap first language (En -> English)
       await tester.tap(find.text('En'));
       await tester.pumpAndSettle();
 
@@ -123,7 +123,7 @@ void main() {
 
       expect(find.text('En'), findsNWidgets(2));
       expect(find.text('MR'), findsOneWidget);
-      expect(find.text('हिन्दी'), findsOneWidget);
+      expect(find.text('मराठी'), findsOneWidget);
     });
   });
 }

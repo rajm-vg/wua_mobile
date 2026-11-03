@@ -30,11 +30,14 @@ void main() {
 
     test('formattedDate and formattedTimeRange format properly', () {
       expect(tTurn.formattedDate, equals('Saturday, 31 Oct 2026'));
-      expect(tTurn.formattedTimeRange, contains('08:00 AM – 08:00 PM (12 Hours)'));
+      expect(
+        tTurn.formattedTimeRange,
+        contains('08:00 AM – 08:00 PM (12 Hours)'),
+      );
     });
 
     test('WaterQuotaEntity calculated properties', () {
-      final quota = WaterQuotaEntity(
+      const quota = WaterQuotaEntity(
         season: 'Rabi 2024-25',
         totalQuotaHaCm: 20.0,
         usedQuotaHaCm: 14.2,
@@ -48,13 +51,13 @@ void main() {
         farmerName: 'Ramesh',
         totalTurnsCount: 5,
         completedTurnsCount: 3,
-        cropBreakdown: const [],
+        cropBreakdown: [],
       );
 
       expect(quota.isNearLimit, isFalse);
       expect(quota.isLimitExceeded, isFalse);
 
-      final nearLimitQuota = WaterQuotaEntity(
+      const nearLimitQuota = WaterQuotaEntity(
         season: 'Rabi 2024-25',
         totalQuotaHaCm: 20.0,
         usedQuotaHaCm: 18.0,
@@ -68,7 +71,7 @@ void main() {
         farmerName: 'Ramesh',
         totalTurnsCount: 5,
         completedTurnsCount: 4,
-        cropBreakdown: const [],
+        cropBreakdown: [],
       );
 
       expect(nearLimitQuota.isNearLimit, isTrue);
@@ -76,4 +79,3 @@ void main() {
     });
   });
 }
-

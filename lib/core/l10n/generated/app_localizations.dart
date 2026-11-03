@@ -7,6 +7,7 @@ import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_en.dart';
 import 'app_localizations_hi.dart';
+import 'app_localizations_mr.dart';
 
 // ignore_for_file: type=lint
 
@@ -96,6 +97,7 @@ abstract class AppLocalizations {
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
     Locale('hi'),
+    Locale('mr'),
   ];
 
   /// The title of the application
@@ -314,6 +316,12 @@ abstract class AppLocalizations {
   /// **'English'**
   String get english;
 
+  /// No description provided for @marathi.
+  ///
+  /// In en, this message translates to:
+  /// **'Marathi'**
+  String get marathi;
+
   /// No description provided for @hindi.
   ///
   /// In en, this message translates to:
@@ -463,6 +471,360 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Something went wrong'**
   String get somethingWentWrong;
+
+  /// No description provided for @goodMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Good Morning'**
+  String get goodMorning;
+
+  /// No description provided for @goodAfternoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Good Afternoon'**
+  String get goodAfternoon;
+
+  /// No description provided for @goodEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'Good Evening'**
+  String get goodEvening;
+
+  /// No description provided for @helloUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello User'**
+  String get helloUser;
+
+  /// No description provided for @gatNoMulshi.
+  ///
+  /// In en, this message translates to:
+  /// **'Gat No. 142 • Mulshi WUA'**
+  String get gatNoMulshi;
+
+  /// No description provided for @nextCanalTurnTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'NEXT CANAL TURN • WARI'**
+  String get nextCanalTurnTitle;
+
+  /// No description provided for @inDays.
+  ///
+  /// In en, this message translates to:
+  /// **'In 2 Days'**
+  String get inDays;
+
+  /// No description provided for @timeline.
+  ///
+  /// In en, this message translates to:
+  /// **'Timeline'**
+  String get timeline;
+
+  /// No description provided for @gateNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Gate #4'**
+  String get gateNumber;
+
+  /// No description provided for @outletFlow.
+  ///
+  /// In en, this message translates to:
+  /// **'Outlet No. 12 • 50 Cusecs Flow'**
+  String get outletFlow;
+
+  /// No description provided for @turnDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'08:00 AM – 08:00 PM (12 Hours)'**
+  String get turnDuration;
+
+  /// No description provided for @waterBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'WATER BALANCE'**
+  String get waterBalance;
+
+  /// No description provided for @totalDues.
+  ///
+  /// In en, this message translates to:
+  /// **'TOTAL DUES'**
+  String get totalDues;
+
+  /// No description provided for @waterUsedSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'79% used of 23,500 L'**
+  String get waterUsedSummary;
+
+  /// No description provided for @noLateSurcharge.
+  ///
+  /// In en, this message translates to:
+  /// **'No late surcharge yet'**
+  String get noLateSurcharge;
+
+  /// No description provided for @currentPaniPattiBill.
+  ///
+  /// In en, this message translates to:
+  /// **'CURRENT PANI PATTI BILL'**
+  String get currentPaniPattiBill;
+
+  /// No description provided for @rabiSeason.
+  ///
+  /// In en, this message translates to:
+  /// **'Rabi Season (2024-25)'**
+  String get rabiSeason;
+
+  /// No description provided for @kharifSeason.
+  ///
+  /// In en, this message translates to:
+  /// **'Kharif Season (2024-25)'**
+  String get kharifSeason;
+
+  /// No description provided for @due25Nov.
+  ///
+  /// In en, this message translates to:
+  /// **'Due 25 Nov'**
+  String get due25Nov;
+
+  /// No description provided for @waterPerAcreLand.
+  ///
+  /// In en, this message translates to:
+  /// **'18,500 L water for 4.5 Acres land'**
+  String get waterPerAcreLand;
+
+  /// No description provided for @payViaUpi.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay via UPI'**
+  String get payViaUpi;
+
+  /// No description provided for @baseWater.
+  ///
+  /// In en, this message translates to:
+  /// **'Base Water'**
+  String get baseWater;
+
+  /// No description provided for @govtCessTax.
+  ///
+  /// In en, this message translates to:
+  /// **'Govt Cess & Tax'**
+  String get govtCessTax;
+
+  /// No description provided for @wuaMaintenance.
+  ///
+  /// In en, this message translates to:
+  /// **'WUA Maintenance'**
+  String get wuaMaintenance;
+
+  /// No description provided for @farmerServices.
+  ///
+  /// In en, this message translates to:
+  /// **'FARMER SERVICES'**
+  String get farmerServices;
+
+  /// No description provided for @payBill.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay Bill'**
+  String get payBill;
+
+  /// No description provided for @canalWari.
+  ///
+  /// In en, this message translates to:
+  /// **'Canal Wari'**
+  String get canalWari;
+
+  /// No description provided for @allBills.
+  ///
+  /// In en, this message translates to:
+  /// **'All Bills'**
+  String get allBills;
+
+  /// No description provided for @myFarm.
+  ///
+  /// In en, this message translates to:
+  /// **'My Farm'**
+  String get myFarm;
+
+  /// No description provided for @recentActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'RECENT ACTIVITY'**
+  String get recentActivity;
+
+  /// No description provided for @viewAll.
+  ///
+  /// In en, this message translates to:
+  /// **'View All'**
+  String get viewAll;
+
+  /// No description provided for @paidViaUpi.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid via UPI'**
+  String get paidViaUpi;
+
+  /// No description provided for @navDashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Dashboard'**
+  String get navDashboard;
+
+  /// No description provided for @navBills.
+  ///
+  /// In en, this message translates to:
+  /// **'Bills'**
+  String get navBills;
+
+  /// No description provided for @navPayments.
+  ///
+  /// In en, this message translates to:
+  /// **'Payments'**
+  String get navPayments;
+
+  /// No description provided for @navProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get navProfile;
+
+  /// No description provided for @waterQuotaOverview.
+  ///
+  /// In en, this message translates to:
+  /// **'Water Quota & Canal Allocation'**
+  String get waterQuotaOverview;
+
+  /// No description provided for @rotationalCanalTurns.
+  ///
+  /// In en, this message translates to:
+  /// **'ROTATIONAL CANAL TURNS • वारी'**
+  String get rotationalCanalTurns;
+
+  /// No description provided for @cropConsumption.
+  ///
+  /// In en, this message translates to:
+  /// **'Crop Consumption Breakdown'**
+  String get cropConsumption;
+
+  /// No description provided for @upcomingTurn.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming Irrigation Turn'**
+  String get upcomingTurn;
+
+  /// No description provided for @requestTurnSwap.
+  ///
+  /// In en, this message translates to:
+  /// **'Request Turn Swap'**
+  String get requestTurnSwap;
+
+  /// No description provided for @canalHelpline.
+  ///
+  /// In en, this message translates to:
+  /// **'Canal Control & Wari Helpline'**
+  String get canalHelpline;
+
+  /// No description provided for @failedToLoadWater.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load water usage'**
+  String get failedToLoadWater;
+
+  /// No description provided for @noTurnsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No turns match the selected filter'**
+  String get noTurnsFound;
+
+  /// No description provided for @paniPattiBills.
+  ///
+  /// In en, this message translates to:
+  /// **'Pani Patti Bills'**
+  String get paniPattiBills;
+
+  /// No description provided for @wuaSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Water Users Association • जल उपभोक्ता संस्था'**
+  String get wuaSubtitle;
+
+  /// No description provided for @paymentHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment History'**
+  String get paymentHistory;
+
+  /// No description provided for @paymentSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Irrigation Dues & Transactions • भरणा इतिहास'**
+  String get paymentSubtitle;
+
+  /// No description provided for @filterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get filterAll;
+
+  /// No description provided for @filterPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get filterPending;
+
+  /// No description provided for @filterOverdue.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue'**
+  String get filterOverdue;
+
+  /// No description provided for @filterPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid'**
+  String get filterPaid;
+
+  /// No description provided for @downloadReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Download Receipt'**
+  String get downloadReceipt;
+
+  /// No description provided for @markAllAsRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark all as read'**
+  String get markAllAsRead;
+
+  /// No description provided for @unread.
+  ///
+  /// In en, this message translates to:
+  /// **'Unread'**
+  String get unread;
+
+  /// No description provided for @appSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'App Settings'**
+  String get appSettings;
+
+  /// No description provided for @helpAndSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Help & Support'**
+  String get helpAndSupport;
+
+  /// No description provided for @logoutConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout'**
+  String get logoutConfirmTitle;
+
+  /// No description provided for @logoutConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to log out of your WUA account?'**
+  String get logoutConfirmMessage;
 }
 
 class _AppLocalizationsDelegate
@@ -476,7 +838,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en', 'hi'].contains(locale.languageCode);
+      <String>['en', 'hi', 'mr'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -489,6 +851,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsEn();
     case 'hi':
       return AppLocalizationsHi();
+    case 'mr':
+      return AppLocalizationsMr();
   }
 
   throw FlutterError(

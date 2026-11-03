@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
+import 'package:wua_mobile/core/l10n/l10n.dart';
 import 'package:wua_mobile/core/router/route_names.dart';
 import 'package:wua_mobile/core/theme/radius.dart';
 import 'package:wua_mobile/core/theme/spacing.dart';
@@ -14,14 +14,13 @@ class PaniPattiBillCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final l10n = context.l10n;
 
     return Container(
       decoration: BoxDecoration(
         color: colors.cardBackground,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: colors.cardBorder,
-        ),
+        border: Border.all(color: colors.cardBorder),
         boxShadow: [
           BoxShadow(
             color: colors.cardShadow,
@@ -42,13 +41,10 @@ class PaniPattiBillCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'CURRENT PANI PATTI BILL',
-                    style: context.badgeText,
-                  ),
+                  Text(l10n.currentPaniPattiBill, style: context.badgeText),
                   const SizedBox(height: 2),
                   Text(
-                    'Rabi Season (2024-25)',
+                    l10n.rabiSeason,
                     style: context.titleSmall.bold.withColor(
                       colors.textPrimary,
                     ),
@@ -65,7 +61,7 @@ class PaniPattiBillCard extends StatelessWidget {
                   borderRadius: AppRadius.borderRadiusFull,
                 ),
                 child: Text(
-                  'Due 25 Nov',
+                  l10n.due25Nov,
                   style: context.labelSmall.bold.withColor(
                     colors.billBadgeText,
                   ),
@@ -87,13 +83,13 @@ class PaniPattiBillCard extends StatelessWidget {
                 children: [
                   Text(
                     '₹ 1,240',
-                    style: context.headlineLarge.bold.withColor(
-                      colors.textPrimary,
-                    ).withSize(32),
+                    style: context.headlineLarge.bold
+                        .withColor(colors.textPrimary)
+                        .withSize(32),
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '18,500 L water for 4.5 Acres land',
+                    l10n.waterPerAcreLand,
                     style: context.caption.withSize(11.5),
                   ),
                 ],
@@ -118,10 +114,7 @@ class PaniPattiBillCard extends StatelessWidget {
                 label: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      'Pay via UPI',
-                      style: context.labelMedium.bold.white,
-                    ),
+                    Text(l10n.payViaUpi, style: context.labelMedium.bold.white),
                     const SizedBox(width: 4),
                     const Icon(Icons.arrow_forward_rounded, size: 14),
                   ],
@@ -131,10 +124,7 @@ class PaniPattiBillCard extends StatelessWidget {
           ),
 
           const SizedBox(height: AppSpacing.md),
-          Divider(
-            color: colors.billDivider,
-            height: 1,
-          ),
+          Divider(color: colors.billDivider, height: 1),
           const SizedBox(height: AppSpacing.sm),
 
           // 3-Column Cost Breakdown
@@ -143,27 +133,19 @@ class PaniPattiBillCard extends StatelessWidget {
             children: [
               _buildBreakdownColumn(
                 context,
-                title: 'Base Water',
+                title: l10n.baseWater,
                 amount: '₹ 1,110',
               ),
-              Container(
-                height: 24,
-                width: 1,
-                color: colors.billDivider,
-              ),
+              Container(height: 24, width: 1, color: colors.billDivider),
               _buildBreakdownColumn(
                 context,
-                title: 'Govt Cess & Tax',
+                title: l10n.govtCessTax,
                 amount: '₹ 90',
               ),
-              Container(
-                height: 24,
-                width: 1,
-                color: colors.billDivider,
-              ),
+              Container(height: 24, width: 1, color: colors.billDivider),
               _buildBreakdownColumn(
                 context,
-                title: 'WUA Maintenance',
+                title: l10n.wuaMaintenance,
                 amount: '₹ 40',
               ),
             ],
@@ -180,16 +162,11 @@ class PaniPattiBillCard extends StatelessWidget {
   }) {
     return Column(
       children: [
-        Text(
-          title,
-          style: context.caption.withSize(11),
-        ),
+        Text(title, style: context.caption.withSize(11)),
         const SizedBox(height: 2),
         Text(
           amount,
-          style: context.labelMedium.bold.withColor(
-            context.colors.textPrimary,
-          ),
+          style: context.labelMedium.bold.withColor(context.colors.textPrimary),
         ),
       ],
     );

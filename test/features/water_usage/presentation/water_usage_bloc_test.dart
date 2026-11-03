@@ -12,7 +12,8 @@ import 'package:wua_mobile/features/water_usage/presentation/bloc/water_usage_st
 
 class MockGetWaterUsageUseCase extends Mock implements GetWaterUsageUseCase {}
 
-class MockRequestTurnSwapUseCase extends Mock implements RequestTurnSwapUseCase {}
+class MockRequestTurnSwapUseCase extends Mock
+    implements RequestTurnSwapUseCase {}
 
 void main() {
   late MockGetWaterUsageUseCase mockGetWaterUsageUseCase;
@@ -75,7 +76,7 @@ void main() {
     fieldParcel: 'Survey 42/1A',
   );
 
-  final tQuota = WaterQuotaEntity(
+  const tQuota = WaterQuotaEntity(
     season: 'Rabi 2024-25',
     totalQuotaHaCm: 20.0,
     usedQuotaHaCm: 14.2,
@@ -89,7 +90,7 @@ void main() {
     farmerName: 'Ramesh',
     totalTurnsCount: 5,
     completedTurnsCount: 3,
-    cropBreakdown: const [],
+    cropBreakdown: [],
   );
 
   final tSummary = WaterUsageSummaryEntity(
@@ -105,9 +106,8 @@ void main() {
   blocTest<WaterUsageBloc, WaterUsageState>(
     'emits [WaterUsageLoading, WaterUsageLoaded] on successful LoadWaterUsageEvent',
     build: () {
-      when(() => mockGetWaterUsageUseCase(any())).thenAnswer(
-        (_) async => Right(tSummary),
-      );
+      when(() => mockGetWaterUsageUseCase(any()))
+          .thenAnswer((_) async => Right(tSummary));
       return bloc;
     },
     act: (bloc) => bloc.add(const LoadWaterUsageEvent()),
@@ -139,9 +139,8 @@ void main() {
   blocTest<WaterUsageBloc, WaterUsageState>(
     'filters turns by status correctly when FilterTurnsByStatusEvent is added',
     build: () {
-      when(() => mockGetWaterUsageUseCase(any())).thenAnswer(
-        (_) async => Right(tSummary),
-      );
+      when(() => mockGetWaterUsageUseCase(any()))
+          .thenAnswer((_) async => Right(tSummary));
       return bloc;
     },
     seed: () => WaterUsageLoaded(
@@ -159,4 +158,3 @@ void main() {
     ],
   );
 }
-

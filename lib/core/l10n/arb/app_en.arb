@@ -42,6 +42,7 @@
   "settings": "Settings",
   "language": "Language",
   "english": "English",
+  "marathi": "Marathi",
   "hindi": "Hindi",
 
   "bills": "Bills",
@@ -71,5 +72,75 @@
   "networkError": "No internet connection. Please check your network.",
   "serverError": "Server error. Please try again later.",
   "timeoutError": "Request timed out. Please try again.",
-  "somethingWentWrong": "Something went wrong"
+  "somethingWentWrong": "Something went wrong",
+
+  "goodMorning": "Good Morning",
+  "goodAfternoon": "Good Afternoon",
+  "goodEvening": "Good Evening",
+  "helloUser": "Hello User",
+  "gatNoMulshi": "Gat No. 142 • Mulshi WUA",
+
+  "nextCanalTurnTitle": "NEXT CANAL TURN • WARI",
+  "inDays": "In 2 Days",
+  "timeline": "Timeline",
+  "gateNumber": "Gate #4",
+  "outletFlow": "Outlet No. 12 • 50 Cusecs Flow",
+  "turnDuration": "08:00 AM – 08:00 PM (12 Hours)",
+
+  "waterBalance": "WATER BALANCE",
+  "totalDues": "TOTAL DUES",
+  "waterUsedSummary": "79% used of 23,500 L",
+  "noLateSurcharge": "No late surcharge yet",
+
+  "currentPaniPattiBill": "CURRENT PANI PATTI BILL",
+  "rabiSeason": "Rabi Season (2024-25)",
+  "kharifSeason": "Kharif Season (2024-25)",
+  "due25Nov": "Due 25 Nov",
+  "waterPerAcreLand": "18,500 L water for 4.5 Acres land",
+  "payViaUpi": "Pay via UPI",
+  "baseWater": "Base Water",
+  "govtCessTax": "Govt Cess & Tax",
+  "wuaMaintenance": "WUA Maintenance",
+
+  "farmerServices": "FARMER SERVICES",
+  "payBill": "Pay Bill",
+  "canalWari": "Canal Wari",
+  "allBills": "All Bills",
+  "myFarm": "My Farm",
+
+  "recentActivity": "RECENT ACTIVITY",
+  "viewAll": "View All",
+  "paidViaUpi": "Paid via UPI",
+
+  "navDashboard": "Dashboard",
+  "navBills": "Bills",
+  "navPayments": "Payments",
+  "navProfile": "Profile",
+
+  "waterQuotaOverview": "Water Quota & Canal Allocation",
+  "rotationalCanalTurns": "ROTATIONAL CANAL TURNS • वारी",
+  "cropConsumption": "Crop Consumption Breakdown",
+  "upcomingTurn": "Upcoming Irrigation Turn",
+  "requestTurnSwap": "Request Turn Swap",
+  "canalHelpline": "Canal Control & Wari Helpline",
+  "failedToLoadWater": "Failed to load water usage",
+  "noTurnsFound": "No turns match the selected filter",
+
+  "paniPattiBills": "Pani Patti Bills",
+  "wuaSubtitle": "Water Users Association • जल उपभोक्ता संस्था",
+  "paymentHistory": "Payment History",
+  "paymentSubtitle": "Irrigation Dues & Transactions • भरणा इतिहास",
+  "filterAll": "All",
+  "filterPending": "Pending",
+  "filterOverdue": "Overdue",
+  "filterPaid": "Paid",
+  "downloadReceipt": "Download Receipt",
+
+  "markAllAsRead": "Mark all as read",
+  "unread": "Unread",
+
+  "appSettings": "App Settings",
+  "helpAndSupport": "Help & Support",
+  "logoutConfirmTitle": "Logout",
+  "logoutConfirmMessage": "Are you sure you want to log out of your WUA account?"
 }

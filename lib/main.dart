@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-
 import 'package:wua_mobile/core/constants/env_config.dart';
 import 'package:wua_mobile/core/di/injection_container.dart';
 import 'package:wua_mobile/core/errors/errors.dart';
 import 'package:wua_mobile/core/l10n/l10n.dart';
 import 'package:wua_mobile/core/logger/app_logger.dart';
 import 'package:wua_mobile/core/router/app_router.dart';
+import 'package:wua_mobile/core/storage/preference_storage_service.dart';
 import 'package:wua_mobile/core/theme/app_theme.dart';
 import 'package:wua_mobile/core/theme/colors.dart';
 
@@ -40,6 +40,11 @@ Future<void> main() async {
 
   // ── Dependency Injection ────────────────────────────────────
   await initDependencies();
+
+  // ── Locale Initialization ───────────────────────────────────
+  final prefs = sl<PreferenceStorageService>();
+  final savedLanguage = prefs.getLanguage();
+  appLocaleNotifier.value = Locale(savedLanguage);
 
   // ── Bloc Observer ───────────────────────────────────────────
   Bloc.observer = AppBlocObserver();

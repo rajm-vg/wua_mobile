@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:wua_mobile/core/theme/colors.dart';
 import 'package:wua_mobile/core/theme/spacing.dart';
 import 'package:wua_mobile/core/theme/theme_extensions.dart';
 import 'package:wua_mobile/features/water_usage/domain/entities/water_usage_entity.dart';
@@ -15,12 +14,13 @@ class RequestTurnSwapSheet extends StatefulWidget {
   });
 
   final IrrigationTurnEntity turn;
-  final Function({
+  final void Function({
     required String turnId,
     required DateTime preferredDate,
     required String reason,
     String? swappedWithFarmer,
-  }) onSubmit;
+  })
+  onSubmit;
   final bool isLoading;
 
   @override
@@ -126,7 +126,9 @@ class _RequestTurnSwapSheetState extends State<RequestTurnSwapSheet> {
                   const SizedBox(width: AppSpacing.xs),
                   Text(
                     'REQUEST TURN SWAP • वारी बदल',
-                    style: context.titleMedium.bold.withColor(colors.textPrimary),
+                    style: context.titleMedium.bold.withColor(
+                      colors.textPrimary,
+                    ),
                   ),
                 ],
               ),
@@ -148,12 +150,18 @@ class _RequestTurnSwapSheetState extends State<RequestTurnSwapSheet> {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.access_time_rounded, size: 16, color: colors.canalGreen),
+                    Icon(
+                      Icons.access_time_rounded,
+                      size: 16,
+                      color: colors.canalGreen,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         'Current: ${widget.turn.formattedDate} (${widget.turn.formattedTimeRange})',
-                        style: context.caption.bold.withColor(colors.textPrimary),
+                        style: context.caption.bold.withColor(
+                          colors.textPrimary,
+                        ),
                       ),
                     ),
                   ],
@@ -185,9 +193,14 @@ class _RequestTurnSwapSheetState extends State<RequestTurnSwapSheet> {
                     children: [
                       Text(
                         DateFormat('EEEE, dd MMMM yyyy').format(_selectedDate),
-                        style: context.bodyMedium.bold.withColor(colors.textPrimary),
+                        style: context.bodyMedium.bold.withColor(
+                          colors.textPrimary,
+                        ),
                       ),
-                      Icon(Icons.calendar_month_rounded, color: colors.canalGreen),
+                      Icon(
+                        Icons.calendar_month_rounded,
+                        color: colors.canalGreen,
+                      ),
                     ],
                   ),
                 ),
@@ -216,7 +229,9 @@ class _RequestTurnSwapSheetState extends State<RequestTurnSwapSheet> {
                         value: r,
                         child: Text(
                           r,
-                          style: context.bodySmall.medium.withColor(colors.textPrimary),
+                          style: context.bodySmall.medium.withColor(
+                            colors.textPrimary,
+                          ),
                         ),
                       );
                     }).toList(),
@@ -290,4 +305,3 @@ class _RequestTurnSwapSheetState extends State<RequestTurnSwapSheet> {
     );
   }
 }
-

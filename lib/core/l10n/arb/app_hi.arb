@@ -39,6 +39,7 @@
   "settings": "सेटिंग्स",
   "language": "भाषा",
   "english": "English",
+  "marathi": "मराठी",
   "hindi": "हिन्दी",
 
   "bills": "बिल",
@@ -68,5 +69,75 @@
   "networkError": "इंटरनेट कनेक्शन नहीं है। कृपया अपना नेटवर्क जांचें।",
   "serverError": "सर्वर त्रुटि। कृपया कुछ समय बाद पुनः प्रयास करें।",
   "timeoutError": "अनुरोध समय समाप्त हो गया। कृपया पुनः प्रयास करें।",
-  "somethingWentWrong": "कुछ गलत हो गया"
+  "somethingWentWrong": "कुछ गलत हो गया",
+
+  "goodMorning": "शुभ प्रभात",
+  "goodAfternoon": "शुभ दोपहर",
+  "goodEvening": "शुभ संध्या",
+  "helloUser": "नमस्ते किसान",
+  "gatNoMulshi": "गट सं. 142 • मुल्शी डब्ल्यू.यू.ए.",
+
+  "nextCanalTurnTitle": "अगला नहर चक्र • वारी",
+  "inDays": "2 दिनों में",
+  "timeline": "समय-सारणी",
+  "gateNumber": "गेट सं. 4",
+  "outletFlow": "आउटलेट सं. 12 • 50 क्यूसेक प्रवाह",
+  "turnDuration": "प्रातः 08:00 – सायं 08:00 (12 घंटे)",
+
+  "waterBalance": "जल संतुलन",
+  "totalDues": "कुल बकाया",
+  "waterUsedSummary": "23,500 L में से 79% उपयोग",
+  "noLateSurcharge": "अभी कोई विलंब शुल्क नहीं",
+
+  "currentPaniPattiBill": "वर्तमान पानी पट्टी बिल",
+  "rabiSeason": "रबी मौसम (2024-25)",
+  "kharifSeason": "खरीफ मौसम (2024-25)",
+  "due25Nov": "25 नवंबर तक देय",
+  "waterPerAcreLand": "4.5 एकड़ भूमि हेतु 18,500 L जल",
+  "payViaUpi": "UPI द्वारा भुगतान करें",
+  "baseWater": "मूल जल प्रभार",
+  "govtCessTax": "सरकारी उपकर व कर",
+  "wuaMaintenance": "संस्था रखरखाव",
+
+  "farmerServices": "किसान सेवाएं",
+  "payBill": "बिल भुगतान",
+  "canalWari": "नहर वारी",
+  "allBills": "सभी बिल",
+  "myFarm": "मेरा खेत",
+
+  "recentActivity": "हालिया गतिविधियां",
+  "viewAll": "सभी देखें",
+  "paidViaUpi": "UPI द्वारा भुगतान किया",
+
+  "navDashboard": "डैशबोर्ड",
+  "navBills": "बिल",
+  "navPayments": "भुगतान",
+  "navProfile": "प्रोफ़ाइल",
+
+  "waterQuotaOverview": "जल कोटा और नहर आबंटन",
+  "rotationalCanalTurns": "चक्रीय नहर चक्र • वारी",
+  "cropConsumption": "फसलवार जल उपभोग",
+  "upcomingTurn": "आगामी सिंचाई चक्र",
+  "requestTurnSwap": "वारी अदला-बदली अनुरोध",
+  "canalHelpline": "नहर नियंत्रण व वारी हेल्पलाइन",
+  "failedToLoadWater": "जल उपयोग लोड करने में विफल",
+  "noTurnsFound": "कोई चक्र नहीं मिला",
+
+  "paniPattiBills": "पानी पट्टी बिल",
+  "wuaSubtitle": "जल उपभोक्ता संस्था • नियामक प्राधिकरण",
+  "paymentHistory": "भुगतान इतिहास",
+  "paymentSubtitle": "सिंचाई बकाया और लेन-देन इतिहास",
+  "filterAll": "सभी",
+  "filterPending": "लंबित",
+  "filterOverdue": "अतिदेय",
+  "filterPaid": "भुगतान पूर्ण",
+  "downloadReceipt": "रसीद डाउनलोड करें",
+
+  "markAllAsRead": "सभी को पढ़ा हुआ चिह्नित करें",
+  "unread": "अपठित",
+
+  "appSettings": "ऐप सेटिंग्स",
+  "helpAndSupport": "सहायता और समर्थन",
+  "logoutConfirmTitle": "लॉग आउट करें",
+  "logoutConfirmMessage": "क्या आप निश्चित रूप से अपने खाते से लॉग आउट करना चाहते हैं?"
 }

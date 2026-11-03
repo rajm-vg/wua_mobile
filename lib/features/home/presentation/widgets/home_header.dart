@@ -25,11 +25,12 @@ class HomeHeader extends StatelessWidget {
   final VoidCallback? onAvatarPressed;
   final bool showTopUtilities;
 
-  String _getGreeting() {
+  String _getGreeting(BuildContext context) {
     final hour = DateTime.now().hour;
-    if (hour < 12) return 'Good Morning, 🙏';
-    if (hour < 17) return 'Good Afternoon, 🙏';
-    return 'Good Evening, 🙏';
+    final l10n = context.l10n;
+    if (hour < 12) return '${l10n.goodMorning}, 🙏';
+    if (hour < 17) return '${l10n.goodAfternoon}, 🙏';
+    return '${l10n.goodEvening}, 🙏';
   }
 
   @override
@@ -39,7 +40,7 @@ class HomeHeader extends StatelessWidget {
 
     final displayName = user?.name.isNotEmpty == true
         ? user!.name
-        : 'Hello User';
+        : l10n.helloUser;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
@@ -126,7 +127,7 @@ class HomeHeader extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    _getGreeting(),
+                    _getGreeting(context),
                     style: context.caption.white.withOpacity(0.85).withSize(12),
                   ),
                   const SizedBox(height: 1),
@@ -138,7 +139,7 @@ class HomeHeader extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'Gat No. 142 • Mulshi WUA',
+                    l10n.gatNoMulshi,
                     style: context.caption
                         .withColor(colors.headerSubtitle)
                         .withSize(12)

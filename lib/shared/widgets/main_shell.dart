@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:wua_mobile/core/l10n/l10n.dart';
 import 'package:wua_mobile/core/theme/spacing.dart';
 import 'package:wua_mobile/core/theme/theme_extensions.dart';
 
@@ -51,6 +52,7 @@ class MainShell extends StatelessWidget {
       listenable: GoRouter.of(context).routerDelegate,
       builder: (context, _) {
         final colors = context.colors;
+        final l10n = context.l10n;
         final selectedIndex = _calculateSelectedIndex(context);
 
         return Scaffold(
@@ -85,25 +87,25 @@ class MainShell extends StatelessWidget {
                   children: [
                     _NavItem(
                       icon: Icons.grid_view_rounded,
-                      label: 'Dashboard',
+                      label: l10n.navDashboard,
                       isSelected: selectedIndex == 0,
                       onTap: () => _onItemTapped(0, context),
                     ),
                     _NavItem(
                       icon: Icons.credit_card_outlined,
-                      label: 'Bills',
+                      label: l10n.navBills,
                       isSelected: selectedIndex == 1,
                       onTap: () => _onItemTapped(1, context),
                     ),
                     _NavItem(
                       icon: Icons.receipt_long_rounded,
-                      label: 'Payments',
+                      label: l10n.navPayments,
                       isSelected: selectedIndex == 2,
                       onTap: () => _onItemTapped(2, context),
                     ),
                     _NavItem(
                       icon: Icons.person_outline_rounded,
-                      label: 'Profile',
+                      label: l10n.navProfile,
                       isSelected: selectedIndex == 3,
                       onTap: () => _onItemTapped(3, context),
                     ),

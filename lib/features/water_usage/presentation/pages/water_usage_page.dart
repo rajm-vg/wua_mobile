@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wua_mobile/core/di/injection_container.dart';
+import 'package:wua_mobile/core/l10n/l10n.dart';
 import 'package:wua_mobile/core/theme/colors.dart';
 import 'package:wua_mobile/core/theme/spacing.dart';
 import 'package:wua_mobile/core/theme/theme_extensions.dart';
@@ -123,7 +124,7 @@ class _WaterUsagePageView extends StatelessWidget {
                 Icon(Icons.support_agent_rounded, color: colors.canalGreen),
                 const SizedBox(width: AppSpacing.xs),
                 Text(
-                  'Canal Control & Wari Helpline',
+                  context.l10n.canalHelpline,
                   style: context.titleMedium.bold.withColor(colors.textPrimary),
                 ),
               ],
@@ -233,7 +234,7 @@ class _WaterUsagePageView extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.md),
             Text(
-              'Failed to load water usage',
+              context.l10n.failedToLoadWater,
               style: context.titleMedium.bold.withColor(colors.textPrimary),
             ),
             const SizedBox(height: 6),
@@ -253,7 +254,7 @@ class _WaterUsagePageView extends StatelessWidget {
                 ),
               ),
               icon: const Icon(Icons.refresh_rounded, size: 16),
-              label: const Text('Try Again'),
+              label: Text(context.l10n.tryAgain),
             ),
           ],
         ),
@@ -300,7 +301,7 @@ class _WaterUsagePageView extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'ROTATIONAL CANAL TURNS • वारी',
+                        context.l10n.rotationalCanalTurns,
                         style: context.caption.bold.withColor(
                           colors.textSecondary,
                         ),
@@ -346,7 +347,7 @@ class _WaterUsagePageView extends StatelessWidget {
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       Text(
-                        'No turns match the selected filter',
+                        context.l10n.noTurnsFound,
                         style: context.bodyMedium.medium.withColor(
                           colors.textSecondary,
                         ),

@@ -4,7 +4,7 @@ import 'package:wua_mobile/core/l10n/l10n.dart';
 import 'package:wua_mobile/core/theme/radius.dart';
 import 'package:wua_mobile/core/theme/theme_extensions.dart';
 
-/// Segmented custom toggle widget for switching application language (e.g. English & Hindi/Marathi).
+/// Segmented custom toggle widget for switching application language (e.g. English & Marathi/Hindi).
 /// Supports both header (dark/teal background) and standard (light surface) style presets.
 class LanguageToggle extends StatelessWidget {
   const LanguageToggle({
@@ -40,7 +40,7 @@ class LanguageToggle extends StatelessWidget {
   const LanguageToggle.standard({
     super.key,
     this.firstLabel = 'En',
-    this.secondLabel = 'हिन्दी',
+    this.secondLabel = 'मराठी',
     this.backgroundColor,
     this.activeBackgroundColor,
     this.activeTextColor,
@@ -54,7 +54,7 @@ class LanguageToggle extends StatelessWidget {
   /// Label for the first language (default: 'En').
   final String firstLabel;
 
-  /// Label for the second language (default: 'MR' / 'हिन्दी').
+  /// Label for the second language (default: 'MR' / 'मराठी').
   final String secondLabel;
 
   /// Capsule background color. Defaults to [AppThemeColors.headerToggleBg].
@@ -78,13 +78,14 @@ class LanguageToggle extends StatelessWidget {
   /// Optional callback invoked when selection changes. When null, toggles [appLocaleNotifier].
   final ValueChanged<bool>? onChanged;
 
-  /// Optional controlled active state for the second language. When null, uses [context.isHindi].
+  /// Optional controlled active state for the second language. When null, checks [context.isMarathi] or [context.isHindi].
   final bool? isSecondActive;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final isSecond = isSecondActive ?? context.isHindi;
+    final isSecond =
+        isSecondActive ?? (context.isMarathi || context.isHindi);
 
     final resolvedBg = backgroundColor ?? colors.headerToggleBg;
     final resolvedActiveBg = activeBackgroundColor ?? Colors.white;
@@ -113,7 +114,7 @@ class LanguageToggle extends StatelessWidget {
                 if (onChanged != null) {
                   onChanged!(false);
                 } else {
-                  context.toggleLocale();
+                  context.setLocale(const Locale('en'));
                 }
               }
             },
@@ -130,7 +131,11 @@ class LanguageToggle extends StatelessWidget {
                 if (onChanged != null) {
                   onChanged!(true);
                 } else {
-                  context.toggleLocale();
+                  final targetCode = (secondLabel.toLowerCase() == 'hi' ||
+                          secondLabel.contains('हिन्द'))
+                      ? 'hi'
+                      : 'mr';
+                  context.setLocale(Locale(targetCode));
                 }
               }
             },

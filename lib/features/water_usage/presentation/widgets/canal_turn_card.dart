@@ -56,7 +56,6 @@ class CanalTurnCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final isDark = context.isDarkMode;
     final statusColor = _getStatusColor(context, turn.status);
     final statusIcon = _getStatusIcon(turn.status);
 
@@ -167,7 +166,9 @@ class CanalTurnCard extends StatelessWidget {
                   padding: const EdgeInsets.only(left: 22.0),
                   child: Text(
                     turn.formattedTimeRange,
-                    style: context.caption.medium.withColor(colors.textSecondary),
+                    style: context.caption.medium.withColor(
+                      colors.textSecondary,
+                    ),
                   ),
                 ),
 
@@ -189,7 +190,9 @@ class CanalTurnCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           '${turn.waterDeliveredHaCm} ha-cm (${turn.dischargeCusecs} Cusecs)',
-                          style: context.caption.bold.withColor(colors.textPrimary),
+                          style: context.caption.bold.withColor(
+                            colors.textPrimary,
+                          ),
                         ),
                       ],
                     ),
@@ -231,7 +234,9 @@ class CanalTurnCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                ] else if (turn.isUpcoming && turn.canRequestSwap && onRequestSwap != null) ...[
+                ] else if (turn.isUpcoming &&
+                    turn.canRequestSwap &&
+                    onRequestSwap != null) ...[
                   const SizedBox(height: AppSpacing.xs),
                   Align(
                     alignment: Alignment.centerRight,
@@ -272,4 +277,3 @@ class CanalTurnCard extends StatelessWidget {
     );
   }
 }
-
