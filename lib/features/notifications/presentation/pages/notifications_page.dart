@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wua_mobile/core/di/injection_container.dart';
-import 'package:wua_mobile/core/l10n/l10n.dart';
-import 'package:wua_mobile/core/theme/colors.dart';
-import 'package:wua_mobile/core/theme/spacing.dart';
-import 'package:wua_mobile/core/theme/theme_extensions.dart';
+import 'package:wua_mobile/core/extensions/extensions.dart';
 import 'package:wua_mobile/features/notifications/domain/entities/notification_entity.dart';
 import 'package:wua_mobile/features/notifications/presentation/bloc/notifications_bloc.dart';
 import 'package:wua_mobile/features/notifications/presentation/bloc/notifications_event.dart';
@@ -78,13 +75,7 @@ class _NotificationsPageView extends StatelessWidget {
                 context.read<NotificationsBloc>().add(
                   const MarkAllNotificationsAsReadEvent(),
                 );
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(l10n.markAllAsRead),
-                    duration: const Duration(seconds: 2),
-                    backgroundColor: AppColors.canalGreen,
-                  ),
-                );
+                context.showSuccessSnackBar(l10n.markAllAsRead);
               },
               icon: const Icon(
                 Icons.done_all_rounded,

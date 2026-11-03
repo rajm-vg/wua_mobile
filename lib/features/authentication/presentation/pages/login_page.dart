@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:wua_mobile/core/di/injection_container.dart';
-import 'package:wua_mobile/core/l10n/l10n.dart';
+import 'package:wua_mobile/core/extensions/extensions.dart';
 import 'package:wua_mobile/core/router/route_names.dart';
-import 'package:wua_mobile/core/theme/colors.dart';
-import 'package:wua_mobile/core/theme/radius.dart';
-import 'package:wua_mobile/core/theme/spacing.dart';
-import 'package:wua_mobile/core/theme/theme_extensions.dart';
 import 'package:wua_mobile/core/utils/validators.dart';
 import 'package:wua_mobile/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:wua_mobile/features/authentication/presentation/bloc/auth_event.dart';
@@ -64,11 +59,11 @@ class _LoginPageViewState extends State<_LoginPageView> {
     FocusScope.of(context).unfocus();
     if (_formKey.currentState?.validate() ?? false) {
       context.read<AuthBloc>().add(
-            AuthLoginRequested(
-              identifier: _identifierController.text.trim(),
-              password: _passwordController.text,
-            ),
-          );
+        AuthLoginRequested(
+          identifier: _identifierController.text.trim(),
+          password: _passwordController.text,
+        ),
+      );
     }
   }
 
@@ -108,33 +103,7 @@ class _LoginPageViewState extends State<_LoginPageView> {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthFailure) {
-          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  const Icon(
-                    Icons.error_outline_rounded,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: Text(
-                      state.message,
-                      style: context.bodySmall.white.medium,
-                    ),
-                  ),
-                ],
-              ),
-              backgroundColor: AppColors.error,
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: AppRadius.borderRadiusMd,
-              ),
-              margin: const EdgeInsets.all(AppSpacing.md),
-            ),
-          );
+          context.showErrorSnackBar(state.message);
         } else if (state is AuthAuthenticated) {
           context.go('/');
         }
@@ -242,7 +211,8 @@ class _LoginPageViewState extends State<_LoginPageView> {
                                 prefixIcon: const Icon(
                                   Icons.account_circle_outlined,
                                 ),
-                                suffixIcon: _identifierController.text.isNotEmpty
+                                suffixIcon:
+                                    _identifierController.text.isNotEmpty
                                     ? IconButton(
                                         icon: const Icon(
                                           Icons.clear_rounded,
@@ -251,7 +221,9 @@ class _LoginPageViewState extends State<_LoginPageView> {
                                         onPressed: isLoading
                                             ? null
                                             : () {
-                                                setState(_identifierController.clear);
+                                                setState(
+                                                  _identifierController.clear,
+                                                );
                                               },
                                       )
                                     : null,
@@ -347,8 +319,8 @@ class _LoginPageViewState extends State<_LoginPageView> {
                                     onPressed: isLoading
                                         ? null
                                         : () => context.push(
-                                              RouteNames.forgotPassword,
-                                            ),
+                                            RouteNames.forgotPassword,
+                                          ),
                                     style: TextButton.styleFrom(
                                       padding: EdgeInsets.zero,
                                       minimumSize: Size.zero,
@@ -373,14 +345,16 @@ class _LoginPageViewState extends State<_LoginPageView> {
                                 height: 50,
                                 child: ElevatedButton(
                                   key: const Key('login_submit_button'),
-                                  onPressed:
-                                      isLoading ? null : _onLoginSubmitted,
+                                  onPressed: isLoading
+                                      ? null
+                                      : _onLoginSubmitted,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: AppColors.primary,
                                     foregroundColor: Colors.white,
                                     elevation: 2,
-                                    shadowColor:
-                                        AppColors.primary.withValues(alpha: 0.4),
+                                    shadowColor: AppColors.primary.withValues(
+                                      alpha: 0.4,
+                                    ),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: AppRadius.borderRadiusMd,
                                     ),
@@ -395,8 +369,8 @@ class _LoginPageViewState extends State<_LoginPageView> {
                                             strokeWidth: 2.2,
                                             valueColor:
                                                 AlwaysStoppedAnimation<Color>(
-                                              Colors.white,
-                                            ),
+                                                  Colors.white,
+                                                ),
                                           ),
                                         )
                                       : Row(
@@ -459,9 +433,9 @@ class _LoginPageViewState extends State<_LoginPageView> {
                                     onPressed: isLoading
                                         ? null
                                         : () => _quickFill(
-                                              '9876543210',
-                                              'Farmer@123',
-                                            ),
+                                            '9876543210',
+                                            'Farmer@123',
+                                          ),
                                   ),
                                   ActionChip(
                                     label: Text(
@@ -476,9 +450,9 @@ class _LoginPageViewState extends State<_LoginPageView> {
                                     onPressed: isLoading
                                         ? null
                                         : () => _quickFill(
-                                              'official@wua.gov.in',
-                                              'Official@123',
-                                            ),
+                                            'official@wua.gov.in',
+                                            'Official@123',
+                                          ),
                                   ),
                                   ActionChip(
                                     label: Text(
@@ -493,9 +467,9 @@ class _LoginPageViewState extends State<_LoginPageView> {
                                     onPressed: isLoading
                                         ? null
                                         : () => _quickFill(
-                                              'admin@wrd.gov.in',
-                                              'Admin@123',
-                                            ),
+                                            'admin@wrd.gov.in',
+                                            'Admin@123',
+                                          ),
                                   ),
                                 ],
                               ),

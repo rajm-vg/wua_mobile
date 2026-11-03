@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:wua_mobile/core/theme/theme_extensions.dart';
+import 'package:wua_mobile/core/extensions/extensions.dart';
 
 /// Modal bottom sheet providing helpline, email support, and official portal links.
 class HelpSupportBottomSheet extends StatelessWidget {
@@ -17,13 +17,7 @@ class HelpSupportBottomSheet extends StatelessWidget {
 
   void _onItemTapped(BuildContext context, String title, String content) {
     Clipboard.setData(ClipboardData(text: content));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Copied $title ($content) to clipboard'),
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    context.showSuccessSnackBar('Copied $title ($content) to clipboard');
   }
 
   @override
@@ -94,11 +88,8 @@ class HelpSupportBottomSheet extends StatelessWidget {
             iconBgColor: const Color(0xFFE0F2FE),
             title: 'WRD Helpline',
             subtitle: '1800-120-8040 (Toll Free, 9 AM – 6 PM)',
-            onTap: () => _onItemTapped(
-              context,
-              'WRD Helpline',
-              '1800-120-8040',
-            ),
+            onTap: () =>
+                _onItemTapped(context, 'WRD Helpline', '1800-120-8040'),
           ),
           const SizedBox(height: 12),
 
@@ -178,13 +169,7 @@ class _SupportCard extends StatelessWidget {
                   color: iconBgColor,
                   shape: BoxShape.circle,
                 ),
-                child: Center(
-                  child: Icon(
-                    icon,
-                    color: iconColor,
-                    size: 22,
-                  ),
-                ),
+                child: Center(child: Icon(icon, color: iconColor, size: 22)),
               ),
               const SizedBox(width: 14),
               Expanded(

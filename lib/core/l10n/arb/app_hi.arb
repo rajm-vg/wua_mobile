@@ -139,5 +139,6 @@
   "appSettings": "ऐप सेटिंग्स",
   "helpAndSupport": "सहायता और समर्थन",
   "logoutConfirmTitle": "लॉग आउट करें",
-  "logoutConfirmMessage": "क्या आप निश्चित रूप से अपने खाते से लॉग आउट करना चाहते हैं?"
+  "logoutConfirmMessage": "क्या आप निश्चित रूप से अपने खाते से लॉग आउट करना चाहते हैं?",
+  "swipeAgainToExit": "बाहर निकलने के लिए फिर से स्वाइप करें"
 }

@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:wua_mobile/core/di/injection_container.dart';
-import 'package:wua_mobile/core/theme/colors.dart';
-import 'package:wua_mobile/core/theme/spacing.dart';
-import 'package:wua_mobile/core/theme/theme_extensions.dart';
+import 'package:wua_mobile/core/extensions/extensions.dart';
 import 'package:wua_mobile/features/bills/domain/entities/bill_entity.dart';
 import 'package:wua_mobile/features/bills/presentation/bloc/bills_bloc.dart';
 import 'package:wua_mobile/features/bills/presentation/bloc/bills_event.dart';
@@ -87,13 +85,8 @@ class _BillDetailPageView extends StatelessWidget {
                     tooltip: 'Share Bill',
                     icon: const Icon(Icons.share_rounded),
                     onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Sharing bill ${activeBill!.billNumber}...',
-                          ),
-                          duration: const Duration(seconds: 2),
-                        ),
+                      context.showInfoSnackBar(
+                        'Sharing bill ${activeBill!.billNumber}...',
                       );
                     },
                   ),
@@ -700,14 +693,8 @@ class _BillDetailPageView extends StatelessWidget {
         children: [
           ElevatedButton.icon(
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'Launching UPI payment for ${_formatCurrency(bill.outstandingAmount)}...',
-                  ),
-                  backgroundColor: AppColors.headerTeal,
-                  duration: const Duration(seconds: 3),
-                ),
+              context.showInfoSnackBar(
+                'Launching UPI payment for ${_formatCurrency(bill.outstandingAmount)}...',
               );
             },
             style: ElevatedButton.styleFrom(
@@ -728,13 +715,8 @@ class _BillDetailPageView extends StatelessWidget {
           const SizedBox(height: AppSpacing.sm),
           OutlinedButton.icon(
             onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                    'Redirecting to Net Banking / Debit Card gateway...',
-                  ),
-                  duration: Duration(seconds: 2),
-                ),
+              context.showInfoSnackBar(
+                'Redirecting to Net Banking / Debit Card gateway...',
               );
             },
             style: OutlinedButton.styleFrom(

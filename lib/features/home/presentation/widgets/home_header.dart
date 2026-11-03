@@ -176,7 +176,7 @@ class HomeHeader extends StatelessWidget {
             const SizedBox(width: AppSpacing.xs),
 
             // Right: Segmented Language Toggle [ En | MR ]
-            const LanguageToggle(firstLabel: 'En', secondLabel: 'MR'),
+            const LanguageToggle(firstLabel: 'En', secondLabel: 'मराठी'),
           ],
         ),
       ),

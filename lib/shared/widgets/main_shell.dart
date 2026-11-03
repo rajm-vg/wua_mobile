@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:wua_mobile/core/l10n/l10n.dart';
 import 'package:wua_mobile/core/theme/spacing.dart';
 import 'package:wua_mobile/core/theme/theme_extensions.dart';
+import 'package:wua_mobile/shared/widgets/double_swipe_to_exit.dart';
 
 /// Persistent shell container providing the floating bottom navigation bar.
 /// Sourced directly from [BuildContext.colors] without manual isDark checks.
@@ -52,64 +53,71 @@ class MainShell extends StatelessWidget {
       listenable: GoRouter.of(context).routerDelegate,
       builder: (context, _) {
         final colors = context.colors;
-        final l10n = context.l10n;
+        final l10n = AppLocalizations.of(context);
         final selectedIndex = _calculateSelectedIndex(context);
 
-        return Scaffold(
-          backgroundColor: colors.background,
-          extendBody: true,
-          body: child,
-          bottomNavigationBar: SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.md,
-                0,
-                AppSpacing.md,
-                AppSpacing.sm,
-              ),
-              child: Container(
-                height: 64,
-                decoration: BoxDecoration(
-                  color: colors.navBarBg,
-                  borderRadius: BorderRadius.circular(32),
-                  border: Border.all(color: colors.navBarBorder),
-                  boxShadow: [
-                    BoxShadow(
-                      color: colors.navBarShadow,
-                      blurRadius: 20,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+        final dashboardLabel = l10n?.navDashboard ?? 'Dashboard';
+        final billsLabel = l10n?.navBills ?? 'Bills';
+        final paymentsLabel = l10n?.navPayments ?? 'Payments';
+        final profileLabel = l10n?.navProfile ?? 'Profile';
+
+        return DoubleSwipeToExit(
+          child: Scaffold(
+            backgroundColor: colors.background,
+            extendBody: true,
+            body: child,
+            bottomNavigationBar: SafeArea(
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.md,
+                  0,
+                  AppSpacing.md,
+                  AppSpacing.sm,
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _NavItem(
-                      icon: Icons.grid_view_rounded,
-                      label: l10n.navDashboard,
-                      isSelected: selectedIndex == 0,
-                      onTap: () => _onItemTapped(0, context),
-                    ),
-                    _NavItem(
-                      icon: Icons.credit_card_outlined,
-                      label: l10n.navBills,
-                      isSelected: selectedIndex == 1,
-                      onTap: () => _onItemTapped(1, context),
-                    ),
-                    _NavItem(
-                      icon: Icons.receipt_long_rounded,
-                      label: l10n.navPayments,
-                      isSelected: selectedIndex == 2,
-                      onTap: () => _onItemTapped(2, context),
-                    ),
-                    _NavItem(
-                      icon: Icons.person_outline_rounded,
-                      label: l10n.navProfile,
-                      isSelected: selectedIndex == 3,
-                      onTap: () => _onItemTapped(3, context),
-                    ),
-                  ],
+                child: Container(
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: colors.navBarBg,
+                    borderRadius: BorderRadius.circular(32),
+                    border: Border.all(color: colors.navBarBorder),
+                    boxShadow: [
+                      BoxShadow(
+                        color: colors.navBarShadow,
+                        blurRadius: 20,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _NavItem(
+                        icon: Icons.grid_view_rounded,
+                        label: dashboardLabel,
+                        isSelected: selectedIndex == 0,
+                        onTap: () => _onItemTapped(0, context),
+                      ),
+                      _NavItem(
+                        icon: Icons.credit_card_outlined,
+                        label: billsLabel,
+                        isSelected: selectedIndex == 1,
+                        onTap: () => _onItemTapped(1, context),
+                      ),
+                      _NavItem(
+                        icon: Icons.receipt_long_rounded,
+                        label: paymentsLabel,
+                        isSelected: selectedIndex == 2,
+                        onTap: () => _onItemTapped(2, context),
+                      ),
+                      _NavItem(
+                        icon: Icons.person_outline_rounded,
+                        label: profileLabel,
+                        isSelected: selectedIndex == 3,
+                        onTap: () => _onItemTapped(3, context),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

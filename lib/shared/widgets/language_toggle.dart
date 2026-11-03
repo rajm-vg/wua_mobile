@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:wua_mobile/core/l10n/l10n.dart';
 import 'package:wua_mobile/core/theme/radius.dart';
 import 'package:wua_mobile/core/theme/theme_extensions.dart';
@@ -10,7 +9,7 @@ class LanguageToggle extends StatelessWidget {
   const LanguageToggle({
     super.key,
     this.firstLabel = 'En',
-    this.secondLabel = 'MR',
+    this.secondLabel = 'मराठी',
     this.backgroundColor,
     this.activeBackgroundColor,
     this.activeTextColor,
@@ -25,7 +24,7 @@ class LanguageToggle extends StatelessWidget {
   const LanguageToggle.header({
     super.key,
     this.firstLabel = 'En',
-    this.secondLabel = 'MR',
+    this.secondLabel = 'मराठी',
     this.backgroundColor,
     this.activeBackgroundColor = Colors.white,
     this.activeTextColor,
@@ -84,8 +83,7 @@ class LanguageToggle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final isSecond =
-        isSecondActive ?? (context.isMarathi || context.isHindi);
+    final isSecond = isSecondActive ?? (context.isMarathi || context.isHindi);
 
     final resolvedBg = backgroundColor ?? colors.headerToggleBg;
     final resolvedActiveBg = activeBackgroundColor ?? Colors.white;
@@ -131,7 +129,8 @@ class LanguageToggle extends StatelessWidget {
                 if (onChanged != null) {
                   onChanged!(true);
                 } else {
-                  final targetCode = (secondLabel.toLowerCase() == 'hi' ||
+                  final targetCode =
+                      (secondLabel.toLowerCase() == 'hi' ||
                           secondLabel.contains('हिन्द'))
                       ? 'hi'
                       : 'mr';
@@ -173,11 +172,8 @@ class _TogglePill extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeInOut,
-        padding: padding ??
-            const EdgeInsets.symmetric(
-              horizontal: 8,
-              vertical: 4,
-            ),
+        padding:
+            padding ?? const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
           color: isActive ? activeBgColor : Colors.transparent,
           borderRadius: AppRadius.borderRadiusFull,

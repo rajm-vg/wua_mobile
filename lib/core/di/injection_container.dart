@@ -6,6 +6,7 @@ import 'package:wua_mobile/core/network/api_client.dart';
 import 'package:wua_mobile/core/network/network_info.dart';
 import 'package:wua_mobile/core/network/network_module.dart';
 import 'package:wua_mobile/core/router/app_router.dart';
+import 'package:wua_mobile/core/services/services.dart';
 import 'package:wua_mobile/core/storage/preference_storage_service.dart';
 import 'package:wua_mobile/core/storage/secure_storage_service.dart';
 // Feature imports — uncomment as features are implemented.
@@ -33,6 +34,7 @@ Future<void> initDependencies() async {
   sl.registerLazySingleton<PreferenceStorageService>(
     () => PreferenceStorageService(prefs: sl<SharedPreferences>()),
   );
+  sl.registerLazySingleton<SnackBarService>(SnackBarService.new);
 
   // ─── Core: Network ─────────────────────────────────────────
   sl.registerLazySingleton<NetworkInfo>(

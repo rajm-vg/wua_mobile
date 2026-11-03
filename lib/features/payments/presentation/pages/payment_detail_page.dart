@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wua_mobile/core/di/injection_container.dart';
-import 'package:wua_mobile/core/theme/colors.dart';
-import 'package:wua_mobile/core/theme/spacing.dart';
-import 'package:wua_mobile/core/theme/theme_extensions.dart';
+import 'package:wua_mobile/core/extensions/extensions.dart';
 import 'package:wua_mobile/features/bills/domain/entities/bill_entity.dart';
 import 'package:wua_mobile/features/bills/presentation/widgets/bill_receipt_sheet.dart';
 import 'package:wua_mobile/features/payments/domain/entities/payment_entity.dart';
@@ -43,10 +41,7 @@ class PaymentDetailPage extends StatelessWidget {
 }
 
 class _PaymentDetailPageView extends StatelessWidget {
-  const _PaymentDetailPageView({
-    required this.paymentId,
-    this.initialPayment,
-  });
+  const _PaymentDetailPageView({required this.paymentId, this.initialPayment});
 
   final String paymentId;
   final PaymentEntity? initialPayment;
@@ -71,7 +66,9 @@ class _PaymentDetailPageView extends StatelessWidget {
 
         return WuaScaffold(
           title: 'Payment Receipt',
-          subtitle: payment != null ? payment.paymentNumber : 'Receipt #$paymentId',
+          subtitle: payment != null
+              ? payment.paymentNumber
+              : 'Receipt #$paymentId',
           showBackButton: true,
           scrollable: true,
           padding: EdgeInsets.zero,
@@ -88,11 +85,8 @@ class _PaymentDetailPageView extends StatelessWidget {
                     tooltip: 'Share Receipt',
                     icon: const Icon(Icons.share_rounded),
                     onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Sharing payment confirmation ${payment.paymentNumber}...'),
-                          duration: const Duration(seconds: 2),
-                        ),
+                      context.showInfoSnackBar(
+                        'Sharing payment confirmation ${payment.paymentNumber}...',
                       );
                     },
                   ),
@@ -125,7 +119,10 @@ class _PaymentDetailPageView extends StatelessWidget {
                                 children: [
                                   _buildHeroBanner(context, payment),
                                   const SizedBox(height: AppSpacing.md),
-                                  _buildTransactionDetailsCard(context, payment),
+                                  _buildTransactionDetailsCard(
+                                    context,
+                                    payment,
+                                  ),
                                 ],
                               ),
                             ),
@@ -231,7 +228,10 @@ class _PaymentDetailPageView extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: badgeBg,
                   borderRadius: BorderRadius.circular(20),
@@ -241,7 +241,10 @@ class _PaymentDetailPageView extends StatelessWidget {
                   children: [
                     Icon(statusIcon, size: 14, color: badgeFg),
                     const SizedBox(width: 5),
-                    Text(statusTitle, style: context.labelSmall.bold.withColor(badgeFg)),
+                    Text(
+                      statusTitle,
+                      style: context.labelSmall.bold.withColor(badgeFg),
+                    ),
                   ],
                 ),
               ),
@@ -250,11 +253,15 @@ class _PaymentDetailPageView extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
           Text(
             payment.formattedAmount,
-            style: context.displaySmall.bold.withColor(
-              payment.isSuccess
-                  ? AppColors.success
-                  : (payment.isFailed ? AppColors.error : colors.textPrimary),
-            ).withSize(36),
+            style: context.displaySmall.bold
+                .withColor(
+                  payment.isSuccess
+                      ? AppColors.success
+                      : (payment.isFailed
+                            ? AppColors.error
+                            : colors.textPrimary),
+                )
+                .withSize(36),
           ),
           const SizedBox(height: 4),
           Text(payment.formattedDateTime, style: context.caption.medium),
@@ -271,16 +278,24 @@ class _PaymentDetailPageView extends StatelessWidget {
               child: Row(
                 children: [
                   Icon(
-                    payment.isFailed ? Icons.error_outline_rounded : Icons.info_outline_rounded,
+                    payment.isFailed
+                        ? Icons.error_outline_rounded
+                        : Icons.info_outline_rounded,
                     size: 16,
-                    color: payment.isFailed ? AppColors.error : colors.textSecondary,
+                    color: payment.isFailed
+                        ? AppColors.error
+                        : colors.textSecondary,
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       payment.remarks!,
-                      style: context.caption.withSize(11.5).withColor(
-                            payment.isFailed ? AppColors.error : colors.textSecondary,
+                      style: context.caption
+                          .withSize(11.5)
+                          .withColor(
+                            payment.isFailed
+                                ? AppColors.error
+                                : colors.textSecondary,
                           ),
                     ),
                   ),
@@ -295,7 +310,10 @@ class _PaymentDetailPageView extends StatelessWidget {
 
   // ─── 2. Transaction Details Card ─────────────────────────────
 
-  Widget _buildTransactionDetailsCard(BuildContext context, PaymentEntity payment) {
+  Widget _buildTransactionDetailsCard(
+    BuildContext context,
+    PaymentEntity payment,
+  ) {
     final colors = context.colors;
 
     return Container(
@@ -310,7 +328,11 @@ class _PaymentDetailPageView extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.receipt_rounded, size: 20, color: AppColors.headerTeal),
+              const Icon(
+                Icons.receipt_rounded,
+                size: 20,
+                color: AppColors.headerTeal,
+              ),
               const SizedBox(width: 8),
               Text('Transaction Particulars', style: context.sectionTitle.bold),
             ],
@@ -331,7 +353,11 @@ class _PaymentDetailPageView extends StatelessWidget {
             payment.bankReference ?? 'N/A',
             context,
           ),
-          _buildInfoRow('Payment Date & Time', payment.formattedDateTime, context),
+          _buildInfoRow(
+            'Payment Date & Time',
+            payment.formattedDateTime,
+            context,
+          ),
         ],
       ),
     );
@@ -339,7 +365,10 @@ class _PaymentDetailPageView extends StatelessWidget {
 
   // ─── 3. Bill & Consumer Particulars Card ──────────────────────
 
-  Widget _buildBillParticularsCard(BuildContext context, PaymentEntity payment) {
+  Widget _buildBillParticularsCard(
+    BuildContext context,
+    PaymentEntity payment,
+  ) {
     final colors = context.colors;
 
     return Container(
@@ -354,18 +383,41 @@ class _PaymentDetailPageView extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.water_drop_rounded, size: 20, color: AppColors.waterCyan),
+              const Icon(
+                Icons.water_drop_rounded,
+                size: 20,
+                color: AppColors.waterCyan,
+              ),
               const SizedBox(width: 8),
-              Text('Associated Bill & Farmer', style: context.sectionTitle.bold),
+              Text(
+                'Associated Bill & Farmer',
+                style: context.sectionTitle.bold,
+              ),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
           Divider(color: colors.billDivider, height: 1),
           const SizedBox(height: AppSpacing.sm),
-          _buildInfoRow('Farmer Name', payment.consumerName ?? 'Ramesh Patil', context),
-          _buildInfoRow('Kisan / Consumer ID', payment.consumerId ?? 'KISAN-MH-41201', context),
-          _buildInfoRow('WUA Society', payment.wuaSocietyName ?? 'Ganga-Godavari WUA #12', context),
-          _buildInfoRow('Bill Number', payment.billNumber ?? 'WUA-PANI-BILL', context),
+          _buildInfoRow(
+            'Farmer Name',
+            payment.consumerName ?? 'Ramesh Patil',
+            context,
+          ),
+          _buildInfoRow(
+            'Kisan / Consumer ID',
+            payment.consumerId ?? 'KISAN-MH-41201',
+            context,
+          ),
+          _buildInfoRow(
+            'WUA Society',
+            payment.wuaSocietyName ?? 'Ganga-Godavari WUA #12',
+            context,
+          ),
+          _buildInfoRow(
+            'Bill Number',
+            payment.billNumber ?? 'WUA-PANI-BILL',
+            context,
+          ),
           _buildInfoRow('Season', payment.season, context),
           _buildInfoRow('Crop Cultivated', payment.cropType, context),
         ],
@@ -395,7 +447,9 @@ class _PaymentDetailPageView extends StatelessWidget {
                 backgroundColor: AppColors.headerTeal,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
               ),
               icon: const Icon(Icons.receipt_long_rounded, size: 18),
               label: const Text('View Official E-Receipt'),
@@ -403,16 +457,15 @@ class _PaymentDetailPageView extends StatelessWidget {
             const SizedBox(height: AppSpacing.sm),
             OutlinedButton.icon(
               onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Downloading digital certificate...'),
-                    duration: Duration(seconds: 2),
-                  ),
+                context.showSuccessSnackBar(
+                  'Downloading digital certificate...',
                 );
               },
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 13),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
                 side: BorderSide(color: colors.cardBorder),
               ),
               icon: const Icon(Icons.download_rounded, size: 16),
@@ -440,7 +493,9 @@ class _PaymentDetailPageView extends StatelessWidget {
                 backgroundColor: AppColors.error,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
               ),
               icon: const Icon(Icons.refresh_rounded, size: 18),
               label: const Text('Retry from Bills Screen'),
@@ -491,4 +546,3 @@ class _PaymentDetailPageView extends StatelessWidget {
     );
   }
 }
-

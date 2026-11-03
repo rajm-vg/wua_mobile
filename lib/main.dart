@@ -8,6 +8,7 @@ import 'package:wua_mobile/core/errors/errors.dart';
 import 'package:wua_mobile/core/l10n/l10n.dart';
 import 'package:wua_mobile/core/logger/app_logger.dart';
 import 'package:wua_mobile/core/router/app_router.dart';
+import 'package:wua_mobile/core/services/services.dart';
 import 'package:wua_mobile/core/storage/preference_storage_service.dart';
 import 'package:wua_mobile/core/theme/app_theme.dart';
 import 'package:wua_mobile/core/theme/colors.dart';
@@ -83,6 +84,7 @@ class WuaApp extends StatelessWidget {
           builder: (context, currentThemeMode, _) {
             return MaterialApp.router(
               title: 'WUA Mobile',
+              scaffoldMessengerKey: SnackBarService.scaffoldMessengerKey,
               debugShowCheckedModeBanner: false,
               locale: currentLocale,
 

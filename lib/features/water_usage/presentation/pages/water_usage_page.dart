@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wua_mobile/core/di/injection_container.dart';
-import 'package:wua_mobile/core/l10n/l10n.dart';
-import 'package:wua_mobile/core/theme/colors.dart';
-import 'package:wua_mobile/core/theme/spacing.dart';
-import 'package:wua_mobile/core/theme/theme_extensions.dart';
+import 'package:wua_mobile/core/extensions/extensions.dart';
 import 'package:wua_mobile/features/water_usage/domain/entities/water_usage_entity.dart';
 import 'package:wua_mobile/features/water_usage/presentation/bloc/water_usage_bloc.dart';
 import 'package:wua_mobile/features/water_usage/presentation/bloc/water_usage_event.dart';
@@ -36,7 +33,9 @@ class _WaterUsagePageView extends StatelessWidget {
   const _WaterUsagePageView();
 
   Future<void> _onRefresh(BuildContext context) async {
-    context.read<WaterUsageBloc>().add(const LoadWaterUsageEvent(refresh: true));
+    context.read<WaterUsageBloc>().add(
+      const LoadWaterUsageEvent(refresh: true),
+    );
     await Future<void>.delayed(const Duration(milliseconds: 500));
   }
 
@@ -52,13 +51,8 @@ class _WaterUsagePageView extends StatelessWidget {
             listener: (context, state) {
               if (state is WaterUsageLoaded && !state.isSubmittingSwap) {
                 Navigator.of(bottomSheetContext).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Turn swap request submitted successfully! Pending Patkari verification.',
-                    ),
-                    backgroundColor: AppColors.canalGreen,
-                  ),
+                context.showSuccessSnackBar(
+                  'Turn swap request submitted successfully! Pending Patkari verification.',
                 );
               }
             },
@@ -69,13 +63,14 @@ class _WaterUsagePageView extends StatelessWidget {
               return RequestTurnSwapSheet(
                 turn: turn,
                 isLoading: isSubmitting,
-                onSubmit: ({
-                  required String turnId,
-                  required DateTime preferredDate,
-                  required String reason,
-                  String? swappedWithFarmer,
-                }) {
-                  context.read<WaterUsageBloc>().add(
+                onSubmit:
+                    ({
+                      required String turnId,
+                      required DateTime preferredDate,
+                      required String reason,
+                      String? swappedWithFarmer,
+                    }) {
+                      context.read<WaterUsageBloc>().add(
                         SubmitTurnSwapEvent(
                           turnId: turnId,
                           preferredDate: preferredDate,
@@ -83,7 +78,7 @@ class _WaterUsagePageView extends StatelessWidget {
                           swappedWithFarmer: swappedWithFarmer,
                         ),
                       );
-                },
+                    },
               );
             },
           ),
@@ -143,10 +138,19 @@ class _WaterUsagePageView extends StatelessWidget {
                   color: colors.canalGreen.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(Icons.phone_in_talk_rounded, color: colors.canalGreen),
+                child: Icon(
+                  Icons.phone_in_talk_rounded,
+                  color: colors.canalGreen,
+                ),
               ),
-              title: Text('Kisan Toll-Free Helpline', style: context.bodySmall.bold),
-              subtitle: Text('1800-180-1551 (24x7 WRD Support)', style: context.caption),
+              title: Text(
+                'Kisan Toll-Free Helpline',
+                style: context.bodySmall.bold,
+              ),
+              subtitle: Text(
+                '1800-180-1551 (24x7 WRD Support)',
+                style: context.caption,
+              ),
             ),
             ListTile(
               contentPadding: EdgeInsets.zero,
@@ -156,10 +160,19 @@ class _WaterUsagePageView extends StatelessWidget {
                   color: AppColors.info.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(Icons.person_pin_rounded, color: AppColors.info),
+                child: const Icon(
+                  Icons.person_pin_rounded,
+                  color: AppColors.info,
+                ),
               ),
-              title: Text('S. K. Deshmukh (Patkari)', style: context.bodySmall.bold),
-              subtitle: Text('+91 98220 12345 • Minor-3 In-charge', style: context.caption),
+              title: Text(
+                'S. K. Deshmukh (Patkari)',
+                style: context.bodySmall.bold,
+              ),
+              subtitle: Text(
+                '+91 98220 12345 • Minor-3 In-charge',
+                style: context.caption,
+              ),
             ),
             const SizedBox(height: AppSpacing.md),
           ],
@@ -285,7 +298,8 @@ class _WaterUsagePageView extends StatelessWidget {
                   if (state.nextTurn != null) ...[
                     UpcomingCanalTurnCard(
                       turn: state.nextTurn!,
-                      onRequestSwap: () => _openSwapSheet(context, state.nextTurn!),
+                      onRequestSwap: () =>
+                          _openSwapSheet(context, state.nextTurn!),
                     ),
                     const SizedBox(height: AppSpacing.md),
                   ],
@@ -318,9 +332,9 @@ class _WaterUsagePageView extends StatelessWidget {
                   WaterUsageFilterChips(
                     selectedFilter: state.selectedStatusFilter,
                     onFilterChanged: (status) {
-                      context
-                          .read<WaterUsageBloc>()
-                          .add(FilterTurnsByStatusEvent(status));
+                      context.read<WaterUsageBloc>().add(
+                        FilterTurnsByStatusEvent(status),
+                      );
                     },
                   ),
                   const SizedBox(height: AppSpacing.sm),
@@ -361,19 +375,16 @@ class _WaterUsagePageView extends StatelessWidget {
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
               sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final turn = state.filteredTurns[index];
-                    return CanalTurnCard(
-                      turn: turn,
-                      onRequestSwap: () => _openSwapSheet(context, turn),
-                      onTap: () {
-                        // Show brief turn details modal
-                      },
-                    );
-                  },
-                  childCount: state.filteredTurns.length,
-                ),
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final turn = state.filteredTurns[index];
+                  return CanalTurnCard(
+                    turn: turn,
+                    onRequestSwap: () => _openSwapSheet(context, turn),
+                    onTap: () {
+                      // Show brief turn details modal
+                    },
+                  );
+                }, childCount: state.filteredTurns.length),
               ),
             ),
 
@@ -410,7 +421,9 @@ class _WaterUsagePageView extends StatelessWidget {
                           const SizedBox(height: 4),
                           Text(
                             'Water delivery operates on a strict rotational basis (Wari). Unauthorized tampering with sluice gates or canal banks is prohibited under Irrigation Act Sec. 58.',
-                            style: context.caption.withColor(colors.textSecondary),
+                            style: context.caption.withColor(
+                              colors.textSecondary,
+                            ),
                           ),
                         ],
                       ),
@@ -421,12 +434,9 @@ class _WaterUsagePageView extends StatelessWidget {
             ),
           ),
 
-          const SliverToBoxAdapter(
-            child: SizedBox(height: 80),
-          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 80)),
         ],
       ),
     );
   }
 }
-

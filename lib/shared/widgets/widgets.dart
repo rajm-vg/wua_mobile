@@ -1,3 +1,4 @@
+export 'double_swipe_to_exit.dart';
 export 'language_toggle.dart';
 export 'main_shell.dart';
 export 'shared_widgets.dart';

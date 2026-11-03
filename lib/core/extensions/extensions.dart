@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:wua_mobile/core/services/services.dart';
 
 export '../l10n/l10n.dart';
+export '../services/services.dart';
 export '../theme/theme.dart';
 
 /// Extension methods on [BuildContext] for cleaner widget code.
@@ -22,15 +24,108 @@ extension BuildContextExtensions on BuildContext {
   void pop<T>([T? result]) => Navigator.of(this).pop(result);
   bool get canPop => Navigator.of(this).canPop();
 
-  // ─── SnackBar ──────────────────────────────────────────────
+  // ─── SnackBar & User Feedback ──────────────────────────────
   void showSnackBar(String message, {bool isError = false}) {
-    ScaffoldMessenger.of(this).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? colorScheme.error : null,
-      ),
+    if (isError) {
+      SnackBarService.showError(message, context: this);
+    } else {
+      SnackBarService.showInfo(message, context: this);
+    }
+  }
+
+  void showSuccessSnackBar(
+    String message, {
+    String? title,
+    Duration? duration,
+    IconData? icon,
+    String? actionLabel,
+    VoidCallback? onAction,
+    double? bottomOffset,
+    bool showCloseButton = false,
+  }) {
+    SnackBarService.showSuccess(
+      message,
+      title: title,
+      duration: duration,
+      icon: icon,
+      actionLabel: actionLabel,
+      onAction: onAction,
+      bottomOffset: bottomOffset,
+      showCloseButton: showCloseButton,
+      context: this,
     );
   }
+
+  void showErrorSnackBar(
+    String message, {
+    String? title,
+    Duration? duration,
+    IconData? icon,
+    String? actionLabel,
+    VoidCallback? onAction,
+    double? bottomOffset,
+    bool showCloseButton = false,
+  }) {
+    SnackBarService.showError(
+      message,
+      title: title,
+      duration: duration,
+      icon: icon,
+      actionLabel: actionLabel,
+      onAction: onAction,
+      bottomOffset: bottomOffset,
+      showCloseButton: showCloseButton,
+      context: this,
+    );
+  }
+
+  void showWarningSnackBar(
+    String message, {
+    String? title,
+    Duration? duration,
+    IconData? icon,
+    String? actionLabel,
+    VoidCallback? onAction,
+    double? bottomOffset,
+    bool showCloseButton = false,
+  }) {
+    SnackBarService.showWarning(
+      message,
+      title: title,
+      duration: duration,
+      icon: icon,
+      actionLabel: actionLabel,
+      onAction: onAction,
+      bottomOffset: bottomOffset,
+      showCloseButton: showCloseButton,
+      context: this,
+    );
+  }
+
+  void showInfoSnackBar(
+    String message, {
+    String? title,
+    Duration? duration,
+    IconData? icon,
+    String? actionLabel,
+    VoidCallback? onAction,
+    double? bottomOffset,
+    bool showCloseButton = false,
+  }) {
+    SnackBarService.showInfo(
+      message,
+      title: title,
+      duration: duration,
+      icon: icon,
+      actionLabel: actionLabel,
+      onAction: onAction,
+      bottomOffset: bottomOffset,
+      showCloseButton: showCloseButton,
+      context: this,
+    );
+  }
+
+  void hideSnackBar() => SnackBarService.hide(context: this);
 
   // ─── Keyboard ──────────────────────────────────────────────
   void hideKeyboard() => FocusScope.of(this).unfocus();

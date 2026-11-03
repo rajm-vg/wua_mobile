@@ -91,9 +91,8 @@ void main() {
     blocTest<NotificationsBloc, NotificationsState>(
       'emits [NotificationsLoading, NotificationsLoaded] when successful',
       build: () {
-        when(() => mockGetNotificationsUseCase(any())).thenAnswer(
-          (_) async => Right(tNotificationsList),
-        );
+        when(() => mockGetNotificationsUseCase(any()))
+            .thenAnswer((_) async => Right(tNotificationsList));
         return bloc;
       },
       act: (bloc) => bloc.add(const LoadNotificationsEvent()),
@@ -186,9 +185,8 @@ void main() {
     blocTest<NotificationsBloc, NotificationsState>(
       'marks target notification as read and calls usecase',
       build: () {
-        when(() => mockMarkNotificationReadUseCase(any())).thenAnswer(
-          (_) async => const Right(true),
-        );
+        when(() => mockMarkNotificationReadUseCase(any()))
+            .thenAnswer((_) async => const Right(true));
         return bloc;
       },
       seed: () => NotificationsLoaded(
@@ -196,8 +194,7 @@ void main() {
         filteredNotifications: tNotificationsList,
         selectedFilter: 'ALL',
       ),
-      act: (bloc) =>
-          bloc.add(const MarkNotificationAsReadEvent('n_bill_1')),
+      act: (bloc) => bloc.add(const MarkNotificationAsReadEvent('n_bill_1')),
       expect: () => [
         NotificationsLoaded(
           allNotifications: [
@@ -225,9 +222,8 @@ void main() {
     blocTest<NotificationsBloc, NotificationsState>(
       'removes notification and calls usecase',
       build: () {
-        when(() => mockDeleteNotificationUseCase(any())).thenAnswer(
-          (_) async => const Right(true),
-        );
+        when(() => mockDeleteNotificationUseCase(any()))
+            .thenAnswer((_) async => const Right(true));
         return bloc;
       },
       seed: () => NotificationsLoaded(
@@ -253,4 +249,3 @@ void main() {
     );
   });
 }
-

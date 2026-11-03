@@ -53,11 +53,23 @@ class _SlidingGradientTransform extends GradientTransform {
       case ShimmerDirection.ltr:
         return Matrix4.translationValues(bounds.width * slidePercent, 0.0, 0.0);
       case ShimmerDirection.rtl:
-        return Matrix4.translationValues(-bounds.width * slidePercent, 0.0, 0.0);
+        return Matrix4.translationValues(
+          -bounds.width * slidePercent,
+          0.0,
+          0.0,
+        );
       case ShimmerDirection.ttb:
-        return Matrix4.translationValues(0.0, bounds.height * slidePercent, 0.0);
+        return Matrix4.translationValues(
+          0.0,
+          bounds.height * slidePercent,
+          0.0,
+        );
       case ShimmerDirection.btt:
-        return Matrix4.translationValues(0.0, -bounds.height * slidePercent, 0.0);
+        return Matrix4.translationValues(
+          0.0,
+          -bounds.height * slidePercent,
+          0.0,
+        );
     }
   }
 }
@@ -106,13 +118,12 @@ class Shimmer extends StatefulWidget {
   const Shimmer.fromColors({
     super.key,
     required this.child,
-    required Color baseColor,
-    required Color highlightColor,
+    required Color this.baseColor,
+    required Color this.highlightColor,
     this.duration = const Duration(milliseconds: 1500),
     this.direction = ShimmerDirection.ltr,
     this.enabled = true,
-  })  : baseColor = baseColor,
-        highlightColor = highlightColor;
+  });
 
   final Widget child;
   final Color? baseColor;
@@ -149,17 +160,13 @@ class Shimmer extends StatefulWidget {
   State<Shimmer> createState() => _ShimmerState();
 }
 
-class _ShimmerState extends State<Shimmer>
-    with SingleTickerProviderStateMixin {
+class _ShimmerState extends State<Shimmer> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: widget.duration,
-    );
+    _controller = AnimationController(vsync: this, duration: widget.duration);
     if (widget.enabled) {
       _controller.repeat();
     }
@@ -213,11 +220,7 @@ class _ShimmerState extends State<Shimmer>
               return LinearGradient(
                 begin: widget.direction.begin,
                 end: widget.direction.end,
-                colors: [
-                  effectiveBase,
-                  effectiveHighlight,
-                  effectiveBase,
-                ],
+                colors: [effectiveBase, effectiveHighlight, effectiveBase],
                 stops: const [0.1, 0.5, 0.9],
                 transform: _SlidingGradientTransform(
                   slidePercent: _controller.value * 3.0 - 1.5,
@@ -260,9 +263,12 @@ class ShimmerContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scope = Shimmer.maybeOf(context);
-    final effectiveBase = baseColor ?? scope?.baseColor ?? Shimmer.defaultBaseColor(context);
+    final effectiveBase =
+        baseColor ?? scope?.baseColor ?? Shimmer.defaultBaseColor(context);
     final effectiveHighlight =
-        highlightColor ?? scope?.highlightColor ?? Shimmer.defaultHighlightColor(context);
+        highlightColor ??
+        scope?.highlightColor ??
+        Shimmer.defaultHighlightColor(context);
 
     final box = Container(
       width: width,
@@ -387,9 +393,7 @@ class ShimmerCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: backgroundColor ?? colors.cardBackground,
         borderRadius: borderRadius ?? BorderRadius.circular(16),
-        border: Border.all(
-          color: borderColor ?? colors.cardBorder,
-        ),
+        border: Border.all(color: borderColor ?? colors.cardBorder),
       ),
       child: Shimmer(
         baseColor: baseColor,
@@ -464,11 +468,7 @@ class ShimmerLoading extends StatelessWidget {
               key: const ValueKey('shimmer_skeleton'),
               child: skeleton,
             )
-          : KeyedSubtree(
-              key: const ValueKey('shimmer_content'),
-              child: child,
-            ),
+          : KeyedSubtree(key: const ValueKey('shimmer_content'), child: child),
     );
   }
 }
-

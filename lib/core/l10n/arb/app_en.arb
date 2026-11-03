@@ -142,5 +142,6 @@
   "appSettings": "App Settings",
   "helpAndSupport": "Help & Support",
   "logoutConfirmTitle": "Logout",
-  "logoutConfirmMessage": "Are you sure you want to log out of your WUA account?"
+  "logoutConfirmMessage": "Are you sure you want to log out of your WUA account?",
+  "swipeAgainToExit": "Swipe back again to exit"
 }

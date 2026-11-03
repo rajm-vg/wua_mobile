@@ -374,4 +374,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get logoutConfirmMessage =>
       'Are you sure you want to log out of your WUA account?';
+
+  @override
+  String get swipeAgainToExit => 'Swipe back again to exit';
 }

@@ -375,4 +375,7 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get logoutConfirmMessage =>
       'क्या आप निश्चित रूप से अपने खाते से लॉग आउट करना चाहते हैं?';
+
+  @override
+  String get swipeAgainToExit => 'बाहर निकलने के लिए फिर से स्वाइप करें';
 }

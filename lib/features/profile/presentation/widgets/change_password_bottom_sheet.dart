@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:wua_mobile/core/theme/colors.dart';
-import 'package:wua_mobile/core/theme/theme_extensions.dart';
+import 'package:wua_mobile/core/extensions/extensions.dart';
 
 /// Modal bottom sheet for updating account password securely.
 class ChangePasswordBottomSheet extends StatefulWidget {
@@ -40,33 +39,17 @@ class _ChangePasswordBottomSheetState extends State<ChangePasswordBottomSheet> {
   void _onSubmit() {
     if (_newPasswordController.text.isEmpty ||
         _currentPasswordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter all required fields'),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      context.showWarningSnackBar('Please enter all required fields');
       return;
     }
 
     if (_newPasswordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('New passwords do not match'),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
+      context.showErrorSnackBar('New passwords do not match');
       return;
     }
 
     Navigator.of(context).pop();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Password updated successfully!'),
-        backgroundColor: AppColors.success,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    context.showSuccessSnackBar('Password updated successfully!');
   }
 
   @override
@@ -82,7 +65,8 @@ class _ChangePasswordBottomSheetState extends State<ChangePasswordBottomSheet> {
         left: 20,
         right: 20,
         top: 12,
-        bottom: MediaQuery.viewInsetsOf(context).bottom +
+        bottom:
+            MediaQuery.viewInsetsOf(context).bottom +
             MediaQuery.paddingOf(context).bottom +
             24,
       ),
@@ -212,8 +196,10 @@ class _PasswordField extends StatelessWidget {
         labelStyle: TextStyle(color: colors.textSecondary, fontSize: 14),
         filled: true,
         fillColor: colors.cardBackground,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide(color: colors.cardBorder),

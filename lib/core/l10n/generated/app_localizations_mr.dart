@@ -373,4 +373,7 @@ class AppLocalizationsMr extends AppLocalizations {
   @override
   String get logoutConfirmMessage =>
       'तुम्हाला तुमच्या पाणी वापर संस्था खात्यातून नक्की लॉग आउट करायचे आहे का?';
+
+  @override
+  String get swipeAgainToExit => 'बाहेर पडण्यासाठी पुन्हा स्वाइप करा';
 }

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:wua_mobile/core/theme/colors.dart';
-import 'package:wua_mobile/core/theme/spacing.dart';
-import 'package:wua_mobile/core/theme/theme_extensions.dart';
+import 'package:wua_mobile/core/extensions/extensions.dart';
 import 'package:wua_mobile/features/bills/domain/entities/bill_entity.dart';
 
 /// Modal bottom sheet displaying official Water Resources Department payment receipt.
@@ -23,8 +21,14 @@ class BillReceiptSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
-    final currencyFormatter = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0);
-    final receiptNo = bill.metadata?['receipt_no'] ?? 'REC-WUA-${bill.billNumber.replaceAll(RegExp(r'[^0-9]'), '')}';
+    final currencyFormatter = NumberFormat.currency(
+      locale: 'en_IN',
+      symbol: '₹',
+      decimalDigits: 0,
+    );
+    final receiptNo =
+        bill.metadata?['receipt_no'] ??
+        'REC-WUA-${bill.billNumber.replaceAll(RegExp(r'[^0-9]'), '')}';
 
     return Container(
       decoration: BoxDecoration(
@@ -78,11 +82,15 @@ class BillReceiptSheet extends StatelessWidget {
                     children: [
                       Text(
                         'WATER RESOURCES DEPARTMENT',
-                        style: context.badgeText.bold.withColor(AppColors.headerTeal),
+                        style: context.badgeText.bold.withColor(
+                          AppColors.headerTeal,
+                        ),
                       ),
                       Text(
                         'Pani Patti E-Receipt / पावती',
-                        style: context.titleSmall.bold.withColor(colors.textPrimary),
+                        style: context.titleSmall.bold.withColor(
+                          colors.textPrimary,
+                        ),
                       ),
                     ],
                   ),
@@ -114,15 +122,35 @@ class BillReceiptSheet extends StatelessWidget {
                   const SizedBox(height: 8),
                   _buildRow('Season:', bill.season, context),
                   const SizedBox(height: 8),
-                  _buildRow('Kisan / Consumer:', bill.consumerName ?? 'Ramesh Patil', context),
+                  _buildRow(
+                    'Kisan / Consumer:',
+                    bill.consumerName ?? 'Ramesh Patil',
+                    context,
+                  ),
                   const SizedBox(height: 8),
-                  _buildRow('Society:', bill.wuaSocietyName ?? 'Ganga-Godavari WUA #12', context),
+                  _buildRow(
+                    'Society:',
+                    bill.wuaSocietyName ?? 'Ganga-Godavari WUA #12',
+                    context,
+                  ),
                   const SizedBox(height: 8),
-                  _buildRow('Payment Date:', bill.formattedPaymentDate ?? '14 Aug 2026', context),
+                  _buildRow(
+                    'Payment Date:',
+                    bill.formattedPaymentDate ?? '14 Aug 2026',
+                    context,
+                  ),
                   const SizedBox(height: 8),
-                  _buildRow('Payment Mode:', bill.paymentMethod ?? 'BHIM UPI', context),
+                  _buildRow(
+                    'Payment Mode:',
+                    bill.paymentMethod ?? 'BHIM UPI',
+                    context,
+                  ),
                   const SizedBox(height: 8),
-                  _buildRow('Ref ID / Txn:', bill.paymentReference ?? 'UPI/WRD/894123', context),
+                  _buildRow(
+                    'Ref ID / Txn:',
+                    bill.paymentReference ?? 'UPI/WRD/894123',
+                    context,
+                  ),
                   const SizedBox(height: 12),
                   Divider(color: colors.divider),
                   const SizedBox(height: 8),
@@ -131,11 +159,19 @@ class BillReceiptSheet extends StatelessWidget {
                     children: [
                       Text(
                         'Total Amount Paid:',
-                        style: context.titleSmall.bold.withColor(colors.textPrimary),
+                        style: context.titleSmall.bold.withColor(
+                          colors.textPrimary,
+                        ),
                       ),
                       Text(
-                        currencyFormatter.format(bill.paidAmount > 0 ? bill.paidAmount : bill.totalAmount),
-                        style: context.titleLarge.bold.withColor(AppColors.success),
+                        currencyFormatter.format(
+                          bill.paidAmount > 0
+                              ? bill.paidAmount
+                              : bill.totalAmount,
+                        ),
+                        style: context.titleLarge.bold.withColor(
+                          AppColors.success,
+                        ),
                       ),
                     ],
                   ),
@@ -151,11 +187,17 @@ class BillReceiptSheet extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.success.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
+                border: Border.all(
+                  color: AppColors.success.withValues(alpha: 0.3),
+                ),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.verified_rounded, color: AppColors.success, size: 28),
+                  const Icon(
+                    Icons.verified_rounded,
+                    color: AppColors.success,
+                    size: 28,
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -163,7 +205,9 @@ class BillReceiptSheet extends StatelessWidget {
                       children: [
                         Text(
                           'Payment Verified by WRD Portal',
-                          style: context.labelMedium.bold.withColor(AppColors.success),
+                          style: context.labelMedium.bold.withColor(
+                            AppColors.success,
+                          ),
                         ),
                         Text(
                           'This is a digitally generated valid proof of irrigation dues settlement.',
@@ -185,11 +229,8 @@ class BillReceiptSheet extends StatelessWidget {
                   child: OutlinedButton.icon(
                     onPressed: () {
                       Navigator.of(context).pop();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Downloading official receipt PDF...'),
-                          duration: Duration(seconds: 2),
-                        ),
+                      context.showSuccessSnackBar(
+                        'Downloading official receipt PDF...',
                       );
                     },
                     style: OutlinedButton.styleFrom(
@@ -208,11 +249,8 @@ class BillReceiptSheet extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: () {
                       Navigator.of(context).pop();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Receipt shared via WhatsApp / SMS.'),
-                          duration: Duration(seconds: 2),
-                        ),
+                      context.showSuccessSnackBar(
+                        'Receipt shared via WhatsApp / SMS.',
                       );
                     },
                     style: ElevatedButton.styleFrom(
@@ -253,4 +291,3 @@ class BillReceiptSheet extends StatelessWidget {
     );
   }
 }
-
