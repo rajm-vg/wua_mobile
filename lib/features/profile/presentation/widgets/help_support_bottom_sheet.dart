@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wua_mobile/core/extensions/extensions.dart';
+import 'package:wua_mobile/shared/widgets/wua_bottom_sheet.dart';
 
 /// Modal bottom sheet providing helpline, email support, and official portal links.
 class HelpSupportBottomSheet extends StatelessWidget {
   const HelpSupportBottomSheet({super.key});
 
   static Future<void> show(BuildContext context) {
-    return showModalBottomSheet<void>(
+    return showWuaBottomSheet<void>(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (context) => const HelpSupportBottomSheet(),
     );
   }
@@ -33,9 +32,13 @@ class HelpSupportBottomSheet extends StatelessWidget {
         left: 20,
         right: 20,
         top: 12,
-        bottom: MediaQuery.paddingOf(context).bottom + 24,
+        bottom:
+            MediaQuery.viewInsetsOf(context).bottom +
+            MediaQuery.paddingOf(context).bottom +
+            24,
       ),
-      child: Column(
+      child: SingleChildScrollView(
+        child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -122,6 +125,7 @@ class HelpSupportBottomSheet extends StatelessWidget {
             ),
           ),
         ],
+        ),
       ),
     );
   }

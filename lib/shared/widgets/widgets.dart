@@ -4,4 +4,5 @@ export 'main_shell.dart';
 export 'shared_widgets.dart';
 export 'shimmer.dart';
 export 'wua_app_bar.dart';
+export 'wua_bottom_sheet.dart';
 export 'wua_scaffold.dart';

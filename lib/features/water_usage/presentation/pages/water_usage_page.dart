@@ -13,6 +13,7 @@ import 'package:wua_mobile/features/water_usage/presentation/widgets/upcoming_ca
 import 'package:wua_mobile/features/water_usage/presentation/widgets/water_quota_hero_card.dart';
 import 'package:wua_mobile/features/water_usage/presentation/widgets/water_usage_filter_chips.dart';
 import 'package:wua_mobile/features/water_usage/presentation/widgets/water_usage_skeleton.dart';
+import 'package:wua_mobile/shared/widgets/wua_bottom_sheet.dart';
 import 'package:wua_mobile/shared/widgets/wua_scaffold.dart';
 
 /// Comprehensive Water Usage, Canal Quota & Rotational Wari Scheduling Screen.
@@ -40,10 +41,8 @@ class _WaterUsagePageView extends StatelessWidget {
   }
 
   void _openSwapSheet(BuildContext context, IrrigationTurnEntity turn) {
-    showModalBottomSheet<void>(
+    showWuaBottomSheet<void>(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (bottomSheetContext) {
         return BlocProvider.value(
           value: context.read<WaterUsageBloc>(),
@@ -90,16 +89,21 @@ class _WaterUsagePageView extends StatelessWidget {
   void _showHelpModal(BuildContext context) {
     final colors = context.colors;
 
-    showModalBottomSheet<void>(
+    showWuaBottomSheet<void>(
       context: context,
-      backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
-        padding: const EdgeInsets.all(AppSpacing.lg),
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.lg,
+          AppSpacing.lg,
+          AppSpacing.lg + MediaQuery.paddingOf(ctx).bottom,
+        ),
         decoration: BoxDecoration(
           color: colors.cardBackground,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
-        child: Column(
+        child: SingleChildScrollView(
+          child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -176,6 +180,7 @@ class _WaterUsagePageView extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.md),
           ],
+          ),
         ),
       ),
     );

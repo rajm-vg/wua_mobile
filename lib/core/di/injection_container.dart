@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -44,8 +46,14 @@ Future<void> initDependencies() async {
     () => NetworkModule.provideApiClient(
       secureStorage: sl<SecureStorageService>(),
       onTokenExpired: () {
-        // TODO: Navigate to login and clear session.
         AppLogger.warning('Token expired — triggering logout.');
+        unawaited(
+          sl<SecureStorageService>().clearAll().then((_) {
+            if (sl.isRegistered<AppRouter>()) {
+              sl<AppRouter>().refresh();
+            }
+          }),
+        );
       },
     ),
   );

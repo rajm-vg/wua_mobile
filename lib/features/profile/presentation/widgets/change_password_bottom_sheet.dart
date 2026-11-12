@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:wua_mobile/core/extensions/extensions.dart';
+import 'package:wua_mobile/shared/widgets/wua_bottom_sheet.dart';
 
 /// Modal bottom sheet for updating account password securely.
 class ChangePasswordBottomSheet extends StatefulWidget {
   const ChangePasswordBottomSheet({super.key});
 
   static Future<void> show(BuildContext context) {
-    return showModalBottomSheet<void>(
+    return showWuaBottomSheet<void>(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (context) => const ChangePasswordBottomSheet(),
     );
   }
@@ -70,7 +69,8 @@ class _ChangePasswordBottomSheetState extends State<ChangePasswordBottomSheet> {
             MediaQuery.paddingOf(context).bottom +
             24,
       ),
-      child: Column(
+      child: SingleChildScrollView(
+        child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -166,6 +166,7 @@ class _ChangePasswordBottomSheetState extends State<ChangePasswordBottomSheet> {
             ),
           ),
         ],
+        ),
       ),
     );
   }

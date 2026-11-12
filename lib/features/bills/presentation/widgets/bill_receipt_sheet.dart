@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:wua_mobile/core/extensions/extensions.dart';
 import 'package:wua_mobile/features/bills/domain/entities/bill_entity.dart';
+import 'package:wua_mobile/shared/widgets/wua_bottom_sheet.dart';
 
 /// Modal bottom sheet displaying official Water Resources Department payment receipt.
 class BillReceiptSheet extends StatelessWidget {
@@ -10,10 +11,8 @@ class BillReceiptSheet extends StatelessWidget {
   final BillEntity bill;
 
   static Future<void> show(BuildContext context, {required BillEntity bill}) {
-    return showModalBottomSheet<void>(
+    return showWuaBottomSheet<void>(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (context) => BillReceiptSheet(bill: bill),
     );
   }
@@ -39,7 +38,10 @@ class BillReceiptSheet extends StatelessWidget {
         top: AppSpacing.md,
         left: AppSpacing.lg,
         right: AppSpacing.lg,
-        bottom: MediaQuery.of(context).viewInsets.bottom + AppSpacing.lg,
+        bottom:
+            MediaQuery.viewInsetsOf(context).bottom +
+            MediaQuery.paddingOf(context).bottom +
+            AppSpacing.lg,
       ),
       child: SingleChildScrollView(
         child: Column(

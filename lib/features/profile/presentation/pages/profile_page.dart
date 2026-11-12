@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -5,9 +7,11 @@ import 'package:go_router/go_router.dart';
 import 'package:wua_mobile/core/di/injection_container.dart';
 import 'package:wua_mobile/core/l10n/l10n.dart';
 import 'package:wua_mobile/core/router/route_names.dart';
+import 'package:wua_mobile/core/services/services.dart';
 import 'package:wua_mobile/core/theme/colors.dart';
 import 'package:wua_mobile/core/theme/spacing.dart';
 import 'package:wua_mobile/core/theme/theme_extensions.dart';
+import 'package:wua_mobile/features/authentication/domain/entities/user_entity.dart';
 import 'package:wua_mobile/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:wua_mobile/features/authentication/presentation/bloc/auth_event.dart';
 import 'package:wua_mobile/features/authentication/presentation/bloc/auth_state.dart';
@@ -31,8 +35,15 @@ class ProfilePage extends StatelessWidget {
   }
 }
 
-class _ProfilePageView extends StatelessWidget {
+class _ProfilePageView extends StatefulWidget {
   const _ProfilePageView();
+
+  @override
+  State<_ProfilePageView> createState() => _ProfilePageViewState();
+}
+
+class _ProfilePageViewState extends State<_ProfilePageView> {
+  UserEntity? _cachedUser;
 
   String _getInitials(String name) {
     final trimmed = name.trim();
@@ -46,50 +57,94 @@ class _ProfilePageView extends StatelessWidget {
         .toUpperCase();
   }
 
-  void _showLogoutDialog(BuildContext context) {
+  Future<void> _showLogoutDialog(BuildContext context) async {
     final colors = context.colors;
     final l10n = context.l10n;
+    final authBloc = context.read<AuthBloc>();
 
-    showDialog<void>(
+    final result = await showDialog<AuthState>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: colors.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(
-          l10n.logoutConfirmTitle,
-          style: context.titleLarge.bold.withColor(colors.textPrimary),
-        ),
-        content: Text(
-          l10n.logoutConfirmMessage,
-          style: context.bodyMedium.regular.withColor(colors.textSecondary),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(
-              l10n.cancel,
-              style: TextStyle(color: colors.textSecondary),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(dialogContext).pop();
-              context.read<AuthBloc>().add(const AuthLogoutRequested());
-              context.go(RouteNames.login);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+      barrierDismissible: false,
+      builder: (dialogContext) => BlocProvider<AuthBloc>.value(
+        value: authBloc,
+        child: BlocConsumer<AuthBloc, AuthState>(
+          listener: (dlgContext, state) {
+            if (state is AuthUnauthenticated || state is AuthFailure) {
+              if (Navigator.of(dlgContext).canPop()) {
+                Navigator.of(dlgContext).pop(state);
+              }
+            }
+          },
+          builder: (dlgContext, state) {
+            final isLoading = state is AuthLoading;
+
+            return PopScope(
+              canPop: !isLoading,
+              child: AlertDialog(
+                backgroundColor: colors.surface,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                title: Text(
+                  l10n.logoutConfirmTitle,
+                  style: context.titleLarge.bold.withColor(colors.textPrimary),
+                ),
+                content: Text(
+                  l10n.logoutConfirmMessage,
+                  style: context.bodyMedium.regular.withColor(
+                    colors.textSecondary,
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: isLoading
+                        ? null
+                        : () => Navigator.of(dlgContext).pop(),
+                    child: Text(
+                      l10n.cancel,
+                      style: TextStyle(color: colors.textSecondary),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: isLoading
+                        ? null
+                        : () => authBloc.add(const AuthLogoutRequested()),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.error,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: isLoading
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : Text(l10n.logout),
+                  ),
+                ],
               ),
-              elevation: 0,
-            ),
-            child: Text(l10n.logout),
-          ),
-        ],
+            );
+          },
+        ),
       ),
     );
+
+    if (!context.mounted) return;
+
+    if (result is AuthUnauthenticated) {
+      // Navigate only after logout finishes clearing tokens so AppRouter._guard
+      // sees hasToken() == false and stays on /login instead of bouncing to /.
+      GoRouter.maybeOf(context)?.goNamed(RouteNames.login);
+    } else if (result is AuthFailure) {
+      SnackBarService.showError(result.message, context: context);
+    }
   }
 
   @override
@@ -98,7 +153,10 @@ class _ProfilePageView extends StatelessWidget {
 
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
-        final user = state is AuthAuthenticated ? state.user : null;
+        if (state is AuthAuthenticated) {
+          _cachedUser = state.user;
+        }
+        final user = state is AuthAuthenticated ? state.user : _cachedUser;
         final displayName = user?.name.isNotEmpty == true ? user!.name : 'User';
         final initials = _getInitials(displayName);
 
@@ -226,7 +284,7 @@ class _ProfilePageView extends StatelessWidget {
                           titleColor: const Color(0xFFEF4444),
                           trailing: const SizedBox.shrink(),
                           showDivider: false,
-                          onTap: () => _showLogoutDialog(context),
+                          onTap: () => unawaited(_showLogoutDialog(context)),
                         ),
                       ],
                     ),

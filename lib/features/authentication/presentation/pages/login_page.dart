@@ -437,40 +437,40 @@ class _LoginPageViewState extends State<_LoginPageView> {
                                             'Farmer@123',
                                           ),
                                   ),
-                                  ActionChip(
-                                    label: Text(
-                                      l10n.roleOfficial,
-                                      style: context.labelSmall.semiBold,
-                                    ),
-                                    avatar: const Icon(
-                                      Icons.badge_rounded,
-                                      size: 16,
-                                      color: AppColors.primaryLight,
-                                    ),
-                                    onPressed: isLoading
-                                        ? null
-                                        : () => _quickFill(
-                                            'official@wua.gov.in',
-                                            'Official@123',
-                                          ),
-                                  ),
-                                  ActionChip(
-                                    label: Text(
-                                      l10n.roleAdmin,
-                                      style: context.labelSmall.semiBold,
-                                    ),
-                                    avatar: const Icon(
-                                      Icons.admin_panel_settings_rounded,
-                                      size: 16,
-                                      color: AppColors.harvestAmber,
-                                    ),
-                                    onPressed: isLoading
-                                        ? null
-                                        : () => _quickFill(
-                                            'admin@wrd.gov.in',
-                                            'Admin@123',
-                                          ),
-                                  ),
+                                  // ActionChip(
+                                  //   label: Text(
+                                  //     l10n.roleOfficial,
+                                  //     style: context.labelSmall.semiBold,
+                                  //   ),
+                                  //   avatar: const Icon(
+                                  //     Icons.badge_rounded,
+                                  //     size: 16,
+                                  //     color: AppColors.primaryLight,
+                                  //   ),
+                                  //   onPressed: isLoading
+                                  //       ? null
+                                  //       : () => _quickFill(
+                                  //           'official@wua.gov.in',
+                                  //           'Official@123',
+                                  //         ),
+                                  // ),
+                                  // ActionChip(
+                                  //   label: Text(
+                                  //     l10n.roleAdmin,
+                                  //     style: context.labelSmall.semiBold,
+                                  //   ),
+                                  //   avatar: const Icon(
+                                  //     Icons.admin_panel_settings_rounded,
+                                  //     size: 16,
+                                  //     color: AppColors.harvestAmber,
+                                  //   ),
+                                  //   onPressed: isLoading
+                                  //       ? null
+                                  //       : () => _quickFill(
+                                  //           'admin@wrd.gov.in',
+                                  //           'Admin@123',
+                                  //         ),
+                                  // ),
                                 ],
                               ),
                             ],

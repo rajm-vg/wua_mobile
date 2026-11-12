@@ -13,6 +13,10 @@ import 'package:wua_mobile/features/splash/splash.dart';
 import 'package:wua_mobile/features/water_usage/water_usage.dart';
 import 'package:wua_mobile/shared/widgets/widgets.dart';
 
+class _AuthRefreshNotifier extends ChangeNotifier {
+  void notify() => notifyListeners();
+}
+
 /// Application router configuration using go_router.
 ///
 /// Features:
@@ -23,10 +27,15 @@ import 'package:wua_mobile/shared/widgets/widgets.dart';
 class AppRouter {
   AppRouter({required this._secureStorage});
   final SecureStorageService _secureStorage;
+  final _AuthRefreshNotifier _authRefreshNotifier = _AuthRefreshNotifier();
+
+  /// Re-evaluates route guards when authentication state changes.
+  void refresh() => _authRefreshNotifier.notify();
 
   late final GoRouter router = GoRouter(
     initialLocation: '/splash',
     debugLogDiagnostics: true,
+    refreshListenable: _authRefreshNotifier,
     redirect: _guard,
     routes: [
       // ─── Splash / Onboarding ────────────────────────────────

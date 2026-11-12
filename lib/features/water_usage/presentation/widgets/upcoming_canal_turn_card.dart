@@ -4,6 +4,7 @@ import 'package:wua_mobile/core/theme/radius.dart';
 import 'package:wua_mobile/core/theme/spacing.dart';
 import 'package:wua_mobile/core/theme/theme_extensions.dart';
 import 'package:wua_mobile/features/water_usage/domain/entities/water_usage_entity.dart';
+import 'package:wua_mobile/shared/widgets/wua_bottom_sheet.dart';
 
 /// Card spotlighting the next upcoming or active canal irrigation turn (Wari).
 class UpcomingCanalTurnCard extends StatelessWidget {
@@ -19,17 +20,21 @@ class UpcomingCanalTurnCard extends StatelessWidget {
   void _showPassModal(BuildContext context) {
     final colors = context.colors;
 
-    showModalBottomSheet<void>(
+    showWuaBottomSheet<void>(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (ctx) => Container(
-        padding: const EdgeInsets.all(AppSpacing.lg),
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.lg,
+          AppSpacing.lg,
+          AppSpacing.lg + MediaQuery.paddingOf(ctx).bottom,
+        ),
         decoration: BoxDecoration(
           color: colors.cardBackground,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
-        child: Column(
+        child: SingleChildScrollView(
+          child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -98,6 +103,7 @@ class UpcomingCanalTurnCard extends StatelessWidget {
               ),
             ),
           ],
+          ),
         ),
       ),
     );

@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:wua_mobile/core/theme/app_theme.dart';
 import 'package:wua_mobile/core/theme/theme_extensions.dart';
+import 'package:wua_mobile/shared/widgets/wua_bottom_sheet.dart';
 
 /// Modal bottom sheet for configuring appearance and viewing app build version.
 class AppSettingsBottomSheet extends StatelessWidget {
   const AppSettingsBottomSheet({super.key});
 
   static Future<void> show(BuildContext context) {
-    return showModalBottomSheet<void>(
+    return showWuaBottomSheet<void>(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (context) => const AppSettingsBottomSheet(),
     );
   }
@@ -28,9 +27,13 @@ class AppSettingsBottomSheet extends StatelessWidget {
         left: 20,
         right: 20,
         top: 12,
-        bottom: MediaQuery.paddingOf(context).bottom + 24,
+        bottom:
+            MediaQuery.viewInsetsOf(context).bottom +
+            MediaQuery.paddingOf(context).bottom +
+            24,
       ),
-      child: Column(
+      child: SingleChildScrollView(
+        child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -146,6 +149,7 @@ class AppSettingsBottomSheet extends StatelessWidget {
             ),
           ),
         ],
+        ),
       ),
     );
   }
