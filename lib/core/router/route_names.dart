@@ -16,11 +16,9 @@ class RouteNames {
 
   // ─── Main ───────────────────────────────────────────────────
   static const String home = 'home';
-  static const String dashboard = 'dashboard';
 
   // ─── Profile ────────────────────────────────────────────────
   static const String profile = 'profile';
-  static const String editProfile = 'edit-profile';
 
   // ─── Bills ──────────────────────────────────────────────────
   static const String bills = 'bills';
@@ -31,10 +29,6 @@ class RouteNames {
   static const String paymentDetail = 'payment-detail';
   static const String paymentConfirmation = 'payment-confirmation';
 
-  // ─── Transactions ──────────────────────────────────────────
-  static const String transactions = 'transactions';
-  static const String transactionDetail = 'transaction-detail';
-
   // ─── Notifications ──────────────────────────────────────────
   static const String notifications = 'notifications';
   static const String notificationDetail = 'notification-detail';
@@ -42,7 +36,4 @@ class RouteNames {
   // ─── Water Usage ────────────────────────────────────────────
   static const String waterUsage = 'water-usage';
   static const String waterUsageDetail = 'water-usage-detail';
-
-  // ─── Settings ───────────────────────────────────────────────
-  static const String settings = 'settings';
 }

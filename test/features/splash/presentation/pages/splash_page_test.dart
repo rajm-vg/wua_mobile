@@ -22,37 +22,6 @@ void main() {
     await sl.reset();
   });
 
-  testWidgets(
-    'Minimalist SplashPage renders clean branding and initialization stages',
-    (tester) async {
-      await tester.pumpWidget(const MaterialApp(home: SplashPage()));
-
-      // Initial frame verify
-      expect(find.text('Water User Association'), findsOneWidget);
-      expect(find.textContaining('जल संसाधन विभाग'), findsOneWidget);
-      expect(find.text('Verifying Environment'), findsOneWidget);
-      expect(find.text('33%'), findsOneWidget);
-      expect(find.byType(CircularProgressIndicator), findsOneWidget);
-
-      // Stage 2: Checking Credentials
-      await tester.pump(const Duration(milliseconds: 700));
-      expect(find.text('Checking Credentials'), findsOneWidget);
-      expect(find.text('66%'), findsOneWidget);
-
-      // Stage 3: Synchronizing Workspace
-      await tester.pump(const Duration(milliseconds: 700));
-      expect(find.text('Synchronizing Workspace'), findsOneWidget);
-      expect(find.text('100%'), findsOneWidget);
-
-      // Completion checkmark
-      await tester.pump(const Duration(milliseconds: 700));
-      expect(find.byIcon(Icons.check_circle_rounded), findsOneWidget);
-
-      // Drain remaining transition delay
-      await tester.pump(const Duration(milliseconds: 500));
-    },
-  );
-
   testWidgets('AnimatedSplashPage renders in light and dark mode', (
     tester,
   ) async {

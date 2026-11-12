@@ -43,7 +43,6 @@ class AppRouter {
         path: '/splash',
         name: RouteNames.splash,
         builder: (context, state) => const AnimatedSplashPage(),
-        // builder: (context, state) => const SplashPage(),
       ),
       GoRoute(
         path: '/onboarding',
@@ -134,24 +133,6 @@ class AppRouter {
                 ],
               ),
 
-              // Transactions
-              GoRoute(
-                path: 'transactions',
-                name: RouteNames.transactions,
-                builder: (context, state) =>
-                    const _PlaceholderPage(title: 'Transactions'),
-                routes: [
-                  GoRoute(
-                    path: ':id',
-                    name: RouteNames.transactionDetail,
-                    builder: (context, state) {
-                      final id = state.pathParameters['id']!;
-                      return _PlaceholderPage(title: 'Transaction $id');
-                    },
-                  ),
-                ],
-              ),
-
               // Notifications
               GoRoute(
                 path: 'notifications',
@@ -164,14 +145,6 @@ class AppRouter {
                 path: 'water-usage',
                 name: RouteNames.waterUsage,
                 builder: (context, state) => const WaterUsagePage(),
-              ),
-
-              // Settings
-              GoRoute(
-                path: 'settings',
-                name: RouteNames.settings,
-                builder: (context, state) =>
-                    const _PlaceholderPage(title: 'Settings'),
               ),
             ],
           ),

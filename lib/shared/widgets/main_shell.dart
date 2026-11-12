@@ -20,8 +20,7 @@ class MainShell extends StatelessWidget {
     if (normalized.startsWith('/bills')) {
       return 1;
     }
-    if (normalized.startsWith('/payments') ||
-        normalized.startsWith('/transactions')) {
+    if (normalized.startsWith('/payments')) {
       return 2;
     }
     if (normalized.startsWith('/profile')) {

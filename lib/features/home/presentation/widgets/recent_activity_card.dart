@@ -28,7 +28,7 @@ class RecentActivityCard extends StatelessWidget {
               style: context.badgeText,
             ),
             GestureDetector(
-              onTap: () => context.push(RouteNames.transactions),
+              onTap: () => context.pushNamed(RouteNames.payments),
               child: Text(
                 l10n.viewAll,
                 style: context.labelSmall.bold.withColor(
@@ -43,7 +43,7 @@ class RecentActivityCard extends StatelessWidget {
           color: colors.cardBackground,
           borderRadius: BorderRadius.circular(16),
           child: InkWell(
-            onTap: () => context.push(RouteNames.transactions),
+            onTap: () => context.pushNamed(RouteNames.payments),
             borderRadius: BorderRadius.circular(16),
             child: Container(
               padding: const EdgeInsets.all(AppSpacing.md),

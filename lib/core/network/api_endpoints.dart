@@ -27,10 +27,6 @@ class ApiEndpoints {
   static const String verifyPayment = '/payments/verify';
   static String paymentDetail(String id) => '/payments/$id';
 
-  // Transactions
-  static const String transactions = '/transactions';
-  static String transactionDetail(String id) => '/transactions/$id';
-
   // Notifications
   static const String notifications = '/notifications';
   static const String markNotificationRead = '/notifications/read';

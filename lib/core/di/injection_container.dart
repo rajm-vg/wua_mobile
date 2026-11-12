@@ -66,17 +66,11 @@ Future<void> initDependencies() async {
   // ─── Feature: Authentication ───────────────────────────────
   await _initAuthenticationFeature();
 
-  // ─── Feature: Profile ──────────────────────────────────────
-  // await _initProfileFeature();
-
   // ─── Feature: Bills ────────────────────────────────────────
   await _initBillsFeature();
 
   // ─── Feature: Payments ─────────────────────────────────────
   await _initPaymentsFeature();
-
-  // ─── Feature: Transactions ─────────────────────────────────
-  // await _initTransactionsFeature();
 
   // ─── Feature: Notifications ────────────────────────────────
   await _initNotificationsFeature();
