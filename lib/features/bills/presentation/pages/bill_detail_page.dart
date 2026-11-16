@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:wua_mobile/core/di/injection_container.dart';
 import 'package:wua_mobile/core/extensions/extensions.dart';
@@ -64,11 +65,13 @@ class _BillDetailPageView extends StatelessWidget {
           errorMessage = state.message;
         }
 
+        final l10n = context.l10n;
+
         return WuaScaffold(
-          title: 'Bill Details',
+          title: l10n.billDetails,
           subtitle: activeBill != null
               ? activeBill.billNumber
-              : 'Invoice #$billId',
+              : l10n.invoiceNumberParam(billId),
           showBackButton: true,
           scrollable: true,
           padding: EdgeInsets.zero,
@@ -82,17 +85,17 @@ class _BillDetailPageView extends StatelessWidget {
           actions: activeBill != null
               ? [
                   IconButton(
-                    tooltip: 'Share Bill',
+                    tooltip: l10n.shareBill,
                     icon: const Icon(Icons.share_rounded),
                     onPressed: () {
                       context.showInfoSnackBar(
-                        'Sharing bill ${activeBill!.billNumber}...',
+                        l10n.sharingBillNotice(activeBill!.billNumber),
                       );
                     },
                   ),
                   if (activeBill.isPaid)
                     IconButton(
-                      tooltip: 'View Official Receipt',
+                      tooltip: l10n.viewOfficialReceipt,
                       icon: const Icon(Icons.receipt_long_rounded),
                       onPressed: () {
                         BillReceiptSheet.show(context, bill: activeBill!);
@@ -182,6 +185,7 @@ class _BillDetailPageView extends StatelessWidget {
 
   Widget _buildHeroStatusCard(BuildContext context, BillEntity bill) {
     final colors = context.colors;
+    final l10n = context.l10n;
 
     Color badgeBg;
     Color badgeFg;
@@ -191,17 +195,17 @@ class _BillDetailPageView extends StatelessWidget {
     if (bill.isPaid) {
       badgeBg = AppColors.success.withValues(alpha: 0.12);
       badgeFg = AppColors.success;
-      badgeTitle = 'PAID IN FULL';
+      badgeTitle = l10n.paidInFullUpper;
       badgeIcon = Icons.check_circle_rounded;
     } else if (bill.isOverdue) {
       badgeBg = AppColors.error.withValues(alpha: 0.12);
       badgeFg = AppColors.error;
-      badgeTitle = 'OVERDUE';
+      badgeTitle = l10n.overdueUpper;
       badgeIcon = Icons.warning_amber_rounded;
     } else {
       badgeBg = colors.billBadgeBg;
       badgeFg = colors.billBadgeText;
-      badgeTitle = 'DUE BY ${bill.formattedDueDate.toUpperCase()}';
+      badgeTitle = l10n.dueByDateUpper(bill.formattedDueDate.toUpperCase());
       badgeIcon = Icons.schedule_rounded;
     }
 
@@ -283,7 +287,7 @@ class _BillDetailPageView extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom: 6),
                 child: Text(
-                  bill.isPaid ? 'Settled' : 'Total Payable',
+                  bill.isPaid ? l10n.settled : l10n.totalPayable,
                   style: context.caption.medium,
                 ),
               ),
@@ -337,6 +341,7 @@ class _BillDetailPageView extends StatelessWidget {
 
   Widget _buildFarmerParticularsCard(BuildContext context, BillEntity bill) {
     final colors = context.colors;
+    final l10n = context.l10n;
 
     return Container(
       decoration: BoxDecoration(
@@ -357,7 +362,7 @@ class _BillDetailPageView extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'Farmer & Command Area Details',
+                l10n.farmerCommandAreaDetails,
                 style: context.sectionTitle.bold,
               ),
             ],
@@ -366,33 +371,33 @@ class _BillDetailPageView extends StatelessWidget {
           Divider(color: colors.billDivider, height: 1),
           const SizedBox(height: AppSpacing.sm),
           _buildInfoRow(
-            'Farmer Name',
+            l10n.farmerName,
             bill.consumerName ?? 'Ramesh Patil',
             context,
           ),
           _buildInfoRow(
-            'Kisan / Consumer ID',
+            l10n.kisanConsumerId,
             bill.consumerId ?? 'KISAN-MH-41201',
             context,
           ),
           _buildInfoRow(
-            'WUA Society',
+            l10n.wuaSociety,
             bill.wuaSocietyName ?? 'Ganga-Godavari WUA #12',
             context,
           ),
           _buildInfoRow(
-            'Canal Section',
+            l10n.canalSection,
             bill.canalSection ?? 'Minor-3 (Outlet 4B)',
             context,
           ),
-          _buildInfoRow('Crop Cultivated', bill.cropType, context),
+          _buildInfoRow(l10n.cropCultivated, bill.cropType, context),
           _buildInfoRow(
-            'Command Land Area',
-            '${bill.landAreaAcres} Acres',
+            l10n.commandLandArea,
+            l10n.acresValue('${bill.landAreaAcres}'),
             context,
           ),
-          _buildInfoRow('Bill Issue Date', bill.formattedBillDate, context),
-          _buildInfoRow('Payment Due Date', bill.formattedDueDate, context),
+          _buildInfoRow(l10n.billIssueDate, bill.formattedBillDate, context),
+          _buildInfoRow(l10n.paymentDueDate, bill.formattedDueDate, context),
         ],
       ),
     );
@@ -402,6 +407,7 @@ class _BillDetailPageView extends StatelessWidget {
 
   Widget _buildWaterConsumptionCard(BuildContext context, BillEntity bill) {
     final colors = context.colors;
+    final l10n = context.l10n;
 
     return Container(
       decoration: BoxDecoration(
@@ -422,7 +428,7 @@ class _BillDetailPageView extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'Water Consumption Metrics',
+                l10n.waterConsumptionMetrics,
                 style: context.sectionTitle.bold,
               ),
             ],
@@ -436,25 +442,27 @@ class _BillDetailPageView extends StatelessWidget {
             children: [
               _buildMetricTile(
                 context,
-                title: 'Total Volume',
+                title: l10n.totalVolume,
                 value:
                     '${NumberFormat('#,###').format(bill.waterQuantityLiters)} L',
-                subtitle: 'Gauged discharge',
+                subtitle: l10n.gaugedDischarge,
               ),
               Container(width: 1, height: 40, color: colors.billDivider),
               _buildMetricTile(
                 context,
-                title: 'Rotations / Wari',
-                value: '${bill.rotationsCount} Turns',
-                subtitle: 'Completed cycles',
+                title: l10n.rotationsWari,
+                value: l10n.turnsCount(bill.rotationsCount),
+                subtitle: l10n.completedCycles,
               ),
               Container(width: 1, height: 40, color: colors.billDivider),
               _buildMetricTile(
                 context,
-                title: 'Water Rate',
-                value:
-                    '₹ ${(bill.subtotal / (bill.landAreaAcres > 0 ? bill.landAreaAcres : 1)).toStringAsFixed(0)} / ac',
-                subtitle: 'Govt canal tariff',
+                title: l10n.waterRate,
+                value: l10n.ratePerAcre(
+                  (bill.subtotal / (bill.landAreaAcres > 0 ? bill.landAreaAcres : 1))
+                      .toStringAsFixed(0),
+                ),
+                subtitle: l10n.govtCanalTariff,
               ),
             ],
           ),
@@ -487,6 +495,7 @@ class _BillDetailPageView extends StatelessWidget {
 
   Widget _buildBreakdownCard(BuildContext context, BillEntity bill) {
     final colors = context.colors;
+    final l10n = context.l10n;
 
     return Container(
       decoration: BoxDecoration(
@@ -507,7 +516,7 @@ class _BillDetailPageView extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'Pani Patti Tariff Breakdown',
+                l10n.paniPattiTariffBreakdown,
                 style: context.sectionTitle.bold,
               ),
             ],
@@ -517,24 +526,24 @@ class _BillDetailPageView extends StatelessWidget {
           const SizedBox(height: AppSpacing.sm),
 
           _buildBreakdownRow(
-            'Base Water Tariff (पाणी पट्टी)',
+            l10n.baseWaterTariff,
             bill.subtotal,
             context,
           ),
           _buildBreakdownRow(
-            'Government Water Cess & Taxes',
+            l10n.govtWaterCessTaxes,
             bill.taxes,
             context,
           ),
           _buildBreakdownRow(
-            'WUA Infrastructure Maintenance',
+            l10n.wuaInfrastructureMaint,
             bill.maintenanceCess,
             context,
           ),
 
           if (bill.penalties > 0)
             _buildBreakdownRow(
-              'Late Overdue Penalty',
+              l10n.lateOverduePenalty,
               bill.penalties,
               context,
               isWarning: true,
@@ -542,7 +551,7 @@ class _BillDetailPageView extends StatelessWidget {
 
           if (bill.discounts > 0)
             _buildBreakdownRow(
-              'Early Settlement Rebate',
+              l10n.earlySettlementRebate,
               -bill.discounts,
               context,
               isPositive: true,
@@ -557,7 +566,7 @@ class _BillDetailPageView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Gross Bill Amount',
+                l10n.grossBillAmount,
                 style: context.bodyMedium.bold.withColor(colors.textPrimary),
               ),
               Text(
@@ -573,7 +582,7 @@ class _BillDetailPageView extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Amount Paid',
+                  l10n.amountPaid,
                   style: context.bodySmall.withColor(AppColors.success),
                 ),
                 Text(
@@ -597,7 +606,7 @@ class _BillDetailPageView extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Net Outstanding Balance',
+                  l10n.netOutstandingBalance,
                   style: context.titleSmall.bold.withColor(colors.textPrimary),
                 ),
                 Text(
@@ -620,6 +629,7 @@ class _BillDetailPageView extends StatelessWidget {
 
   Widget _buildActionPanel(BuildContext context, BillEntity bill) {
     final colors = context.colors;
+    final l10n = context.l10n;
 
     if (bill.isPaid) {
       return Container(
@@ -645,13 +655,13 @@ class _BillDetailPageView extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Payment Completed',
+                        l10n.paymentCompleted,
                         style: context.labelMedium.bold.withColor(
                           AppColors.success,
                         ),
                       ),
                       Text(
-                        'Ref: ${bill.paymentReference ?? 'UPI/WRD/894123'}',
+                        l10n.refPrefix(bill.paymentReference ?? 'UPI/WRD/894123'),
                         style: context.caption.withSize(11),
                       ),
                     ],
@@ -673,7 +683,7 @@ class _BillDetailPageView extends StatelessWidget {
                 ),
               ),
               icon: const Icon(Icons.receipt_long_rounded, size: 18),
-              label: const Text('View Official E-Receipt'),
+              label: Text(l10n.viewOfficialEReceipt),
             ),
           ],
         ),
@@ -693,9 +703,7 @@ class _BillDetailPageView extends StatelessWidget {
         children: [
           ElevatedButton.icon(
             onPressed: () {
-              context.showInfoSnackBar(
-                'Launching UPI payment for ${_formatCurrency(bill.outstandingAmount)}...',
-              );
+              context.push('/payments/checkout?method=upi', extra: bill);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: colors.billCtaBg,
@@ -708,16 +716,14 @@ class _BillDetailPageView extends StatelessWidget {
             ),
             icon: const Icon(Icons.payment_rounded, size: 18),
             label: Text(
-              'Pay ${_formatCurrency(bill.outstandingAmount)} via UPI',
+              l10n.payAmountViaUpi(_formatCurrency(bill.outstandingAmount)),
               style: context.buttonText.bold.white,
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
           OutlinedButton.icon(
             onPressed: () {
-              context.showInfoSnackBar(
-                'Redirecting to Net Banking / Debit Card gateway...',
-              );
+              context.push('/payments/checkout?method=netbanking', extra: bill);
             },
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 13),
@@ -727,7 +733,7 @@ class _BillDetailPageView extends StatelessWidget {
               side: BorderSide(color: colors.cardBorder),
             ),
             icon: const Icon(Icons.account_balance_rounded, size: 16),
-            label: const Text('Net Banking / Debit Card'),
+            label: Text(l10n.netBankingDebitCard),
           ),
           const SizedBox(height: AppSpacing.sm),
           Row(
@@ -740,7 +746,7 @@ class _BillDetailPageView extends StatelessWidget {
               ),
               const SizedBox(width: 4),
               Text(
-                'Secured via WRD Government Payment Gateway',
+                l10n.securedViaWrdGateway,
                 style: context.caption.withSize(10.5),
               ),
             ],

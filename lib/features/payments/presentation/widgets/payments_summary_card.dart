@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:wua_mobile/core/l10n/l10n.dart';
 import 'package:wua_mobile/core/theme/colors.dart';
 import 'package:wua_mobile/core/theme/spacing.dart';
 import 'package:wua_mobile/core/theme/theme_extensions.dart';
@@ -21,6 +22,7 @@ class PaymentsSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final l10n = context.l10n;
     final currencyFormat = NumberFormat.currency(
       locale: 'en_IN',
       symbol: '₹ ',
@@ -53,7 +55,7 @@ class PaymentsSummaryCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'TOTAL SETTLED PAYMENTS',
+                      l10n.totalSettledPayments,
                       style: context.badgeText.bold.withColor(AppColors.success),
                     ),
                     const SizedBox(height: 4),
@@ -79,7 +81,7 @@ class PaymentsSummaryCard extends StatelessWidget {
                     const Icon(Icons.verified_rounded, size: 14, color: AppColors.success),
                     const SizedBox(width: 4),
                     Text(
-                      '$successCount Completed',
+                      l10n.completedCount(successCount),
                       style: context.labelSmall.bold.withColor(AppColors.success),
                     ),
                   ],
@@ -95,21 +97,21 @@ class PaymentsSummaryCard extends StatelessWidget {
             children: [
               _buildMetric(
                 context,
-                title: 'Successful',
+                title: l10n.successful,
                 value: '$successCount',
                 color: AppColors.success,
               ),
               Container(width: 1, height: 26, color: colors.billDivider),
               _buildMetric(
                 context,
-                title: 'Pending',
+                title: l10n.filterPending,
                 value: '$pendingCount',
                 color: pendingCount > 0 ? AppColors.warning : colors.textSecondary,
               ),
               Container(width: 1, height: 26, color: colors.billDivider),
               _buildMetric(
                 context,
-                title: 'Failed',
+                title: l10n.failed,
                 value: '$failedCount',
                 color: failedCount > 0 ? AppColors.error : colors.textSecondary,
               ),

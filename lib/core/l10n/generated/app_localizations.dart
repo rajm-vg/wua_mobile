@@ -831,6 +831,690 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Swipe back again to exit'**
   String get swipeAgainToExit;
+
+  /// No description provided for @failedToLoadPayments.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load payment history'**
+  String get failedToLoadPayments;
+
+  /// No description provided for @searchPaymentsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by receipt no, mode, or season...'**
+  String get searchPaymentsHint;
+
+  /// No description provided for @successful.
+  ///
+  /// In en, this message translates to:
+  /// **'Successful'**
+  String get successful;
+
+  /// No description provided for @failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get failed;
+
+  /// No description provided for @noMatchingTransactions.
+  ///
+  /// In en, this message translates to:
+  /// **'No transactions match your filter'**
+  String get noMatchingTransactions;
+
+  /// No description provided for @noPaymentsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No payments found'**
+  String get noPaymentsFound;
+
+  /// No description provided for @adjustPaymentFiltersHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Try changing your status filter or clearing your search term.'**
+  String get adjustPaymentFiltersHint;
+
+  /// No description provided for @noPaymentsRecordedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'You have no recorded payments or dues transactions yet.'**
+  String get noPaymentsRecordedHint;
+
+  /// No description provided for @resetFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset Filters'**
+  String get resetFilters;
+
+  /// No description provided for @totalSettledPayments.
+  ///
+  /// In en, this message translates to:
+  /// **'TOTAL SETTLED PAYMENTS'**
+  String get totalSettledPayments;
+
+  /// No description provided for @completedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Completed'**
+  String completedCount(int count);
+
+  /// No description provided for @receipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt'**
+  String get receipt;
+
+  /// No description provided for @details.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get details;
+
+  /// No description provided for @paymentReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Receipt'**
+  String get paymentReceipt;
+
+  /// No description provided for @receiptNumberParam.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt #{id}'**
+  String receiptNumberParam(String id);
+
+  /// No description provided for @shareReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Receipt'**
+  String get shareReceipt;
+
+  /// No description provided for @sharingPaymentConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Sharing payment confirmation {paymentNumber}...'**
+  String sharingPaymentConfirmation(String paymentNumber);
+
+  /// No description provided for @viewOfficialEReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'View Official E-Receipt'**
+  String get viewOfficialEReceipt;
+
+  /// No description provided for @paymentSuccessfulUpper.
+  ///
+  /// In en, this message translates to:
+  /// **'PAYMENT SUCCESSFUL'**
+  String get paymentSuccessfulUpper;
+
+  /// No description provided for @paymentFailedUpper.
+  ///
+  /// In en, this message translates to:
+  /// **'PAYMENT FAILED'**
+  String get paymentFailedUpper;
+
+  /// No description provided for @processingUpper.
+  ///
+  /// In en, this message translates to:
+  /// **'PROCESSING'**
+  String get processingUpper;
+
+  /// No description provided for @transactionParticulars.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction Particulars'**
+  String get transactionParticulars;
+
+  /// No description provided for @officialReceiptNo.
+  ///
+  /// In en, this message translates to:
+  /// **'Official Receipt No'**
+  String get officialReceiptNo;
+
+  /// No description provided for @paymentMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Mode'**
+  String get paymentMode;
+
+  /// No description provided for @paymentGateway.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Gateway'**
+  String get paymentGateway;
+
+  /// No description provided for @gatewayRefId.
+  ///
+  /// In en, this message translates to:
+  /// **'Gateway Ref ID / Txn'**
+  String get gatewayRefId;
+
+  /// No description provided for @notAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'N/A'**
+  String get notAvailable;
+
+  /// No description provided for @bankReferenceNo.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank Reference No'**
+  String get bankReferenceNo;
+
+  /// No description provided for @paymentDateTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Date & Time'**
+  String get paymentDateTime;
+
+  /// No description provided for @associatedBillFarmer.
+  ///
+  /// In en, this message translates to:
+  /// **'Associated Bill & Farmer'**
+  String get associatedBillFarmer;
+
+  /// No description provided for @farmerName.
+  ///
+  /// In en, this message translates to:
+  /// **'Farmer Name'**
+  String get farmerName;
+
+  /// No description provided for @kisanConsumerId.
+  ///
+  /// In en, this message translates to:
+  /// **'Kisan / Consumer ID'**
+  String get kisanConsumerId;
+
+  /// No description provided for @wuaSociety.
+  ///
+  /// In en, this message translates to:
+  /// **'WUA Society'**
+  String get wuaSociety;
+
+  /// No description provided for @billNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Bill Number'**
+  String get billNumber;
+
+  /// No description provided for @season.
+  ///
+  /// In en, this message translates to:
+  /// **'Season'**
+  String get season;
+
+  /// No description provided for @cropCultivated.
+  ///
+  /// In en, this message translates to:
+  /// **'Crop Cultivated'**
+  String get cropCultivated;
+
+  /// No description provided for @downloadingDigitalCertificate.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading digital certificate...'**
+  String get downloadingDigitalCertificate;
+
+  /// No description provided for @downloadPdfCertificate.
+  ///
+  /// In en, this message translates to:
+  /// **'Download PDF Certificate'**
+  String get downloadPdfCertificate;
+
+  /// No description provided for @retryFromBillsScreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry from Bills Screen'**
+  String get retryFromBillsScreen;
+
+  /// No description provided for @waterResourcesDepartmentUpper.
+  ///
+  /// In en, this message translates to:
+  /// **'WATER RESOURCES DEPARTMENT'**
+  String get waterResourcesDepartmentUpper;
+
+  /// No description provided for @paniPattiEReceiptTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pani Patti E-Receipt'**
+  String get paniPattiEReceiptTitle;
+
+  /// No description provided for @receiptNoLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt No:'**
+  String get receiptNoLabel;
+
+  /// No description provided for @billNoLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Bill No:'**
+  String get billNoLabel;
+
+  /// No description provided for @seasonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Season:'**
+  String get seasonLabel;
+
+  /// No description provided for @kisanConsumerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Kisan / Consumer:'**
+  String get kisanConsumerLabel;
+
+  /// No description provided for @societyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Society:'**
+  String get societyLabel;
+
+  /// No description provided for @paymentDateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Date:'**
+  String get paymentDateLabel;
+
+  /// No description provided for @paymentModeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Mode:'**
+  String get paymentModeLabel;
+
+  /// No description provided for @refIdTxnLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Ref ID / Txn:'**
+  String get refIdTxnLabel;
+
+  /// No description provided for @totalAmountPaidLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Amount Paid:'**
+  String get totalAmountPaidLabel;
+
+  /// No description provided for @paymentVerifiedByWrd.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Verified by WRD Portal'**
+  String get paymentVerifiedByWrd;
+
+  /// No description provided for @digitalReceiptProofNote.
+  ///
+  /// In en, this message translates to:
+  /// **'This is a digitally generated valid proof of irrigation dues settlement.'**
+  String get digitalReceiptProofNote;
+
+  /// No description provided for @downloadingReceiptPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading official receipt PDF...'**
+  String get downloadingReceiptPdf;
+
+  /// No description provided for @downloadPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Download PDF'**
+  String get downloadPdf;
+
+  /// No description provided for @receiptSharedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt shared via WhatsApp / SMS.'**
+  String get receiptSharedSuccess;
+
+  /// No description provided for @dueWithDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Due {date}'**
+  String dueWithDate(String date);
+
+  /// No description provided for @waterForAcres.
+  ///
+  /// In en, this message translates to:
+  /// **'{liters} L water for {acres} Acres'**
+  String waterForAcres(String liters, String acres);
+
+  /// No description provided for @commandAreaCessForAcres.
+  ///
+  /// In en, this message translates to:
+  /// **'Command area cess for {acres} Acres'**
+  String commandAreaCessForAcres(String acres);
+
+  /// No description provided for @govtCessShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Govt Cess'**
+  String get govtCessShort;
+
+  /// No description provided for @wuaMaintShort.
+  ///
+  /// In en, this message translates to:
+  /// **'WUA Maint.'**
+  String get wuaMaintShort;
+
+  /// No description provided for @totalWaterDuesUpper.
+  ///
+  /// In en, this message translates to:
+  /// **'TOTAL WATER DUES (PANI PATTI)'**
+  String get totalWaterDuesUpper;
+
+  /// No description provided for @overdueCountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Overdue'**
+  String overdueCountLabel(int count);
+
+  /// No description provided for @dueCountLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Due'**
+  String dueCountLabel(int count);
+
+  /// No description provided for @allDuesCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'All Dues Cleared'**
+  String get allDuesCleared;
+
+  /// No description provided for @pendingBills.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending Bills'**
+  String get pendingBills;
+
+  /// No description provided for @paidBills.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid Bills'**
+  String get paidBills;
+
+  /// No description provided for @failedToLoadBills.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load bills'**
+  String get failedToLoadBills;
+
+  /// No description provided for @searchBillsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by bill no, season, or crop...'**
+  String get searchBillsHint;
+
+  /// No description provided for @duePending.
+  ///
+  /// In en, this message translates to:
+  /// **'Due / Pending'**
+  String get duePending;
+
+  /// No description provided for @noMatchingBills.
+  ///
+  /// In en, this message translates to:
+  /// **'No bills match your filter'**
+  String get noMatchingBills;
+
+  /// No description provided for @noBillsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No bills found'**
+  String get noBillsFound;
+
+  /// No description provided for @adjustBillFiltersHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Try selecting a different status or clear your search query.'**
+  String get adjustBillFiltersHint;
+
+  /// No description provided for @noBillsRecordedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'You have no recorded irrigation water bills at this time.'**
+  String get noBillsRecordedHint;
+
+  /// No description provided for @billDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Bill Details'**
+  String get billDetails;
+
+  /// No description provided for @invoiceNumberParam.
+  ///
+  /// In en, this message translates to:
+  /// **'Invoice #{id}'**
+  String invoiceNumberParam(String id);
+
+  /// No description provided for @shareBill.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Bill'**
+  String get shareBill;
+
+  /// No description provided for @sharingBillNotice.
+  ///
+  /// In en, this message translates to:
+  /// **'Sharing bill {billNumber}...'**
+  String sharingBillNotice(String billNumber);
+
+  /// No description provided for @viewOfficialReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'View Official Receipt'**
+  String get viewOfficialReceipt;
+
+  /// No description provided for @paidInFullUpper.
+  ///
+  /// In en, this message translates to:
+  /// **'PAID IN FULL'**
+  String get paidInFullUpper;
+
+  /// No description provided for @overdueUpper.
+  ///
+  /// In en, this message translates to:
+  /// **'OVERDUE'**
+  String get overdueUpper;
+
+  /// No description provided for @dueByDateUpper.
+  ///
+  /// In en, this message translates to:
+  /// **'DUE BY {date}'**
+  String dueByDateUpper(String date);
+
+  /// No description provided for @settled.
+  ///
+  /// In en, this message translates to:
+  /// **'Settled'**
+  String get settled;
+
+  /// No description provided for @totalPayable.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Payable'**
+  String get totalPayable;
+
+  /// No description provided for @farmerCommandAreaDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Farmer & Command Area Details'**
+  String get farmerCommandAreaDetails;
+
+  /// No description provided for @canalSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Canal Section'**
+  String get canalSection;
+
+  /// No description provided for @commandLandArea.
+  ///
+  /// In en, this message translates to:
+  /// **'Command Land Area'**
+  String get commandLandArea;
+
+  /// No description provided for @acresValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{acres} Acres'**
+  String acresValue(String acres);
+
+  /// No description provided for @billIssueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Bill Issue Date'**
+  String get billIssueDate;
+
+  /// No description provided for @paymentDueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Due Date'**
+  String get paymentDueDate;
+
+  /// No description provided for @waterConsumptionMetrics.
+  ///
+  /// In en, this message translates to:
+  /// **'Water Consumption Metrics'**
+  String get waterConsumptionMetrics;
+
+  /// No description provided for @totalVolume.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Volume'**
+  String get totalVolume;
+
+  /// No description provided for @gaugedDischarge.
+  ///
+  /// In en, this message translates to:
+  /// **'Gauged discharge'**
+  String get gaugedDischarge;
+
+  /// No description provided for @rotationsWari.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotations / Wari'**
+  String get rotationsWari;
+
+  /// No description provided for @turnsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} Turns'**
+  String turnsCount(int count);
+
+  /// No description provided for @completedCycles.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed cycles'**
+  String get completedCycles;
+
+  /// No description provided for @waterRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Water Rate'**
+  String get waterRate;
+
+  /// No description provided for @ratePerAcre.
+  ///
+  /// In en, this message translates to:
+  /// **'₹ {rate} / ac'**
+  String ratePerAcre(String rate);
+
+  /// No description provided for @govtCanalTariff.
+  ///
+  /// In en, this message translates to:
+  /// **'Govt canal tariff'**
+  String get govtCanalTariff;
+
+  /// No description provided for @paniPattiTariffBreakdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Pani Patti Tariff Breakdown'**
+  String get paniPattiTariffBreakdown;
+
+  /// No description provided for @baseWaterTariff.
+  ///
+  /// In en, this message translates to:
+  /// **'Base Water Tariff'**
+  String get baseWaterTariff;
+
+  /// No description provided for @govtWaterCessTaxes.
+  ///
+  /// In en, this message translates to:
+  /// **'Government Water Cess & Taxes'**
+  String get govtWaterCessTaxes;
+
+  /// No description provided for @wuaInfrastructureMaint.
+  ///
+  /// In en, this message translates to:
+  /// **'WUA Infrastructure Maintenance'**
+  String get wuaInfrastructureMaint;
+
+  /// No description provided for @lateOverduePenalty.
+  ///
+  /// In en, this message translates to:
+  /// **'Late Overdue Penalty'**
+  String get lateOverduePenalty;
+
+  /// No description provided for @earlySettlementRebate.
+  ///
+  /// In en, this message translates to:
+  /// **'Early Settlement Rebate'**
+  String get earlySettlementRebate;
+
+  /// No description provided for @grossBillAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Gross Bill Amount'**
+  String get grossBillAmount;
+
+  /// No description provided for @amountPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount Paid'**
+  String get amountPaid;
+
+  /// No description provided for @netOutstandingBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Net Outstanding Balance'**
+  String get netOutstandingBalance;
+
+  /// No description provided for @paymentCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Completed'**
+  String get paymentCompleted;
+
+  /// No description provided for @refPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Ref: {ref}'**
+  String refPrefix(String ref);
+
+  /// No description provided for @launchingUpiPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Launching UPI payment for {amount}...'**
+  String launchingUpiPayment(String amount);
+
+  /// No description provided for @payAmountViaUpi.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay {amount} via UPI'**
+  String payAmountViaUpi(String amount);
+
+  /// No description provided for @redirectingNetBanking.
+  ///
+  /// In en, this message translates to:
+  /// **'Redirecting to Net Banking / Debit Card gateway...'**
+  String get redirectingNetBanking;
+
+  /// No description provided for @netBankingDebitCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Net Banking / Debit Card'**
+  String get netBankingDebitCard;
+
+  /// No description provided for @securedViaWrdGateway.
+  ///
+  /// In en, this message translates to:
+  /// **'Secured via WRD Government Payment Gateway'**
+  String get securedViaWrdGateway;
 }
 
 class _AppLocalizationsDelegate

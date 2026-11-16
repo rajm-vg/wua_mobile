@@ -12,6 +12,13 @@ abstract class BillRemoteDataSource {
   });
 
   Future<BillModel> getBillById(String id);
+
+  Future<BillModel> markBillAsPaid(
+    String id, {
+    required String paymentReference,
+    required String paymentMethod,
+    required double paidAmount,
+  });
 }
 
 /// Remote Bills data source with simulated WUA & WRD irrigation backend dataset.
@@ -262,6 +269,57 @@ class BillRemoteDataSourceImpl implements BillRemoteDataSource {
     );
 
     return bill;
+  }
+
+  @override
+  Future<BillModel> markBillAsPaid(
+    String id, {
+    required String paymentReference,
+    required String paymentMethod,
+    required double paidAmount,
+  }) async {
+    await Future<void>.delayed(const Duration(milliseconds: 300));
+    final index = _mockBills.indexWhere((b) => b.id == id || b.billNumber == id);
+    if (index == -1) {
+      throw Exception('Bill with ID "$id" not found');
+    }
+
+    final old = _mockBills[index];
+    final updated = BillModel(
+      id: old.id,
+      billNumber: old.billNumber,
+      status: BillStatus.paid,
+      consumerId: old.consumerId,
+      consumerName: old.consumerName,
+      wuaSocietyName: old.wuaSocietyName,
+      canalSection: old.canalSection,
+      season: old.season,
+      cropType: old.cropType,
+      landAreaAcres: old.landAreaAcres,
+      waterQuantityLiters: old.waterQuantityLiters,
+      rotationsCount: old.rotationsCount,
+      billDate: old.billDate,
+      dueDate: old.dueDate,
+      subtotal: old.subtotal,
+      taxes: old.taxes,
+      maintenanceCess: old.maintenanceCess,
+      penalties: old.penalties,
+      interestAmount: old.interestAmount,
+      discounts: old.discounts,
+      adjustmentAmount: old.adjustmentAmount,
+      totalAmount: old.totalAmount,
+      paidAmount: paidAmount > 0 ? paidAmount : old.totalAmount,
+      outstandingAmount: 0.0,
+      paymentReference: paymentReference,
+      paymentDate: DateTime.now(),
+      paymentMethod: paymentMethod,
+      notes: old.notes,
+      metadata: old.metadata,
+    );
+
+    _mockBills[index] = updated;
+    AppLogger.repository('📦 [BILLS REMOTE] Marked bill ${old.billNumber} as PAID');
+    return updated;
   }
 }
 

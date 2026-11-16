@@ -16,6 +16,7 @@ class PaymentsBloc extends Bloc<PaymentsEvent, PaymentsState> {
     on<SearchPaymentsEvent>(_onSearchPayments);
     on<ClearPaymentFiltersEvent>(_onClearPaymentFilters);
     on<LoadPaymentDetailEvent>(_onLoadPaymentDetail);
+    on<RecordPaymentEvent>(_onRecordPayment);
   }
 
   final GetPaymentsUseCase getPaymentsUseCase;
@@ -178,6 +179,26 @@ class PaymentsBloc extends Bloc<PaymentsEvent, PaymentsState> {
     }
 
     return list;
+  }
+
+  void _onRecordPayment(
+    RecordPaymentEvent event,
+    Emitter<PaymentsState> emit,
+  ) {
+    _cachedPayments = [event.payment, ..._cachedPayments];
+    final filtered = _applyFilters(
+      payments: _cachedPayments,
+      status: _activeStatus,
+      query: _activeQuery,
+    );
+    emit(
+      PaymentsLoaded(
+        allPayments: _cachedPayments,
+        filteredPayments: filtered,
+        selectedStatus: _activeStatus,
+        searchQuery: _activeQuery,
+      ),
+    );
   }
 }
 

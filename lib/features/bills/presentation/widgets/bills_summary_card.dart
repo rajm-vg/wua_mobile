@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:wua_mobile/core/l10n/l10n.dart';
 import 'package:wua_mobile/core/theme/colors.dart';
 import 'package:wua_mobile/core/theme/spacing.dart';
 import 'package:wua_mobile/core/theme/theme_extensions.dart';
@@ -24,6 +25,7 @@ class BillsSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final l10n = context.l10n;
     final currencyFormat = NumberFormat.currency(
       locale: 'en_IN',
       symbol: '₹ ',
@@ -59,7 +61,7 @@ class BillsSummaryCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'TOTAL WATER DUES (PANI PATTI)',
+                      l10n.totalWaterDuesUpper,
                       style: context.badgeText.bold.withColor(
                         hasDues ? AppColors.warning : AppColors.success,
                       ),
@@ -94,7 +96,9 @@ class BillsSummaryCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        overdueCount > 0 ? '$overdueCount Overdue' : '$pendingCount Due',
+                        overdueCount > 0
+                            ? l10n.overdueCountLabel(overdueCount)
+                            : l10n.dueCountLabel(pendingCount),
                         style: context.labelSmall.bold.withColor(
                           overdueCount > 0 ? AppColors.error : colors.billBadgeText,
                         ),
@@ -115,7 +119,7 @@ class BillsSummaryCard extends StatelessWidget {
                       const Icon(Icons.check_circle_rounded, size: 14, color: AppColors.success),
                       const SizedBox(width: 4),
                       Text(
-                        'All Dues Cleared',
+                        l10n.allDuesCleared,
                         style: context.labelSmall.bold.withColor(AppColors.success),
                       ),
                     ],
@@ -134,21 +138,21 @@ class BillsSummaryCard extends StatelessWidget {
             children: [
               _buildMetric(
                 context,
-                title: 'Pending Bills',
+                title: l10n.pendingBills,
                 value: '$pendingCount',
                 color: colors.textPrimary,
               ),
               Container(width: 1, height: 26, color: colors.billDivider),
               _buildMetric(
                 context,
-                title: 'Overdue',
+                title: l10n.filterOverdue,
                 value: '$overdueCount',
                 color: overdueCount > 0 ? AppColors.error : colors.textSecondary,
               ),
               Container(width: 1, height: 26, color: colors.billDivider),
               _buildMetric(
                 context,
-                title: 'Paid Bills',
+                title: l10n.paidBills,
                 value: '$paidCount',
                 color: AppColors.success,
               ),

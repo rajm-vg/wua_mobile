@@ -378,4 +378,388 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get swipeAgainToExit => 'बाहर निकलने के लिए फिर से स्वाइप करें';
+
+  @override
+  String get failedToLoadPayments => 'भुगतान इतिहास लोड करने में विफल';
+
+  @override
+  String get searchPaymentsHint => 'रसीद संख्या, माध्यम या मौसम से खोजें...';
+
+  @override
+  String get successful => 'सफल';
+
+  @override
+  String get failed => 'विफल';
+
+  @override
+  String get noMatchingTransactions =>
+      'आपके फ़िल्टर से कोई लेन-देन मेल नहीं खाता';
+
+  @override
+  String get noPaymentsFound => 'कोई भुगतान नहीं मिला';
+
+  @override
+  String get adjustPaymentFiltersHint =>
+      'स्थिति फ़िल्टर बदलकर या खोज शब्द हटाकर पुनः प्रयास करें।';
+
+  @override
+  String get noPaymentsRecordedHint =>
+      'अभी तक आपका कोई दर्ज भुगतान या बकाया लेन-देन नहीं है।';
+
+  @override
+  String get resetFilters => 'फ़िल्टर रीसेट करें';
+
+  @override
+  String get totalSettledPayments => 'कुल निपटाए गए भुगतान';
+
+  @override
+  String completedCount(int count) {
+    return '$count पूर्ण';
+  }
+
+  @override
+  String get receipt => 'रसीद';
+
+  @override
+  String get details => 'विवरण';
+
+  @override
+  String get paymentReceipt => 'भुगतान रसीद';
+
+  @override
+  String receiptNumberParam(String id) {
+    return 'रसीद #$id';
+  }
+
+  @override
+  String get shareReceipt => 'रसीद साझा करें';
+
+  @override
+  String sharingPaymentConfirmation(String paymentNumber) {
+    return 'भुगतान पुष्टि $paymentNumber साझा की जा रही है...';
+  }
+
+  @override
+  String get viewOfficialEReceipt => 'आधिकारिक ई-रसीद देखें';
+
+  @override
+  String get paymentSuccessfulUpper => 'भुगतान सफल';
+
+  @override
+  String get paymentFailedUpper => 'भुगतान विफल';
+
+  @override
+  String get processingUpper => 'प्रक्रियाधीन';
+
+  @override
+  String get transactionParticulars => 'लेन-देन विवरण';
+
+  @override
+  String get officialReceiptNo => 'आधिकारिक रसीद संख्या';
+
+  @override
+  String get paymentMode => 'भुगतान का माध्यम';
+
+  @override
+  String get paymentGateway => 'पेमेंट गेटवे';
+
+  @override
+  String get gatewayRefId => 'गेटवे संदर्भ / लेन-देन ID';
+
+  @override
+  String get notAvailable => 'उपलब्ध नहीं';
+
+  @override
+  String get bankReferenceNo => 'बैंक संदर्भ संख्या';
+
+  @override
+  String get paymentDateTime => 'भुगतान तिथि एवं समय';
+
+  @override
+  String get associatedBillFarmer => 'संबंधित बिल एवं किसान';
+
+  @override
+  String get farmerName => 'किसान का नाम';
+
+  @override
+  String get kisanConsumerId => 'किसान / उपभोक्ता ID';
+
+  @override
+  String get wuaSociety => 'डब्ल्यू.यू.ए. संस्था';
+
+  @override
+  String get billNumber => 'बिल संख्या';
+
+  @override
+  String get season => 'मौसम';
+
+  @override
+  String get cropCultivated => 'उगाई गई फसल';
+
+  @override
+  String get downloadingDigitalCertificate =>
+      'डिजिटल प्रमाणपत्र डाउनलोड हो रहा है...';
+
+  @override
+  String get downloadPdfCertificate => 'PDF प्रमाणपत्र डाउनलोड करें';
+
+  @override
+  String get retryFromBillsScreen => 'बिल स्क्रीन से पुनः प्रयास करें';
+
+  @override
+  String get waterResourcesDepartmentUpper => 'जल संसाधन विभाग';
+
+  @override
+  String get paniPattiEReceiptTitle => 'पानी पट्टी ई-रसीद';
+
+  @override
+  String get receiptNoLabel => 'रसीद संख्या:';
+
+  @override
+  String get billNoLabel => 'बिल संख्या:';
+
+  @override
+  String get seasonLabel => 'मौसम:';
+
+  @override
+  String get kisanConsumerLabel => 'किसान / उपभोक्ता:';
+
+  @override
+  String get societyLabel => 'संस्था:';
+
+  @override
+  String get paymentDateLabel => 'भुगतान तिथि:';
+
+  @override
+  String get paymentModeLabel => 'भुगतान माध्यम:';
+
+  @override
+  String get refIdTxnLabel => 'संदर्भ / लेन-देन ID:';
+
+  @override
+  String get totalAmountPaidLabel => 'कुल भुगतान राशि:';
+
+  @override
+  String get paymentVerifiedByWrd => 'WRD पोर्टल द्वारा सत्यापित भुगतान';
+
+  @override
+  String get digitalReceiptProofNote =>
+      'यह सिंचाई बकाया निपटान का डिजिटल रूप से उत्पन्न वैध प्रमाण है।';
+
+  @override
+  String get downloadingReceiptPdf => 'आधिकारिक रसीद PDF डाउनलोड हो रही है...';
+
+  @override
+  String get downloadPdf => 'PDF डाउनलोड करें';
+
+  @override
+  String get receiptSharedSuccess => 'रसीद WhatsApp / SMS द्वारा साझा की गई।';
+
+  @override
+  String dueWithDate(String date) {
+    return 'देय $date';
+  }
+
+  @override
+  String waterForAcres(String liters, String acres) {
+    return '$acres एकड़ हेतु $liters L जल';
+  }
+
+  @override
+  String commandAreaCessForAcres(String acres) {
+    return '$acres एकड़ हेतु कमान क्षेत्र उपकर';
+  }
+
+  @override
+  String get govtCessShort => 'सरकारी उपकर';
+
+  @override
+  String get wuaMaintShort => 'संस्था रखरखाव';
+
+  @override
+  String get totalWaterDuesUpper => 'कुल जल बकाया (पानी पट्टी)';
+
+  @override
+  String overdueCountLabel(int count) {
+    return '$count अतिदेय';
+  }
+
+  @override
+  String dueCountLabel(int count) {
+    return '$count देय';
+  }
+
+  @override
+  String get allDuesCleared => 'सभी बकाया चुकता';
+
+  @override
+  String get pendingBills => 'लंबित बिल';
+
+  @override
+  String get paidBills => 'भुगतान किए गए बिल';
+
+  @override
+  String get failedToLoadBills => 'बिल लोड करने में विफल';
+
+  @override
+  String get searchBillsHint => 'बिल संख्या, मौसम या फसल से खोजें...';
+
+  @override
+  String get duePending => 'देय / लंबित';
+
+  @override
+  String get noMatchingBills => 'आपके फ़िल्टर से कोई बिल मेल नहीं खाता';
+
+  @override
+  String get noBillsFound => 'कोई बिल नहीं मिला';
+
+  @override
+  String get adjustBillFiltersHint =>
+      'कोई अन्य स्थिति चुनें या अपनी खोज साफ़ करें।';
+
+  @override
+  String get noBillsRecordedHint =>
+      'इस समय आपके नाम कोई सिंचाई जल बिल दर्ज नहीं है।';
+
+  @override
+  String get billDetails => 'बिल विवरण';
+
+  @override
+  String invoiceNumberParam(String id) {
+    return 'बिल #$id';
+  }
+
+  @override
+  String get shareBill => 'बिल साझा करें';
+
+  @override
+  String sharingBillNotice(String billNumber) {
+    return 'बिल $billNumber साझा किया जा रहा है...';
+  }
+
+  @override
+  String get viewOfficialReceipt => 'आधिकारिक रसीद देखें';
+
+  @override
+  String get paidInFullUpper => 'पूर्ण भुगतान';
+
+  @override
+  String get overdueUpper => 'अतिदेय';
+
+  @override
+  String dueByDateUpper(String date) {
+    return 'अंतिम तिथि $date';
+  }
+
+  @override
+  String get settled => 'चुकता';
+
+  @override
+  String get totalPayable => 'कुल देय';
+
+  @override
+  String get farmerCommandAreaDetails => 'किसान एवं कमान क्षेत्र विवरण';
+
+  @override
+  String get canalSection => 'नहर अनुभाग';
+
+  @override
+  String get commandLandArea => 'कमान भूमि क्षेत्र';
+
+  @override
+  String acresValue(String acres) {
+    return '$acres एकड़';
+  }
+
+  @override
+  String get billIssueDate => 'बिल जारी तिथि';
+
+  @override
+  String get paymentDueDate => 'भुगतान की अंतिम तिथि';
+
+  @override
+  String get waterConsumptionMetrics => 'जल उपभोग विवरण';
+
+  @override
+  String get totalVolume => 'कुल मात्रा';
+
+  @override
+  String get gaugedDischarge => 'मापा गया प्रवाह';
+
+  @override
+  String get rotationsWari => 'चक्र / वारी';
+
+  @override
+  String turnsCount(int count) {
+    return '$count चक्र';
+  }
+
+  @override
+  String get completedCycles => 'पूर्ण चक्र';
+
+  @override
+  String get waterRate => 'जल दर';
+
+  @override
+  String ratePerAcre(String rate) {
+    return '₹ $rate / एकड़';
+  }
+
+  @override
+  String get govtCanalTariff => 'सरकारी नहर दर';
+
+  @override
+  String get paniPattiTariffBreakdown => 'पानी पट्टी शुल्क विवरण';
+
+  @override
+  String get baseWaterTariff => 'मूल जल शुल्क (पानी पट्टी)';
+
+  @override
+  String get govtWaterCessTaxes => 'सरकारी जल उपकर एवं कर';
+
+  @override
+  String get wuaInfrastructureMaint => 'संस्था अवसंरचना रखरखाव';
+
+  @override
+  String get lateOverduePenalty => 'विलंब अतिदेय जुर्माना';
+
+  @override
+  String get earlySettlementRebate => 'शीघ्र भुगतान छूट';
+
+  @override
+  String get grossBillAmount => 'सकल बिल राशि';
+
+  @override
+  String get amountPaid => 'भुगतान की गई राशि';
+
+  @override
+  String get netOutstandingBalance => 'शुद्ध बकाया शेष';
+
+  @override
+  String get paymentCompleted => 'भुगतान पूर्ण हुआ';
+
+  @override
+  String refPrefix(String ref) {
+    return 'संदर्भ: $ref';
+  }
+
+  @override
+  String launchingUpiPayment(String amount) {
+    return '$amount के लिए UPI भुगतान शुरू किया जा रहा है...';
+  }
+
+  @override
+  String payAmountViaUpi(String amount) {
+    return 'UPI से $amount भुगतान करें';
+  }
+
+  @override
+  String get redirectingNetBanking =>
+      'नेट बैंकिंग / डेबिट कार्ड गेटवे पर भेजा जा रहा है...';
+
+  @override
+  String get netBankingDebitCard => 'नेट बैंकिंग / डेबिट कार्ड';
+
+  @override
+  String get securedViaWrdGateway => 'WRD सरकारी पेमेंट गेटवे द्वारा सुरक्षित';
 }

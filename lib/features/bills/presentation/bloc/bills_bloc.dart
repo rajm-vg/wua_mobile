@@ -15,6 +15,7 @@ class BillsBloc extends Bloc<BillsEvent, BillsState> {
     on<SearchBillsEvent>(_onSearchBills);
     on<ClearBillFiltersEvent>(_onClearBillFilters);
     on<LoadBillDetailEvent>(_onLoadBillDetail);
+    on<MarkBillPaidEvent>(_onMarkBillPaid);
   }
 
   final GetBillsUseCase getBillsUseCase;
@@ -182,5 +183,39 @@ class BillsBloc extends Bloc<BillsEvent, BillsState> {
     }
 
     return list;
+  }
+
+  void _onMarkBillPaid(
+    MarkBillPaidEvent event,
+    Emitter<BillsState> emit,
+  ) {
+    _cachedBills = _cachedBills.map((b) {
+      if (b.id == event.billId || b.billNumber == event.billId) {
+        return b.copyWith(
+          status: BillStatus.paid,
+          paidAmount: event.paidAmount > 0 ? event.paidAmount : b.totalAmount,
+          outstandingAmount: 0.0,
+          paymentReference: event.paymentReference,
+          paymentDate: DateTime.now(),
+          paymentMethod: event.paymentMethod,
+        );
+      }
+      return b;
+    }).toList();
+
+    final filtered = _applyFilters(
+      bills: _cachedBills,
+      status: _activeStatus,
+      query: _activeQuery,
+    );
+
+    emit(
+      BillsLoaded(
+        allBills: _cachedBills,
+        filteredBills: filtered,
+        selectedStatus: _activeStatus,
+        searchQuery: _activeQuery,
+      ),
+    );
   }
 }

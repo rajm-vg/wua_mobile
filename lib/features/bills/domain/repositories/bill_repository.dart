@@ -13,4 +13,11 @@ abstract class BillRepository {
 
   /// Fetches a specific bill by its unique ID.
   Future<Either<Failure, BillEntity>> getBillById(String id);
+
+  Future<Either<Failure, BillEntity>> markBillAsPaid(
+    String id, {
+    required String paymentReference,
+    required String paymentMethod,
+    required double paidAmount,
+  });
 }

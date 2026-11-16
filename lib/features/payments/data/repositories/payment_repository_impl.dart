@@ -3,6 +3,7 @@ import 'package:wua_mobile/core/errors/exceptions.dart';
 import 'package:wua_mobile/core/errors/failures.dart';
 import 'package:wua_mobile/core/network/network_info.dart';
 import 'package:wua_mobile/features/payments/data/datasources/payment_remote_datasource.dart';
+import 'package:wua_mobile/features/payments/data/models/payment_model.dart';
 import 'package:wua_mobile/features/payments/domain/entities/payment_entity.dart';
 import 'package:wua_mobile/features/payments/domain/repositories/payment_repository.dart';
 
@@ -66,6 +67,54 @@ class PaymentRepositoryImpl implements PaymentRepository {
     } catch (e) {
       return Left(
         ServerFailure(message: 'Failed to retrieve payment: ${e.toString()}'),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, PaymentEntity>> processPayment(
+    PaymentEntity payment,
+  ) async {
+    try {
+      final isConnected = await networkInfo.isConnected;
+      if (!isConnected) {
+        return const Left(
+          NetworkFailure(
+            message: 'No active network connection. Please check your internet.',
+          ),
+        );
+      }
+
+      final model = payment is PaymentModel
+          ? payment
+          : PaymentModel(
+              id: payment.id,
+              paymentNumber: payment.paymentNumber,
+              status: payment.status,
+              amount: payment.amount,
+              paymentDate: payment.paymentDate,
+              billId: payment.billId,
+              billNumber: payment.billNumber,
+              consumerId: payment.consumerId,
+              consumerName: payment.consumerName,
+              wuaSocietyName: payment.wuaSocietyName,
+              season: payment.season,
+              cropType: payment.cropType,
+              paymentMode: payment.paymentMode,
+              gatewayTransactionId: payment.gatewayTransactionId,
+              bankReference: payment.bankReference,
+              gatewayName: payment.gatewayName,
+              remarks: payment.remarks,
+              metadata: payment.metadata,
+            );
+
+      final result = await remoteDataSource.processPayment(model);
+      return Right(result);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message, code: e.statusCode));
+    } catch (e) {
+      return Left(
+        ServerFailure(message: 'Failed to process payment: ${e.toString()}'),
       );
     }
   }

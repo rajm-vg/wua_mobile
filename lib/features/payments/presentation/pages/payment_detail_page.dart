@@ -63,12 +63,13 @@ class _PaymentDetailPageView extends StatelessWidget {
         }
 
         final payment = activePayment;
+        final l10n = context.l10n;
 
         return WuaScaffold(
-          title: 'Payment Receipt',
+          title: l10n.paymentReceipt,
           subtitle: payment != null
               ? payment.paymentNumber
-              : 'Receipt #$paymentId',
+              : l10n.receiptNumberParam(paymentId),
           showBackButton: true,
           scrollable: true,
           padding: EdgeInsets.zero,
@@ -82,17 +83,17 @@ class _PaymentDetailPageView extends StatelessWidget {
           actions: payment != null
               ? [
                   IconButton(
-                    tooltip: 'Share Receipt',
+                    tooltip: l10n.shareReceipt,
                     icon: const Icon(Icons.share_rounded),
                     onPressed: () {
                       context.showInfoSnackBar(
-                        'Sharing payment confirmation ${payment.paymentNumber}...',
+                        l10n.sharingPaymentConfirmation(payment.paymentNumber),
                       );
                     },
                   ),
                   if (payment.isSuccess)
                     IconButton(
-                      tooltip: 'View Official E-Receipt',
+                      tooltip: l10n.viewOfficialEReceipt,
                       icon: const Icon(Icons.receipt_long_rounded),
                       onPressed: () => _openOfficialReceipt(context, payment),
                     ),
@@ -173,6 +174,7 @@ class _PaymentDetailPageView extends StatelessWidget {
 
   Widget _buildHeroBanner(BuildContext context, PaymentEntity payment) {
     final colors = context.colors;
+    final l10n = context.l10n;
 
     Color badgeBg;
     Color badgeFg;
@@ -182,17 +184,17 @@ class _PaymentDetailPageView extends StatelessWidget {
     if (payment.isSuccess) {
       badgeBg = AppColors.success.withValues(alpha: 0.12);
       badgeFg = AppColors.success;
-      statusTitle = 'PAYMENT SUCCESSFUL';
+      statusTitle = l10n.paymentSuccessfulUpper;
       statusIcon = Icons.check_circle_rounded;
     } else if (payment.isFailed) {
       badgeBg = AppColors.error.withValues(alpha: 0.12);
       badgeFg = AppColors.error;
-      statusTitle = 'PAYMENT FAILED';
+      statusTitle = l10n.paymentFailedUpper;
       statusIcon = Icons.cancel_rounded;
     } else {
       badgeBg = AppColors.warning.withValues(alpha: 0.12);
       badgeFg = AppColors.warning;
-      statusTitle = 'PROCESSING';
+      statusTitle = l10n.processingUpper;
       statusIcon = Icons.timelapse_rounded;
     }
 
@@ -315,6 +317,7 @@ class _PaymentDetailPageView extends StatelessWidget {
     PaymentEntity payment,
   ) {
     final colors = context.colors;
+    final l10n = context.l10n;
 
     return Container(
       decoration: BoxDecoration(
@@ -334,27 +337,27 @@ class _PaymentDetailPageView extends StatelessWidget {
                 color: AppColors.headerTeal,
               ),
               const SizedBox(width: 8),
-              Text('Transaction Particulars', style: context.sectionTitle.bold),
+              Text(l10n.transactionParticulars, style: context.sectionTitle.bold),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
           Divider(color: colors.billDivider, height: 1),
           const SizedBox(height: AppSpacing.sm),
-          _buildInfoRow('Official Receipt No', payment.paymentNumber, context),
-          _buildInfoRow('Payment Mode', payment.paymentMode, context),
-          _buildInfoRow('Payment Gateway', payment.gatewayName, context),
+          _buildInfoRow(l10n.officialReceiptNo, payment.paymentNumber, context),
+          _buildInfoRow(l10n.paymentMode, payment.paymentMode, context),
+          _buildInfoRow(l10n.paymentGateway, payment.gatewayName, context),
           _buildInfoRow(
-            'Gateway Ref ID / Txn',
-            payment.gatewayTransactionId ?? 'N/A',
+            l10n.gatewayRefId,
+            payment.gatewayTransactionId ?? l10n.notAvailable,
             context,
           ),
           _buildInfoRow(
-            'Bank Reference No',
-            payment.bankReference ?? 'N/A',
+            l10n.bankReferenceNo,
+            payment.bankReference ?? l10n.notAvailable,
             context,
           ),
           _buildInfoRow(
-            'Payment Date & Time',
+            l10n.paymentDateTime,
             payment.formattedDateTime,
             context,
           ),
@@ -370,6 +373,7 @@ class _PaymentDetailPageView extends StatelessWidget {
     PaymentEntity payment,
   ) {
     final colors = context.colors;
+    final l10n = context.l10n;
 
     return Container(
       decoration: BoxDecoration(
@@ -390,7 +394,7 @@ class _PaymentDetailPageView extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                'Associated Bill & Farmer',
+                l10n.associatedBillFarmer,
                 style: context.sectionTitle.bold,
               ),
             ],
@@ -399,27 +403,27 @@ class _PaymentDetailPageView extends StatelessWidget {
           Divider(color: colors.billDivider, height: 1),
           const SizedBox(height: AppSpacing.sm),
           _buildInfoRow(
-            'Farmer Name',
+            l10n.farmerName,
             payment.consumerName ?? 'Ramesh Patil',
             context,
           ),
           _buildInfoRow(
-            'Kisan / Consumer ID',
+            l10n.kisanConsumerId,
             payment.consumerId ?? 'KISAN-MH-41201',
             context,
           ),
           _buildInfoRow(
-            'WUA Society',
+            l10n.wuaSociety,
             payment.wuaSocietyName ?? 'Ganga-Godavari WUA #12',
             context,
           ),
           _buildInfoRow(
-            'Bill Number',
+            l10n.billNumber,
             payment.billNumber ?? 'WUA-PANI-BILL',
             context,
           ),
-          _buildInfoRow('Season', payment.season, context),
-          _buildInfoRow('Crop Cultivated', payment.cropType, context),
+          _buildInfoRow(l10n.season, payment.season, context),
+          _buildInfoRow(l10n.cropCultivated, payment.cropType, context),
         ],
       ),
     );
@@ -429,6 +433,7 @@ class _PaymentDetailPageView extends StatelessWidget {
 
   Widget _buildActionCard(BuildContext context, PaymentEntity payment) {
     final colors = context.colors;
+    final l10n = context.l10n;
 
     if (payment.isSuccess) {
       return Container(
@@ -452,13 +457,13 @@ class _PaymentDetailPageView extends StatelessWidget {
                 ),
               ),
               icon: const Icon(Icons.receipt_long_rounded, size: 18),
-              label: const Text('View Official E-Receipt'),
+              label: Text(l10n.viewOfficialEReceipt),
             ),
             const SizedBox(height: AppSpacing.sm),
             OutlinedButton.icon(
               onPressed: () {
                 context.showSuccessSnackBar(
-                  'Downloading digital certificate...',
+                  l10n.downloadingDigitalCertificate,
                 );
               },
               style: OutlinedButton.styleFrom(
@@ -469,7 +474,7 @@ class _PaymentDetailPageView extends StatelessWidget {
                 side: BorderSide(color: colors.cardBorder),
               ),
               icon: const Icon(Icons.download_rounded, size: 16),
-              label: const Text('Download PDF Certificate'),
+              label: Text(l10n.downloadPdfCertificate),
             ),
           ],
         ),
@@ -498,7 +503,7 @@ class _PaymentDetailPageView extends StatelessWidget {
                 ),
               ),
               icon: const Icon(Icons.refresh_rounded, size: 18),
-              label: const Text('Retry from Bills Screen'),
+              label: Text(l10n.retryFromBillsScreen),
             ),
           ],
         ),

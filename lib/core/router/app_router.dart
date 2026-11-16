@@ -117,6 +117,20 @@ class AppRouter {
                 builder: (context, state) => const PaymentsPage(),
                 routes: [
                   GoRoute(
+                    path: 'checkout',
+                    name: RouteNames.paymentCheckout,
+                    builder: (context, state) {
+                      final bill = state.extra is BillEntity
+                          ? state.extra as BillEntity
+                          : null;
+                      final initialMethod = state.uri.queryParameters['method'];
+                      return PaymentCheckoutPage(
+                        bill: bill,
+                        initialMethod: initialMethod,
+                      );
+                    },
+                  ),
+                  GoRoute(
                     path: ':id',
                     name: RouteNames.paymentDetail,
                     builder: (context, state) {

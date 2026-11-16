@@ -143,5 +143,245 @@
   "helpAndSupport": "Help & Support",
   "logoutConfirmTitle": "Logout",
   "logoutConfirmMessage": "Are you sure you want to log out of your WUA account?",
-  "swipeAgainToExit": "Swipe back again to exit"
+  "swipeAgainToExit": "Swipe back again to exit",
+
+  "failedToLoadPayments": "Failed to load payment history",
+  "searchPaymentsHint": "Search by receipt no, mode, or season...",
+  "successful": "Successful",
+  "failed": "Failed",
+  "noMatchingTransactions": "No transactions match your filter",
+  "noPaymentsFound": "No payments found",
+  "adjustPaymentFiltersHint": "Try changing your status filter or clearing your search term.",
+  "noPaymentsRecordedHint": "You have no recorded payments or dues transactions yet.",
+  "resetFilters": "Reset Filters",
+  "totalSettledPayments": "TOTAL SETTLED PAYMENTS",
+  "completedCount": "{count} Completed",
+  "@completedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "receipt": "Receipt",
+  "details": "Details",
+  "paymentReceipt": "Payment Receipt",
+  "receiptNumberParam": "Receipt #{id}",
+  "@receiptNumberParam": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "shareReceipt": "Share Receipt",
+  "sharingPaymentConfirmation": "Sharing payment confirmation {paymentNumber}...",
+  "@sharingPaymentConfirmation": {
+    "placeholders": {
+      "paymentNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "viewOfficialEReceipt": "View Official E-Receipt",
+  "paymentSuccessfulUpper": "PAYMENT SUCCESSFUL",
+  "paymentFailedUpper": "PAYMENT FAILED",
+  "processingUpper": "PROCESSING",
+  "transactionParticulars": "Transaction Particulars",
+  "officialReceiptNo": "Official Receipt No",
+  "paymentMode": "Payment Mode",
+  "paymentGateway": "Payment Gateway",
+  "gatewayRefId": "Gateway Ref ID / Txn",
+  "notAvailable": "N/A",
+  "bankReferenceNo": "Bank Reference No",
+  "paymentDateTime": "Payment Date & Time",
+  "associatedBillFarmer": "Associated Bill & Farmer",
+  "farmerName": "Farmer Name",
+  "kisanConsumerId": "Kisan / Consumer ID",
+  "wuaSociety": "WUA Society",
+  "billNumber": "Bill Number",
+  "season": "Season",
+  "cropCultivated": "Crop Cultivated",
+  "downloadingDigitalCertificate": "Downloading digital certificate...",
+  "downloadPdfCertificate": "Download PDF Certificate",
+  "retryFromBillsScreen": "Retry from Bills Screen",
+
+  "waterResourcesDepartmentUpper": "WATER RESOURCES DEPARTMENT",
+  "paniPattiEReceiptTitle": "Pani Patti E-Receipt",
+  "receiptNoLabel": "Receipt No:",
+  "billNoLabel": "Bill No:",
+  "seasonLabel": "Season:",
+  "kisanConsumerLabel": "Kisan / Consumer:",
+  "societyLabel": "Society:",
+  "paymentDateLabel": "Payment Date:",
+  "paymentModeLabel": "Payment Mode:",
+  "refIdTxnLabel": "Ref ID / Txn:",
+  "totalAmountPaidLabel": "Total Amount Paid:",
+  "paymentVerifiedByWrd": "Payment Verified by WRD Portal",
+  "digitalReceiptProofNote": "This is a digitally generated valid proof of irrigation dues settlement.",
+  "downloadingReceiptPdf": "Downloading official receipt PDF...",
+  "downloadPdf": "Download PDF",
+  "receiptSharedSuccess": "Receipt shared via WhatsApp / SMS.",
+
+  "dueWithDate": "Due {date}",
+  "@dueWithDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "waterForAcres": "{liters} L water for {acres} Acres",
+  "@waterForAcres": {
+    "placeholders": {
+      "liters": {
+        "type": "String"
+      },
+      "acres": {
+        "type": "String"
+      }
+    }
+  },
+  "commandAreaCessForAcres": "Command area cess for {acres} Acres",
+  "@commandAreaCessForAcres": {
+    "placeholders": {
+      "acres": {
+        "type": "String"
+      }
+    }
+  },
+  "govtCessShort": "Govt Cess",
+  "wuaMaintShort": "WUA Maint.",
+  "totalWaterDuesUpper": "TOTAL WATER DUES (PANI PATTI)",
+  "overdueCountLabel": "{count} Overdue",
+  "@overdueCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dueCountLabel": "{count} Due",
+  "@dueCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "allDuesCleared": "All Dues Cleared",
+  "pendingBills": "Pending Bills",
+  "paidBills": "Paid Bills",
+  "failedToLoadBills": "Failed to load bills",
+  "searchBillsHint": "Search by bill no, season, or crop...",
+  "duePending": "Due / Pending",
+  "noMatchingBills": "No bills match your filter",
+  "noBillsFound": "No bills found",
+  "adjustBillFiltersHint": "Try selecting a different status or clear your search query.",
+  "noBillsRecordedHint": "You have no recorded irrigation water bills at this time.",
+
+  "billDetails": "Bill Details",
+  "invoiceNumberParam": "Invoice #{id}",
+  "@invoiceNumberParam": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "shareBill": "Share Bill",
+  "sharingBillNotice": "Sharing bill {billNumber}...",
+  "@sharingBillNotice": {
+    "placeholders": {
+      "billNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "viewOfficialReceipt": "View Official Receipt",
+  "paidInFullUpper": "PAID IN FULL",
+  "overdueUpper": "OVERDUE",
+  "dueByDateUpper": "DUE BY {date}",
+  "@dueByDateUpper": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "settled": "Settled",
+  "totalPayable": "Total Payable",
+  "farmerCommandAreaDetails": "Farmer & Command Area Details",
+  "canalSection": "Canal Section",
+  "commandLandArea": "Command Land Area",
+  "acresValue": "{acres} Acres",
+  "@acresValue": {
+    "placeholders": {
+      "acres": {
+        "type": "String"
+      }
+    }
+  },
+  "billIssueDate": "Bill Issue Date",
+  "paymentDueDate": "Payment Due Date",
+  "waterConsumptionMetrics": "Water Consumption Metrics",
+  "totalVolume": "Total Volume",
+  "gaugedDischarge": "Gauged discharge",
+  "rotationsWari": "Rotations / Wari",
+  "turnsCount": "{count} Turns",
+  "@turnsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "completedCycles": "Completed cycles",
+  "waterRate": "Water Rate",
+  "ratePerAcre": "₹ {rate} / ac",
+  "@ratePerAcre": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "govtCanalTariff": "Govt canal tariff",
+  "paniPattiTariffBreakdown": "Pani Patti Tariff Breakdown",
+  "baseWaterTariff": "Base Water Tariff",
+  "govtWaterCessTaxes": "Government Water Cess & Taxes",
+  "wuaInfrastructureMaint": "WUA Infrastructure Maintenance",
+  "lateOverduePenalty": "Late Overdue Penalty",
+  "earlySettlementRebate": "Early Settlement Rebate",
+  "grossBillAmount": "Gross Bill Amount",
+  "amountPaid": "Amount Paid",
+  "netOutstandingBalance": "Net Outstanding Balance",
+  "paymentCompleted": "Payment Completed",
+  "refPrefix": "Ref: {ref}",
+  "@refPrefix": {
+    "placeholders": {
+      "ref": {
+        "type": "String"
+      }
+    }
+  },
+  "launchingUpiPayment": "Launching UPI payment for {amount}...",
+  "@launchingUpiPayment": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "payAmountViaUpi": "Pay {amount} via UPI",
+  "@payAmountViaUpi": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "redirectingNetBanking": "Redirecting to Net Banking / Debit Card gateway...",
+  "netBankingDebitCard": "Net Banking / Debit Card",
+  "securedViaWrdGateway": "Secured via WRD Government Payment Gateway"
 }

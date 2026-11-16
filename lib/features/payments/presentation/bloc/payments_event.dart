@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:wua_mobile/features/payments/domain/entities/payment_entity.dart';
 
 abstract class PaymentsEvent extends Equatable {
   const PaymentsEvent();
@@ -46,5 +47,14 @@ class LoadPaymentDetailEvent extends PaymentsEvent {
 
   @override
   List<Object?> get props => [paymentId];
+}
+
+class RecordPaymentEvent extends PaymentsEvent {
+  const RecordPaymentEvent(this.payment);
+
+  final PaymentEntity payment;
+
+  @override
+  List<Object?> get props => [payment];
 }
 

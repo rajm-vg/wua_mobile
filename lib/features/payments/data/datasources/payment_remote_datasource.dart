@@ -11,6 +11,8 @@ abstract class PaymentRemoteDataSource {
   });
 
   Future<PaymentModel> getPaymentById(String id);
+
+  Future<PaymentModel> processPayment(PaymentModel payment);
 }
 
 class PaymentRemoteDataSourceImpl implements PaymentRemoteDataSource {
@@ -186,6 +188,14 @@ class PaymentRemoteDataSourceImpl implements PaymentRemoteDataSource {
       orElse: () => throw Exception('Payment with ID "$id" not found'),
     );
 
+    return payment;
+  }
+
+  @override
+  Future<PaymentModel> processPayment(PaymentModel payment) async {
+    await Future<void>.delayed(const Duration(milliseconds: 300));
+    AppLogger.repository('📦 [PAYMENTS REMOTE] Processing payment: ${payment.paymentNumber}');
+    _mockPayments.insert(0, payment);
     return payment;
   }
 }

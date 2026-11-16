@@ -164,6 +164,12 @@ Future<void> _initPaymentsFeature() async {
   // Use Cases
   sl.registerLazySingleton(() => GetPaymentsUseCase(sl()));
   sl.registerLazySingleton(() => GetPaymentByIdUseCase(sl()));
+  sl.registerLazySingleton(
+    () => ProcessPaymentUseCase(
+      paymentRepository: sl(),
+      billRepository: sl(),
+    ),
+  );
 
   // Bloc
   sl.registerFactory(

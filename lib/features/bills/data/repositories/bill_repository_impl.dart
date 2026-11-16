@@ -70,5 +70,38 @@ class BillRepositoryImpl implements BillRepository {
       );
     }
   }
+
+  @override
+  Future<Either<Failure, BillEntity>> markBillAsPaid(
+    String id, {
+    required String paymentReference,
+    required String paymentMethod,
+    required double paidAmount,
+  }) async {
+    try {
+      final isConnected = await networkInfo.isConnected;
+      if (!isConnected) {
+        return const Left(
+          NetworkFailure(
+            message: 'No active network connection. Please check your internet.',
+          ),
+        );
+      }
+
+      final model = await remoteDataSource.markBillAsPaid(
+        id,
+        paymentReference: paymentReference,
+        paymentMethod: paymentMethod,
+        paidAmount: paidAmount,
+      );
+      return Right(model);
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message, code: e.statusCode));
+    } catch (e) {
+      return Left(
+        ServerFailure(message: 'Failed to mark bill as paid: ${e.toString()}'),
+      );
+    }
+  }
 }
 

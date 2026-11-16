@@ -100,6 +100,7 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
 
   Widget _buildErrorState(BuildContext context, String message) {
     final colors = context.colors;
+    final l10n = context.l10n;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xl),
@@ -117,7 +118,7 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
             ),
             const SizedBox(height: AppSpacing.md),
             Text(
-              'Failed to load payment history',
+              l10n.failedToLoadPayments,
               style: context.titleMedium.bold.withColor(colors.textPrimary),
             ),
             const SizedBox(height: 6),
@@ -131,7 +132,7 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               icon: const Icon(Icons.refresh_rounded, size: 16),
-              label: const Text('Try Again'),
+              label: Text(l10n.tryAgain),
             ),
           ],
         ),
@@ -141,6 +142,7 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
 
   Widget _buildLoadedContent(BuildContext context, PaymentsLoaded state) {
     final colors = context.colors;
+    final l10n = context.l10n;
 
     return RefreshIndicator(
       onRefresh: () => _onRefresh(context),
@@ -188,7 +190,7 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
                       controller: _searchController,
                       style: context.bodyMedium.withColor(colors.textPrimary),
                       decoration: InputDecoration(
-                        hintText: 'Search by receipt no, mode, or season...',
+                        hintText: l10n.searchPaymentsHint,
                         hintStyle: context.caption,
                         prefixIcon: Icon(Icons.search_rounded, color: colors.textSecondary, size: 20),
                         suffixIcon: _searchController.text.isNotEmpty
@@ -218,14 +220,14 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
                       children: [
                         _buildFilterChip(
                           context,
-                          label: 'All (${state.allPayments.length})',
+                          label: '${l10n.filterAll} (${state.allPayments.length})',
                           statusKey: 'ALL',
                           isSelected: state.selectedStatus == 'ALL',
                         ),
                         const SizedBox(width: 8),
                         _buildFilterChip(
                           context,
-                          label: 'Successful (${state.successCount})',
+                          label: '${l10n.successful} (${state.successCount})',
                           statusKey: 'SUCCESS',
                           isSelected: state.selectedStatus == 'SUCCESS',
                           isSuccess: true,
@@ -233,7 +235,7 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
                         const SizedBox(width: 8),
                         _buildFilterChip(
                           context,
-                          label: 'Pending (${state.pendingCount})',
+                          label: '${l10n.filterPending} (${state.pendingCount})',
                           statusKey: 'PENDING',
                           isSelected: state.selectedStatus == 'PENDING',
                           isWarning: true,
@@ -241,7 +243,7 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
                         const SizedBox(width: 8),
                         _buildFilterChip(
                           context,
-                          label: 'Failed (${state.failedCount})',
+                          label: '${l10n.failed} (${state.failedCount})',
                           statusKey: 'FAILED',
                           isSelected: state.selectedStatus == 'FAILED',
                           isDanger: true,
@@ -345,6 +347,7 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
 
   Widget _buildEmptyState(BuildContext context, PaymentsLoaded state) {
     final colors = context.colors;
+    final l10n = context.l10n;
     final isFiltered = state.selectedStatus != 'ALL' || state.searchQuery.isNotEmpty;
 
     return Center(
@@ -364,14 +367,14 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
             ),
             const SizedBox(height: AppSpacing.md),
             Text(
-              isFiltered ? 'No transactions match your filter' : 'No payments found',
+              isFiltered ? l10n.noMatchingTransactions : l10n.noPaymentsFound,
               style: context.titleMedium.bold.withColor(colors.textPrimary),
             ),
             const SizedBox(height: 6),
             Text(
               isFiltered
-                  ? 'Try changing your status filter or clearing your search term.'
-                  : 'You have no recorded payments or dues transactions yet.',
+                  ? l10n.adjustPaymentFiltersHint
+                  : l10n.noPaymentsRecordedHint,
               textAlign: TextAlign.center,
               style: context.caption,
             ),
@@ -386,7 +389,7 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 icon: const Icon(Icons.filter_alt_off_rounded, size: 16),
-                label: const Text('Reset Filters'),
+                label: Text(l10n.resetFilters),
               ),
             ],
           ],

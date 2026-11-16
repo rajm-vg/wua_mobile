@@ -99,6 +99,7 @@ class _BillsPageViewState extends State<_BillsPageView> {
 
   Widget _buildErrorState(BuildContext context, String message) {
     final colors = context.colors;
+    final l10n = context.l10n;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xl),
@@ -120,7 +121,7 @@ class _BillsPageViewState extends State<_BillsPageView> {
             ),
             const SizedBox(height: AppSpacing.md),
             Text(
-              'Failed to load bills',
+              l10n.failedToLoadBills,
               style: context.titleMedium.bold.withColor(colors.textPrimary),
             ),
             const SizedBox(height: 6),
@@ -136,7 +137,7 @@ class _BillsPageViewState extends State<_BillsPageView> {
                 ),
               ),
               icon: const Icon(Icons.refresh_rounded, size: 16),
-              label: const Text('Try Again'),
+              label: Text(l10n.tryAgain),
             ),
           ],
         ),
@@ -146,6 +147,7 @@ class _BillsPageViewState extends State<_BillsPageView> {
 
   Widget _buildLoadedContent(BuildContext context, BillsLoaded state) {
     final colors = context.colors;
+    final l10n = context.l10n;
 
     return RefreshIndicator(
       onRefresh: () => _onRefresh(context),
@@ -193,7 +195,7 @@ class _BillsPageViewState extends State<_BillsPageView> {
                       controller: _searchController,
                       style: context.bodyMedium.withColor(colors.textPrimary),
                       decoration: InputDecoration(
-                        hintText: 'Search by bill no, season, or crop...',
+                        hintText: l10n.searchBillsHint,
                         hintStyle: context.caption,
                         prefixIcon: Icon(
                           Icons.search_rounded,
@@ -231,21 +233,21 @@ class _BillsPageViewState extends State<_BillsPageView> {
                       children: [
                         _buildFilterChip(
                           context,
-                          label: 'All (${state.allBills.length})',
+                          label: '${l10n.filterAll} (${state.allBills.length})',
                           statusKey: 'ALL',
                           isSelected: state.selectedStatus == 'ALL',
                         ),
                         const SizedBox(width: 8),
                         _buildFilterChip(
                           context,
-                          label: 'Due / Pending (${state.pendingCount})',
+                          label: '${l10n.duePending} (${state.pendingCount})',
                           statusKey: 'PENDING',
                           isSelected: state.selectedStatus == 'PENDING',
                         ),
                         const SizedBox(width: 8),
                         _buildFilterChip(
                           context,
-                          label: 'Overdue (${state.overdueCount})',
+                          label: '${l10n.filterOverdue} (${state.overdueCount})',
                           statusKey: 'OVERDUE',
                           isSelected: state.selectedStatus == 'OVERDUE',
                           isDanger: true,
@@ -253,7 +255,7 @@ class _BillsPageViewState extends State<_BillsPageView> {
                         const SizedBox(width: 8),
                         _buildFilterChip(
                           context,
-                          label: 'Paid (${state.paidCount})',
+                          label: '${l10n.filterPaid} (${state.paidCount})',
                           statusKey: 'PAID',
                           isSelected: state.selectedStatus == 'PAID',
                           isSuccess: true,
@@ -343,6 +345,7 @@ class _BillsPageViewState extends State<_BillsPageView> {
 
   Widget _buildEmptyState(BuildContext context, BillsLoaded state) {
     final colors = context.colors;
+    final l10n = context.l10n;
     final isFiltered =
         state.selectedStatus != 'ALL' || state.searchQuery.isNotEmpty;
 
@@ -367,14 +370,14 @@ class _BillsPageViewState extends State<_BillsPageView> {
             ),
             const SizedBox(height: AppSpacing.md),
             Text(
-              isFiltered ? 'No bills match your filter' : 'No bills found',
+              isFiltered ? l10n.noMatchingBills : l10n.noBillsFound,
               style: context.titleMedium.bold.withColor(colors.textPrimary),
             ),
             const SizedBox(height: 6),
             Text(
               isFiltered
-                  ? 'Try selecting a different status or clear your search query.'
-                  : 'You have no recorded irrigation water bills at this time.',
+                  ? l10n.adjustBillFiltersHint
+                  : l10n.noBillsRecordedHint,
               textAlign: TextAlign.center,
               style: context.caption,
             ),
@@ -391,7 +394,7 @@ class _BillsPageViewState extends State<_BillsPageView> {
                   ),
                 ),
                 icon: const Icon(Icons.filter_alt_off_rounded, size: 16),
-                label: const Text('Reset Filters'),
+                label: Text(l10n.resetFilters),
               ),
             ],
           ],

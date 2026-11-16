@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wua_mobile/core/l10n/l10n.dart';
-import 'package:wua_mobile/core/router/route_names.dart';
 import 'package:wua_mobile/core/theme/radius.dart';
 import 'package:wua_mobile/core/theme/spacing.dart';
 import 'package:wua_mobile/core/theme/theme_extensions.dart';
@@ -97,7 +96,7 @@ class PaniPattiBillCard extends StatelessWidget {
 
               // Pay via UPI Button
               ElevatedButton.icon(
-                onPressed: () => context.push(RouteNames.bills),
+                onPressed: () => context.push('/payments/checkout?method=upi'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: colors.billCtaBg,
                   foregroundColor: colors.billCtaText,

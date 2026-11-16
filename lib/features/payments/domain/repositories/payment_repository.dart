@@ -11,5 +11,7 @@ abstract class PaymentRepository {
   });
 
   Future<Either<Failure, PaymentEntity>> getPaymentById(String id);
+
+  Future<Either<Failure, PaymentEntity>> processPayment(PaymentEntity payment);
 }
 

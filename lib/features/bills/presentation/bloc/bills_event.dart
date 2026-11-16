@@ -52,3 +52,27 @@ class LoadBillDetailEvent extends BillsEvent {
 class ClearBillFiltersEvent extends BillsEvent {
   const ClearBillFiltersEvent();
 }
+
+/// Dispatched when a bill is settled via payment flow.
+class MarkBillPaidEvent extends BillsEvent {
+  const MarkBillPaidEvent({
+    required this.billId,
+    required this.paymentReference,
+    required this.paymentMethod,
+    required this.paidAmount,
+  });
+
+  final String billId;
+  final String paymentReference;
+  final String paymentMethod;
+  final double paidAmount;
+
+  @override
+  List<Object?> get props => [
+    billId,
+    paymentReference,
+    paymentMethod,
+    paidAmount,
+  ];
+}
+

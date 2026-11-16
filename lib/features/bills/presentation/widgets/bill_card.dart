@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:wua_mobile/core/l10n/l10n.dart';
 import 'package:wua_mobile/core/theme/colors.dart';
 import 'package:wua_mobile/core/theme/radius.dart';
 import 'package:wua_mobile/core/theme/spacing.dart';
@@ -33,6 +34,7 @@ class BillCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final l10n = context.l10n;
 
     // Status chip styling
     Color badgeBg;
@@ -43,17 +45,17 @@ class BillCard extends StatelessWidget {
     if (bill.isPaid) {
       badgeBg = AppColors.success.withValues(alpha: 0.12);
       badgeText = AppColors.success;
-      badgeLabel = 'Paid';
+      badgeLabel = l10n.paid;
       badgeIcon = Icons.check_circle_rounded;
     } else if (bill.isOverdue) {
       badgeBg = AppColors.error.withValues(alpha: 0.12);
       badgeText = AppColors.error;
-      badgeLabel = 'Overdue';
+      badgeLabel = l10n.filterOverdue;
       badgeIcon = Icons.warning_amber_rounded;
     } else {
       badgeBg = colors.billBadgeBg;
       badgeText = colors.billBadgeText;
-      badgeLabel = 'Due ${bill.formattedDueDate}';
+      badgeLabel = l10n.dueWithDate(bill.formattedDueDate);
       badgeIcon = Icons.schedule_rounded;
     }
 
@@ -188,8 +190,11 @@ class BillCard extends StatelessWidget {
                           const SizedBox(height: 2),
                           Text(
                             bill.waterQuantityLiters > 0
-                                ? '${NumberFormat('#,###').format(bill.waterQuantityLiters)} L water for ${bill.landAreaAcres} Acres'
-                                : 'Command area cess for ${bill.landAreaAcres} Acres',
+                                ? l10n.waterForAcres(
+                                    NumberFormat('#,###').format(bill.waterQuantityLiters),
+                                    '${bill.landAreaAcres}',
+                                  )
+                                : l10n.commandAreaCessForAcres('${bill.landAreaAcres}'),
                             style: context.caption.withSize(11.5),
                           ),
                         ],
@@ -203,7 +208,10 @@ class BillCard extends StatelessWidget {
                         onPressed:
                             onPayPressed ??
                             () {
-                              context.push('/bills/${bill.id}', extra: bill);
+                              context.push(
+                                '/payments/checkout?method=upi',
+                                extra: bill,
+                              );
                             },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: colors.billCtaBg,
@@ -222,7 +230,7 @@ class BillCard extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              'Pay via UPI',
+                              l10n.payViaUpi,
                               style: context.labelMedium.bold.white,
                             ),
                             const SizedBox(width: 4),
@@ -249,7 +257,7 @@ class BillCard extends StatelessWidget {
                           ),
                         ),
                         icon: const Icon(Icons.receipt_long_rounded, size: 15),
-                        label: const Text('Receipt'),
+                        label: Text(l10n.receipt),
                       ),
                   ],
                 ),
@@ -264,19 +272,19 @@ class BillCard extends StatelessWidget {
                   children: [
                     _buildBreakdownColumn(
                       context,
-                      title: 'Base Water',
+                      title: l10n.baseWater,
                       amount: _formatCurrency(bill.subtotal),
                     ),
                     Container(height: 22, width: 1, color: colors.billDivider),
                     _buildBreakdownColumn(
                       context,
-                      title: 'Govt Cess',
+                      title: l10n.govtCessShort,
                       amount: _formatCurrency(bill.taxes),
                     ),
                     Container(height: 22, width: 1, color: colors.billDivider),
                     _buildBreakdownColumn(
                       context,
-                      title: 'WUA Maint.',
+                      title: l10n.wuaMaintShort,
                       amount: _formatCurrency(bill.maintenanceCess),
                     ),
                   ],

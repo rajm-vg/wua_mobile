@@ -28,6 +28,7 @@ class RouteNames {
   static const String payments = 'payments';
   static const String paymentDetail = 'payment-detail';
   static const String paymentConfirmation = 'payment-confirmation';
+  static const String paymentCheckout = 'payment-checkout';
 
   // ─── Notifications ──────────────────────────────────────────
   static const String notifications = 'notifications';

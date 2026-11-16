@@ -95,6 +95,48 @@ class PaymentEntity extends Equatable {
     return format.format(amount);
   }
 
+  PaymentEntity copyWith({
+    String? id,
+    String? paymentNumber,
+    String? status,
+    double? amount,
+    DateTime? paymentDate,
+    String? billId,
+    String? billNumber,
+    String? consumerId,
+    String? consumerName,
+    String? wuaSocietyName,
+    String? season,
+    String? cropType,
+    String? paymentMode,
+    String? gatewayTransactionId,
+    String? bankReference,
+    String? gatewayName,
+    String? remarks,
+    Map<String, dynamic>? metadata,
+  }) {
+    return PaymentEntity(
+      id: id ?? this.id,
+      paymentNumber: paymentNumber ?? this.paymentNumber,
+      status: status ?? this.status,
+      amount: amount ?? this.amount,
+      paymentDate: paymentDate ?? this.paymentDate,
+      billId: billId ?? this.billId,
+      billNumber: billNumber ?? this.billNumber,
+      consumerId: consumerId ?? this.consumerId,
+      consumerName: consumerName ?? this.consumerName,
+      wuaSocietyName: wuaSocietyName ?? this.wuaSocietyName,
+      season: season ?? this.season,
+      cropType: cropType ?? this.cropType,
+      paymentMode: paymentMode ?? this.paymentMode,
+      gatewayTransactionId: gatewayTransactionId ?? this.gatewayTransactionId,
+      bankReference: bankReference ?? this.bankReference,
+      gatewayName: gatewayName ?? this.gatewayName,
+      remarks: remarks ?? this.remarks,
+      metadata: metadata ?? this.metadata,
+    );
+  }
+
   @override
   List<Object?> get props => [
     id,

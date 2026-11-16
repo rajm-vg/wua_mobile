@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:wua_mobile/core/l10n/l10n.dart';
 import 'package:wua_mobile/core/theme/colors.dart';
 import 'package:wua_mobile/core/theme/radius.dart';
 import 'package:wua_mobile/core/theme/spacing.dart';
@@ -21,6 +22,7 @@ class PaymentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
+    final l10n = context.l10n;
 
     Color badgeBg;
     Color badgeFg;
@@ -30,17 +32,17 @@ class PaymentCard extends StatelessWidget {
     if (payment.isSuccess) {
       badgeBg = AppColors.success.withValues(alpha: 0.12);
       badgeFg = AppColors.success;
-      badgeLabel = 'Successful';
+      badgeLabel = l10n.successful;
       badgeIcon = Icons.check_circle_rounded;
     } else if (payment.isFailed) {
       badgeBg = AppColors.error.withValues(alpha: 0.12);
       badgeFg = AppColors.error;
-      badgeLabel = 'Failed';
+      badgeLabel = l10n.failed;
       badgeIcon = Icons.cancel_rounded;
     } else {
       badgeBg = AppColors.warning.withValues(alpha: 0.12);
       badgeFg = AppColors.warning;
-      badgeLabel = 'Pending';
+      badgeLabel = l10n.filterPending;
       badgeIcon = Icons.timelapse_rounded;
     }
 
@@ -193,7 +195,7 @@ class PaymentCard extends StatelessWidget {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),
                         icon: const Icon(Icons.receipt_long_rounded, size: 15),
-                        label: const Text('Receipt'),
+                        label: Text(l10n.receipt),
                       )
                     else if (payment.isFailed)
                       ElevatedButton.icon(
@@ -205,14 +207,14 @@ class PaymentCard extends StatelessWidget {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),
                         icon: const Icon(Icons.refresh_rounded, size: 15),
-                        label: const Text('Retry'),
+                        label: Text(l10n.retry),
                       )
                     else
                       OutlinedButton(
                         onPressed: () {
                           context.push('/payments/${payment.id}', extra: payment);
                         },
-                        child: const Text('Details'),
+                        child: Text(l10n.details),
                       ),
                   ],
                 ),
