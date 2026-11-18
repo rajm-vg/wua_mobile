@@ -9,6 +9,7 @@ import 'package:wua_mobile/features/bills/presentation/bloc/bills_bloc.dart';
 import 'package:wua_mobile/features/bills/presentation/bloc/bills_event.dart';
 import 'package:wua_mobile/features/bills/presentation/bloc/bills_state.dart';
 import 'package:wua_mobile/features/bills/presentation/widgets/bill_receipt_sheet.dart';
+import 'package:wua_mobile/features/payments/payments.dart';
 import 'package:wua_mobile/shared/widgets/wua_scaffold.dart';
 
 /// Detailed view for a specific WUA Pani Patti Bill.
@@ -703,7 +704,7 @@ class _BillDetailPageView extends StatelessWidget {
         children: [
           ElevatedButton.icon(
             onPressed: () {
-              context.push('/payments/checkout?method=upi', extra: bill);
+              UpiAppChooserSheet.show(context, bill: bill);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: colors.billCtaBg,
@@ -723,7 +724,7 @@ class _BillDetailPageView extends StatelessWidget {
           const SizedBox(height: AppSpacing.sm),
           OutlinedButton.icon(
             onPressed: () {
-              context.push('/payments/checkout?method=netbanking', extra: bill);
+              context.push('/payments/gateway?mode=netbanking', extra: bill);
             },
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 13),

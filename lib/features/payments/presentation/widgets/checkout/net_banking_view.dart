@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:wua_mobile/core/extensions/extensions.dart';
 import 'package:wua_mobile/features/payments/presentation/bloc/payment_checkout/payment_checkout_bloc.dart';
 import 'package:wua_mobile/features/payments/presentation/bloc/payment_checkout/payment_checkout_event.dart';
 import 'package:wua_mobile/features/payments/presentation/bloc/payment_checkout/payment_checkout_state.dart';
-import 'package:wua_mobile/features/payments/presentation/widgets/checkout/simulated_auth_sheets.dart';
 
 class NetBankingView extends StatelessWidget {
   const NetBankingView({super.key});
@@ -256,16 +256,9 @@ class NetBankingView extends StatelessWidget {
             // Proceed CTA
             ElevatedButton.icon(
               onPressed: () {
-                SimulatedCyberTreasurySheet.show(
-                  context,
-                  title: 'NetBanking Authorization',
-                  sourceBank: state.selectedBank,
-                  amount: payableAmount,
-                  onVerified: () {
-                    context.read<PaymentCheckoutBloc>().add(
-                          const ExecutePaymentEvent(),
-                        );
-                  },
+                context.push(
+                  '/payments/gateway?mode=netbanking',
+                  extra: state.bill,
                 );
               },
               style: ElevatedButton.styleFrom(
@@ -277,9 +270,9 @@ class NetBankingView extends StatelessWidget {
                 ),
                 elevation: 2,
               ),
-              icon: const Icon(Icons.account_balance_rounded, size: 18),
+              icon: const Icon(Icons.open_in_browser_rounded, size: 18),
               label: Text(
-                'Proceed via ${state.selectedBank} (${_formatCurrency(payableAmount)})',
+                'Open Cyber Treasury Gateway (${_formatCurrency(payableAmount)})',
                 style: context.buttonText.bold.white,
               ),
             ),

@@ -63,7 +63,7 @@ void main() {
           paymentReference: any(named: 'paymentReference'),
           paymentMethod: any(named: 'paymentMethod'),
           paidAmount: any(named: 'paidAmount'),
-        )).thenAnswer((_) async => Right(tBill));
+        )).thenAnswer((_) async => const Right(tBill));
 
     // Act
     // ignore: prefer_const_constructors

@@ -232,9 +232,7 @@ class BillReceiptSheet extends StatelessWidget {
                   child: OutlinedButton.icon(
                     onPressed: () {
                       Navigator.of(context).pop();
-                      context.showSuccessSnackBar(
-                        l10n.downloadingReceiptPdf,
-                      );
+                      context.showSuccessSnackBar(l10n.downloadingReceiptPdf);
                     },
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
@@ -252,9 +250,7 @@ class BillReceiptSheet extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: () {
                       Navigator.of(context).pop();
-                      context.showSuccessSnackBar(
-                        l10n.receiptSharedSuccess,
-                      );
+                      context.showSuccessSnackBar(l10n.receiptSharedSuccess);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.headerTeal,

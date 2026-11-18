@@ -29,6 +29,8 @@ class RouteNames {
   static const String paymentDetail = 'payment-detail';
   static const String paymentConfirmation = 'payment-confirmation';
   static const String paymentCheckout = 'payment-checkout';
+  static const String upiAppSimulator = 'upi-app-simulator';
+  static const String paymentGateway = 'payment-gateway';
 
   // ─── Notifications ──────────────────────────────────────────
   static const String notifications = 'notifications';

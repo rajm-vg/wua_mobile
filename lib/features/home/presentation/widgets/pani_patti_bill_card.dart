@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:wua_mobile/core/l10n/l10n.dart';
 import 'package:wua_mobile/core/theme/radius.dart';
 import 'package:wua_mobile/core/theme/spacing.dart';
 import 'package:wua_mobile/core/theme/theme_extensions.dart';
+import 'package:wua_mobile/features/payments/payments.dart';
 
 /// Current Pani Patti Bill card showing cess breakdown, acre metric, and Pay via UPI CTA.
 /// Sourced directly from [BuildContext.colors] without manual isDark checks.
@@ -96,7 +96,10 @@ class PaniPattiBillCard extends StatelessWidget {
 
               // Pay via UPI Button
               ElevatedButton.icon(
-                onPressed: () => context.push('/payments/checkout?method=upi'),
+                onPressed: () => UpiAppChooserSheet.show(
+                  context,
+                  bill: PaymentCheckoutPage.defaultRabiBill,
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: colors.billCtaBg,
                   foregroundColor: colors.billCtaText,

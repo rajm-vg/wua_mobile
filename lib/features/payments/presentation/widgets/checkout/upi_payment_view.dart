@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:wua_mobile/core/extensions/extensions.dart';
 import 'package:wua_mobile/features/payments/presentation/bloc/payment_checkout/payment_checkout_bloc.dart';
@@ -330,15 +331,9 @@ class _UpiPaymentViewState extends State<UpiPaymentView> {
         // Pay CTA Button
         ElevatedButton.icon(
           onPressed: () {
-            SimulatedUpiPinSheet.show(
-              context,
-              appName: state.selectedUpiApp,
-              amount: amount,
-              onPinSubmitted: () {
-                context.read<PaymentCheckoutBloc>().add(
-                      const ExecutePaymentEvent(),
-                    );
-              },
+            context.push(
+              '/payments/upi-app?app=${Uri.encodeComponent(state.selectedUpiApp)}',
+              extra: state.bill,
             );
           },
           style: ElevatedButton.styleFrom(
@@ -350,9 +345,9 @@ class _UpiPaymentViewState extends State<UpiPaymentView> {
             ),
             elevation: 2,
           ),
-          icon: const Icon(Icons.flash_on_rounded, size: 20),
+          icon: const Icon(Icons.open_in_new_rounded, size: 20),
           label: Text(
-            'Pay ${_formatCurrency(amount)} with ${state.selectedUpiApp}',
+            'Open ${state.selectedUpiApp} (${_formatCurrency(amount)})',
             style: context.buttonText.bold.white,
           ),
         ),

@@ -128,10 +128,7 @@ Future<void> _initBillsFeature() async {
 
   // Repository
   sl.registerLazySingleton<BillRepository>(
-    () => BillRepositoryImpl(
-      remoteDataSource: sl(),
-      networkInfo: sl(),
-    ),
+    () => BillRepositoryImpl(remoteDataSource: sl(), networkInfo: sl()),
   );
 
   // Use Cases
@@ -140,10 +137,7 @@ Future<void> _initBillsFeature() async {
 
   // Bloc
   sl.registerFactory(
-    () => BillsBloc(
-      getBillsUseCase: sl(),
-      getBillByIdUseCase: sl(),
-    ),
+    () => BillsBloc(getBillsUseCase: sl(), getBillByIdUseCase: sl()),
   );
 }
 
@@ -155,28 +149,19 @@ Future<void> _initPaymentsFeature() async {
 
   // Repository
   sl.registerLazySingleton<PaymentRepository>(
-    () => PaymentRepositoryImpl(
-      remoteDataSource: sl(),
-      networkInfo: sl(),
-    ),
+    () => PaymentRepositoryImpl(remoteDataSource: sl(), networkInfo: sl()),
   );
 
   // Use Cases
   sl.registerLazySingleton(() => GetPaymentsUseCase(sl()));
   sl.registerLazySingleton(() => GetPaymentByIdUseCase(sl()));
   sl.registerLazySingleton(
-    () => ProcessPaymentUseCase(
-      paymentRepository: sl(),
-      billRepository: sl(),
-    ),
+    () => ProcessPaymentUseCase(paymentRepository: sl(), billRepository: sl()),
   );
 
   // Bloc
   sl.registerFactory(
-    () => PaymentsBloc(
-      getPaymentsUseCase: sl(),
-      getPaymentByIdUseCase: sl(),
-    ),
+    () => PaymentsBloc(getPaymentsUseCase: sl(), getPaymentByIdUseCase: sl()),
   );
 }
 
@@ -188,10 +173,7 @@ Future<void> _initWaterUsageFeature() async {
 
   // Repository
   sl.registerLazySingleton<WaterUsageRepository>(
-    () => WaterUsageRepositoryImpl(
-      remoteDataSource: sl(),
-      networkInfo: sl(),
-    ),
+    () => WaterUsageRepositoryImpl(remoteDataSource: sl(), networkInfo: sl()),
   );
 
   // Use Cases
@@ -215,10 +197,7 @@ Future<void> _initNotificationsFeature() async {
 
   // Repository
   sl.registerLazySingleton<NotificationRepository>(
-    () => NotificationRepositoryImpl(
-      remoteDataSource: sl(),
-      networkInfo: sl(),
-    ),
+    () => NotificationRepositoryImpl(remoteDataSource: sl(), networkInfo: sl()),
   );
 
   // Use Cases

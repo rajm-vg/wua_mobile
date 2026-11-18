@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:wua_mobile/core/extensions/extensions.dart';
 import 'package:wua_mobile/features/payments/presentation/bloc/payment_checkout/payment_checkout_bloc.dart';
 import 'package:wua_mobile/features/payments/presentation/bloc/payment_checkout/payment_checkout_event.dart';
 import 'package:wua_mobile/features/payments/presentation/bloc/payment_checkout/payment_checkout_state.dart';
-import 'package:wua_mobile/features/payments/presentation/widgets/checkout/simulated_auth_sheets.dart';
 
 class CardPaymentView extends StatefulWidget {
   const CardPaymentView({super.key});
@@ -276,19 +276,9 @@ class _CardPaymentViewState extends State<CardPaymentView> {
             // Submit Button
             ElevatedButton.icon(
               onPressed: () {
-                if (_cardNumberController.text.isEmpty) {
-                  _fillKisanDemoCard();
-                }
-                SimulatedCyberTreasurySheet.show(
-                  context,
-                  title: '3D Secure Card Verification',
-                  sourceBank: state.detectedCardBrand,
-                  amount: payableAmount,
-                  onVerified: () {
-                    context.read<PaymentCheckoutBloc>().add(
-                          const ExecutePaymentEvent(),
-                        );
-                  },
+                context.push(
+                  '/payments/gateway?mode=card',
+                  extra: state.bill,
                 );
               },
               style: ElevatedButton.styleFrom(
@@ -300,9 +290,9 @@ class _CardPaymentViewState extends State<CardPaymentView> {
                 ),
                 elevation: 2,
               ),
-              icon: const Icon(Icons.lock_rounded, size: 18),
+              icon: const Icon(Icons.open_in_browser_rounded, size: 18),
               label: Text(
-                'Pay ${_formatCurrency(payableAmount)} Securely',
+                'Open Payment Gateway (${_formatCurrency(payableAmount)})',
                 style: context.buttonText.bold.white,
               ),
             ),

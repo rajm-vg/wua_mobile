@@ -8,6 +8,7 @@ import 'package:wua_mobile/core/theme/spacing.dart';
 import 'package:wua_mobile/core/theme/theme_extensions.dart';
 import 'package:wua_mobile/features/bills/domain/entities/bill_entity.dart';
 import 'package:wua_mobile/features/bills/presentation/widgets/bill_receipt_sheet.dart';
+import 'package:wua_mobile/features/payments/payments.dart';
 
 /// Interactive, theme-aware card representing an individual WUA Pani Patti Bill.
 class BillCard extends StatelessWidget {
@@ -208,10 +209,7 @@ class BillCard extends StatelessWidget {
                         onPressed:
                             onPayPressed ??
                             () {
-                              context.push(
-                                '/payments/checkout?method=upi',
-                                extra: bill,
-                              );
+                              UpiAppChooserSheet.show(context, bill: bill);
                             },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: colors.billCtaBg,

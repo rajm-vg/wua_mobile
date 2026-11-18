@@ -21,7 +21,9 @@ export 'presentation/bloc/payments_state.dart';
 // Presentation Widgets & Pages
 export 'presentation/pages/payment_checkout_page.dart';
 export 'presentation/pages/payment_detail_page.dart';
+export 'presentation/pages/payment_gateway_page.dart';
 export 'presentation/pages/payments_page.dart';
+export 'presentation/pages/upi_app_simulator_page.dart';
 export 'presentation/widgets/checkout/bill_summary_card.dart';
 export 'presentation/widgets/checkout/card_payment_view.dart';
 export 'presentation/widgets/checkout/net_banking_view.dart';
@@ -29,6 +31,7 @@ export 'presentation/widgets/checkout/payment_failure_view.dart';
 export 'presentation/widgets/checkout/payment_processing_view.dart';
 export 'presentation/widgets/checkout/payment_success_view.dart';
 export 'presentation/widgets/checkout/simulated_auth_sheets.dart';
+export 'presentation/widgets/checkout/upi_app_chooser_sheet.dart';
 export 'presentation/widgets/checkout/upi_payment_view.dart';
 export 'presentation/widgets/payment_card.dart';
 export 'presentation/widgets/payment_card_skeleton.dart';
