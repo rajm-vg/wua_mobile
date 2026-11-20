@@ -186,7 +186,7 @@ void main() {
       'marks target notification as read and calls usecase',
       build: () {
         when(() => mockMarkNotificationReadUseCase(any()))
-            .thenAnswer((_) async => const Right(true));
+            .thenAnswer((_) async => const Right(null));
         return bloc;
       },
       seed: () => NotificationsLoaded(
@@ -223,7 +223,7 @@ void main() {
       'removes notification and calls usecase',
       build: () {
         when(() => mockDeleteNotificationUseCase(any()))
-            .thenAnswer((_) async => const Right(true));
+            .thenAnswer((_) async => const Right(null));
         return bloc;
       },
       seed: () => NotificationsLoaded(

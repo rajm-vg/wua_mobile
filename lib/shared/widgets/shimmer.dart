@@ -77,6 +77,7 @@ class _SlidingGradientTransform extends GradientTransform {
 /// Scope inherited widget for synchronized nested shimmer elements.
 class ShimmerScope extends InheritedWidget {
   const ShimmerScope({
+    super.key,
     required this.baseColor,
     required this.highlightColor,
     required this.enabled,
@@ -148,12 +149,12 @@ class Shimmer extends StatefulWidget {
 
   /// Checks if the widget tree is currently inside an active [Shimmer] scope.
   static bool isInsideShimmer(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<_ShimmerScope>() != null;
+    return context.dependOnInheritedWidgetOfExactType<ShimmerScope>() != null;
   }
 
-  /// Retrieves the ambient [_ShimmerScope] if available.
-  static _ShimmerScope? maybeOf(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<_ShimmerScope>();
+  /// Retrieves the ambient [ShimmerScope] if available.
+  static ShimmerScope? maybeOf(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<ShimmerScope>();
   }
 
   @override
@@ -200,7 +201,7 @@ class _ShimmerState extends State<Shimmer> with SingleTickerProviderStateMixin {
     final effectiveHighlight =
         widget.highlightColor ?? Shimmer.defaultHighlightColor(context);
 
-    return _ShimmerScope(
+    return ShimmerScope(
       baseColor: effectiveBase,
       highlightColor: effectiveHighlight,
       enabled: widget.enabled,
