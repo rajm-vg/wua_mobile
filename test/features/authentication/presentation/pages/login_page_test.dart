@@ -50,6 +50,11 @@ void main() {
 
   group('LoginPage Widget Tests', () {
     testWidgets('renders all critical login UI components', (tester) async {
+      tester.view.physicalSize = const Size(1080, 1920);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
@@ -72,7 +77,7 @@ void main() {
       expect(find.text('QUICK ROLE DEMO'), findsOneWidget);
       expect(find.text('Farmer'), findsOneWidget);
       expect(find.text('WUA Official'), findsOneWidget);
-      expect(find.text('Department Officer'), findsOneWidget);
+      expect(find.text('सचिव (9922322710)'), findsOneWidget);
       expect(find.text("Don't have an account?"), findsOneWidget);
       expect(find.text('Register'), findsOneWidget);
       expect(
@@ -125,6 +130,11 @@ void main() {
     testWidgets('populates fields when tapping quick role demo chip', (
       tester,
     ) async {
+      tester.view.physicalSize = const Size(1080, 1920);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
@@ -134,6 +144,13 @@ void main() {
 
       expect(find.text('9876543210'), findsOneWidget);
       expect(find.text('Farmer@123'), findsOneWidget);
+
+      // Tap Secretary (wrd_backend) demo chip
+      await tester.tap(find.text('सचिव (9922322710)'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('9922322710'), findsOneWidget);
+      expect(find.text('admin'), findsOneWidget);
     });
 
     testWidgets('dispatches AuthLoginRequested with valid credentials', (

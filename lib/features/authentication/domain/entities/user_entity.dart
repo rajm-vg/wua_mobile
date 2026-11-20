@@ -12,6 +12,14 @@ class UserEntity extends Equatable {
     required this.role,
     required this.isVerified,
     required this.createdAt,
+    this.firstName,
+    this.lastName,
+    this.societyId,
+    this.username,
+    this.refTable,
+    this.refTableId,
+    this.authorities = const [],
+    this.roles = const [],
   });
   final String id;
   final String name;
@@ -21,6 +29,14 @@ class UserEntity extends Equatable {
   final UserRole role;
   final bool isVerified;
   final DateTime createdAt;
+  final String? firstName;
+  final String? lastName;
+  final int? societyId;
+  final String? username;
+  final String? refTable;
+  final int? refTableId;
+  final List<String> authorities;
+  final List<String> roles;
 
   @override
   List<Object?> get props => [
@@ -32,6 +48,14 @@ class UserEntity extends Equatable {
     role,
     isVerified,
     createdAt,
+    firstName,
+    lastName,
+    societyId,
+    username,
+    refTable,
+    refTableId,
+    authorities,
+    roles,
   ];
 }
 

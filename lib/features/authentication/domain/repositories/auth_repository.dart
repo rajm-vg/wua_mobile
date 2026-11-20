@@ -11,6 +11,7 @@ abstract class AuthRepository {
   Future<Either<Failure, ({UserEntity user, AuthTokens tokens})>> login({
     required String identifier,
     required String password,
+    bool rememberMe = false,
   });
 
   /// Registers a new user.

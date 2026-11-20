@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:wua_mobile/core/constants/env_config.dart';
 import 'package:wua_mobile/core/di/injection_container.dart';
 import 'package:wua_mobile/core/extensions/extensions.dart';
 import 'package:wua_mobile/core/router/route_names.dart';
@@ -62,6 +63,7 @@ class _LoginPageViewState extends State<_LoginPageView> {
         AuthLoginRequested(
           identifier: _identifierController.text.trim(),
           password: _passwordController.text,
+          rememberMe: _rememberMe,
         ),
       );
     }
@@ -170,7 +172,52 @@ class _LoginPageViewState extends State<_LoginPageView> {
                       children: [
                         // Department Brand Header
                         const WrdBrandHeader(),
-                        const SizedBox(height: AppSpacing.xl),
+                        const SizedBox(height: AppSpacing.md),
+
+                        if (EnvConfig.enableDemoFallback) ...[
+                          Center(
+                            child: Container(
+                              key: const Key('dev_demo_fallback_badge'),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.sm,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isDark
+                                    ? AppColors.sproutGreen.withValues(alpha: 0.15)
+                                    : AppColors.sproutGreen.withValues(alpha: 0.10),
+                                borderRadius: AppRadius.borderRadiusFull,
+                                border: Border.all(
+                                  color: AppColors.sproutGreen.withValues(alpha: 0.4),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 7,
+                                    height: 7,
+                                    decoration: const BoxDecoration(
+                                      color: AppColors.sproutGreen,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'DEV • Offline Demo Fallback Ready',
+                                    style: context.caption.semiBold.withColor(
+                                      isDark
+                                          ? AppColors.sproutGreen
+                                          : AppColors.canalGreen,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                        ] else
+                          const SizedBox(height: AppSpacing.md),
 
                         // Form Container Card
                         Container(
@@ -421,6 +468,20 @@ class _LoginPageViewState extends State<_LoginPageView> {
                                 alignment: WrapAlignment.center,
                                 children: [
                                   ActionChip(
+                                    label: const Text('सचिव (9922322710)'),
+                                    avatar: const Icon(
+                                      Icons.manage_accounts_rounded,
+                                      size: 16,
+                                      color: AppColors.canalGreen,
+                                    ),
+                                    onPressed: isLoading
+                                        ? null
+                                        : () => _quickFill(
+                                            '9922322710',
+                                            'admin',
+                                          ),
+                                  ),
+                                  ActionChip(
                                     label: Text(
                                       l10n.roleFarmer,
                                       style: context.labelSmall.semiBold,
@@ -437,23 +498,23 @@ class _LoginPageViewState extends State<_LoginPageView> {
                                             'Farmer@123',
                                           ),
                                   ),
-                                  // ActionChip(
-                                  //   label: Text(
-                                  //     l10n.roleOfficial,
-                                  //     style: context.labelSmall.semiBold,
-                                  //   ),
-                                  //   avatar: const Icon(
-                                  //     Icons.badge_rounded,
-                                  //     size: 16,
-                                  //     color: AppColors.primaryLight,
-                                  //   ),
-                                  //   onPressed: isLoading
-                                  //       ? null
-                                  //       : () => _quickFill(
-                                  //           'official@wua.gov.in',
-                                  //           'Official@123',
-                                  //         ),
-                                  // ),
+                                  ActionChip(
+                                    label: Text(
+                                      l10n.roleOfficial,
+                                      style: context.labelSmall.semiBold,
+                                    ),
+                                    avatar: const Icon(
+                                      Icons.badge_rounded,
+                                      size: 16,
+                                      color: AppColors.primaryLight,
+                                    ),
+                                    onPressed: isLoading
+                                        ? null
+                                        : () => _quickFill(
+                                            'official@wua.gov.in',
+                                            'Official@123',
+                                          ),
+                                  ),
                                   // ActionChip(
                                   //   label: Text(
                                   //     l10n.roleAdmin,

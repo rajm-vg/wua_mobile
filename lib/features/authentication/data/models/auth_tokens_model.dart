@@ -9,10 +9,15 @@ class AuthTokensModel {
   });
 
   factory AuthTokensModel.fromJson(Map<String, dynamic> json) {
+    final token = (json['id_token'] ??
+            json['access_token'] ??
+            json['token'] ??
+            json['accessToken']) as String? ??
+        '';
     return AuthTokensModel(
-      accessToken: json['access_token'] as String? ?? '',
-      refreshToken: json['refresh_token'] as String? ?? '',
-      expiresIn: json['expires_in'] as int? ?? 3600,
+      accessToken: token,
+      refreshToken: (json['refresh_token'] ?? json['refreshToken']) as String? ?? '',
+      expiresIn: (json['expires_in'] ?? json['expiresIn']) as int? ?? 86400,
     );
   }
   final String accessToken;

@@ -56,5 +56,35 @@ void main() {
       expect(model.id, entity.id);
       expect(model.email, entity.email);
     });
+
+    test('fromJson should parse wrd_backend LoginUserDTO response correctly', () {
+      final backendJson = {
+        'id': 2100,
+        'firstName': 'सुभाष रंगनाथ झिंजाड',
+        'lastName': null,
+        'societyId': 1503,
+        'username': '9922322710',
+        'mobileNo': '9922322710',
+        'email': '',
+        'imageUrl': null,
+        'langKey': 'en',
+        'status': 'A',
+        'createdOn': '2024-09-13T07:27:45.175044Z',
+        'refTable': 'SocietyFarmer',
+        'refTableId': 696,
+        'authorities': ['SUPER_ADMIN_AND_SACHIV_AND_SANCHALAK_ONLY'],
+        'roles': ['सचिव'],
+      };
+
+      final model = UserModel.fromJson(backendJson);
+      expect(model.id, '2100');
+      expect(model.name, 'सुभाष रंगनाथ झिंजाड');
+      expect(model.phone, '9922322710');
+      expect(model.societyId, 1503);
+      expect(model.username, '9922322710');
+      expect(model.roles, ['सचिव']);
+      expect(model.role, 'wua_official');
+      expect(model.isVerified, true);
+    });
   });
 }

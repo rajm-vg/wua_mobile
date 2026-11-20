@@ -20,15 +20,21 @@ class LoginUseCase
     return repository.login(
       identifier: params.identifier,
       password: params.password,
+      rememberMe: params.rememberMe,
     );
   }
 }
 
 class LoginParams extends Equatable {
-  const LoginParams({required this.identifier, required this.password});
+  const LoginParams({
+    required this.identifier,
+    required this.password,
+    this.rememberMe = false,
+  });
   final String identifier;
   final String password;
+  final bool rememberMe;
 
   @override
-  List<Object?> get props => [identifier, password];
+  List<Object?> get props => [identifier, password, rememberMe];
 }

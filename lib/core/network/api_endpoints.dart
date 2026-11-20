@@ -3,13 +3,17 @@
 class ApiEndpoints {
   ApiEndpoints._();
 
-  // Authentication
-  static const String login = '/auth/login';
-  static const String register = '/auth/register';
-  static const String refreshToken = '/auth/refresh-token';
-  static const String logout = '/auth/logout';
-  static const String forgotPassword = '/auth/forgot-password';
-  static const String resetPassword = '/auth/reset-password';
+  // Authentication (wrd_backend Spring Boot / JHipster)
+  static const String authenticate = '/api/authenticate';
+  static const String account = '/api/account';
+  static const String loggedInUser = '/api/loggedInUser';
+  static const String login = '/api/authenticate';
+  static const String register = '/api/register';
+  static const String refreshToken = '/api/refresh-token';
+  static const String logout = '/api/logout';
+  static const String forgotPassword = '/api/account/reset-password/init';
+  static const String resetPassword = '/api/account/reset-password/finish';
+  static const String changePassword = '/api/account/change-password';
   static const String verifyOtp = '/auth/verify-otp';
   static const String resendOtp = '/auth/resend-otp';
 

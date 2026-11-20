@@ -25,7 +25,7 @@ class EnvConfig {
   }
 
   static String get baseUrl =>
-      dotenv.env['BASE_URL'] ?? 'http://localhost:8080/api/v1';
+      dotenv.env['BASE_URL'] ?? 'http://localhost:7010';
 
   static String get apiKey => dotenv.env['API_KEY'] ?? '';
 
@@ -38,7 +38,13 @@ class EnvConfig {
       int.tryParse(dotenv.env['RECEIVE_TIMEOUT'] ?? '30000') ?? 30000;
 
   static bool get enableLogging =>
+      dotenv.isInitialized &&
       dotenv.env['ENABLE_LOGGING']?.toLowerCase() == 'true';
+
+  /// Whether to allow offline mock fallback when backend is unreachable during dev/demo.
+  static bool get enableDemoFallback =>
+      dotenv.isInitialized &&
+      dotenv.env['ENABLE_DEMO_FALLBACK']?.toLowerCase() == 'true';
 
   static bool get isProduction => buildFlavor == 'production';
   static bool get isDevelopment => buildFlavor == 'development';

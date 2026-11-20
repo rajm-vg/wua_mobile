@@ -27,6 +27,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, ({UserEntity user, AuthTokens tokens})>> login({
     required String identifier,
     required String password,
+    bool rememberMe = false,
   }) async {
     if (!await networkInfo.isConnected) {
       return const Left(NetworkFailure());
@@ -36,6 +37,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final result = await remoteDataSource.login(
         identifier: identifier,
         password: password,
+        rememberMe: rememberMe,
       );
 
       // Cache user and tokens locally.
