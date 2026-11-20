@@ -122,7 +122,7 @@ class _LoginPageViewState extends State<_LoginPageView> {
             elevation: 0,
             scrolledUnderElevation: 0,
             actions: [
-              // Language Switcher Button (English / हिन्दी)
+              // Language Switcher Button (English / मराठी)
               Padding(
                 padding: const EdgeInsets.only(right: AppSpacing.sm),
                 child: TextButton.icon(
@@ -133,7 +133,7 @@ class _LoginPageViewState extends State<_LoginPageView> {
                     color: isDark ? AppColors.waterCyan : AppColors.primary,
                   ),
                   label: Text(
-                    context.isHindi ? 'English' : 'हिन्दी',
+                    context.isMarathi ? 'English' : 'मराठी',
                     style: context.labelMedium.semiBold.withColor(
                       isDark ? AppColors.waterCyan : AppColors.primary,
                     ),

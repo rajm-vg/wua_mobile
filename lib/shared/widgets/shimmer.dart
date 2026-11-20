@@ -75,8 +75,8 @@ class _SlidingGradientTransform extends GradientTransform {
 }
 
 /// Scope inherited widget for synchronized nested shimmer elements.
-class _ShimmerScope extends InheritedWidget {
-  const _ShimmerScope({
+class ShimmerScope extends InheritedWidget {
+  const ShimmerScope({
     required this.baseColor,
     required this.highlightColor,
     required this.enabled,
@@ -88,7 +88,7 @@ class _ShimmerScope extends InheritedWidget {
   final bool enabled;
 
   @override
-  bool updateShouldNotify(_ShimmerScope oldWidget) {
+  bool updateShouldNotify(ShimmerScope oldWidget) {
     return baseColor != oldWidget.baseColor ||
         highlightColor != oldWidget.highlightColor ||
         enabled != oldWidget.enabled;

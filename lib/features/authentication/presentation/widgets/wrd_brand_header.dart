@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:wua_mobile/core/constants/app_assets.dart';
 import 'package:wua_mobile/core/l10n/l10n.dart';
 import 'package:wua_mobile/core/theme/colors.dart';
 import 'package:wua_mobile/core/theme/radius.dart';
@@ -20,64 +20,65 @@ class WrdBrandHeader extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Emblem badge with subtle gradient and gold border
+        // Emblem badge with official logo and gold border
         Container(
-          width: compact ? 64 : 76,
-          height: compact ? 64 : 76,
+          width: compact ? 68 : 84,
+          height: compact ? 68 : 84,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: isDark
-                  ? const [AppColors.navyDark, AppColors.surfaceDark]
-                  : const [AppColors.primary, AppColors.primaryDark],
-            ),
             border: Border.all(
               color: AppColors.gold.withValues(alpha: isDark ? 0.6 : 0.8),
-              width: 1.8,
+              width: 2.0,
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withValues(alpha: isDark ? 0.3 : 0.2),
+                color: AppColors.primary.withValues(
+                  alpha: isDark ? 0.35 : 0.25,
+                ),
                 blurRadius: 18,
                 offset: const Offset(0, 6),
               ),
             ],
           ),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              // Subtle inner ripple
-              Container(
-                width: compact ? 50 : 60,
-                height: compact ? 50 : 60,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.15),
-                    width: 1.0,
+          child: ClipOval(
+            child: Image.asset(
+              AppAssets.appLogo,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: isDark
+                          ? const [AppColors.navyDark, AppColors.surfaceDark]
+                          : const [AppColors.primary, AppColors.primaryDark],
+                    ),
                   ),
-                ),
-              ),
-              // Water drop with wheat sprout iconography
-              Icon(
-                Icons.water_drop_rounded,
-                size: compact ? 30 : 38,
-                color: isDark ? AppColors.waterCyan : Colors.white,
-              ),
-              Positioned(
-                bottom: compact ? 10 : 12,
-                child: Container(
-                  width: 6,
-                  height: 6,
-                  decoration: const BoxDecoration(
-                    color: AppColors.gold,
-                    shape: BoxShape.circle,
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Icon(
+                        Icons.water_drop_rounded,
+                        size: compact ? 32 : 40,
+                        color: isDark ? AppColors.waterCyan : Colors.white,
+                      ),
+                      Positioned(
+                        bottom: compact ? 10 : 12,
+                        child: Container(
+                          width: 6,
+                          height: 6,
+                          decoration: const BoxDecoration(
+                            color: AppColors.gold,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ),
-            ],
+                );
+              },
+            ),
           ),
         ),
         SizedBox(height: compact ? AppSpacing.sm : AppSpacing.md),

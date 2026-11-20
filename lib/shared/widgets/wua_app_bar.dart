@@ -235,7 +235,7 @@ class WuaAppBar extends StatelessWidget implements PreferredSizeWidget {
             padding: EdgeInsets.symmetric(horizontal: AppSpacing.xs),
             child: LanguageToggle.standard(
               firstLabel: 'En',
-              secondLabel: 'हिन्दी',
+              secondLabel: 'मराठी',
             ),
           ),
         ),

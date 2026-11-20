@@ -60,7 +60,7 @@ class AppRouter {
       GoRoute(
         path: '/register',
         name: RouteNames.register,
-        builder: (context, state) => const _PlaceholderPage(title: 'Register'),
+        builder: (context, state) => const RegisterPage(),
       ),
       GoRoute(
         path: '/forgot-password',

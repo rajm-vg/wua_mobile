@@ -90,7 +90,7 @@ class WuaScaffold extends StatelessWidget {
   /// Custom action widgets in app bar.
   final List<Widget>? actions;
 
-  /// Whether to display English / हिन्दी toggle button.
+  /// Whether to display English / मराठी toggle button.
   final bool showLanguageToggle;
 
   /// Whether to display notification bell action.
