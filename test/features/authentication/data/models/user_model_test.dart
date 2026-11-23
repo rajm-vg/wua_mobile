@@ -86,5 +86,29 @@ void main() {
       expect(model.role, 'wua_official');
       expect(model.isVerified, true);
     });
+
+    test('fromJson correctly identifies Sabhasad (सभासद) as farmer role', () {
+      final sabhasadJson = {
+        'id': 501,
+        'firstName': 'रमेश',
+        'lastName': 'पाटील',
+        'societyId': 1503,
+        'username': '9876543210',
+        'mobileNo': '9876543210',
+        'email': 'farmer@wua.gov.in',
+        'status': 'A',
+        'refTable': 'SocietyFarmer',
+        'refTableId': 501,
+        'roles': ['सभासद (शेतकरी)'],
+        'authorities': ['MEMBER_LIST_VIEW'],
+      };
+
+      final model = UserModel.fromJson(sabhasadJson);
+      expect(model.name, 'रमेश पाटील');
+      expect(model.role, 'farmer');
+      expect(model.toEntity().role, UserRole.farmer);
+      expect(model.refTable, 'SocietyFarmer');
+      expect(model.refTableId, 501);
+    });
   });
 }

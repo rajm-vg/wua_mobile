@@ -193,6 +193,13 @@ class UserModel {
     String? refTable,
   ) {
     if (roles.any((r) =>
+        r.contains('सभासद') ||
+        r.toLowerCase().contains('sabhasad') ||
+        r.contains('शेतकरी') ||
+        r.toLowerCase().contains('farmer'))) {
+      return 'farmer';
+    }
+    if (roles.any((r) =>
         r.contains('सचिव') ||
         r.toLowerCase().contains('sachiv') ||
         r.toLowerCase().contains('secretary'))) {

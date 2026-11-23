@@ -148,9 +148,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     final lower = username.toLowerCase();
     return lower == '9922322710' ||
         lower == '9876543210' ||
+        lower == '9822334455' ||
         lower == 'official@wua.gov.in' ||
         lower == 'admin@wrd.gov.in' ||
         lower.contains('farmer') ||
+        lower.contains('sabhasad') ||
         lower.contains('official') ||
         lower.contains('admin');
   }
@@ -160,7 +162,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     final UserModel user;
 
     if (cleanId == '9922322710') {
-      // Exactly matches wrd_backend AuthenticateController / AccountResource response for Subhash Zinjad
+      // Matches wrd_backend AuthenticateController / AccountResource response for Subhash Zinjad (SocietyFarmer #696)
       user = const UserModel(
         id: '2100',
         name: 'सुभाष रंगनाथ झिंजाड',
@@ -175,7 +177,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         refTable: 'SocietyFarmer',
         refTableId: 696,
         status: 'A',
-        roles: ['सचिव'],
+        roles: ['सचिव', 'सभासद'],
         authorities: [
           'SUPER_ADMIN_AND_SACHIV_AND_SANCHALAK_ONLY',
           'MASTER_LIST_FULL_ACCESS',
@@ -201,7 +203,26 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           'SOCIETY_EDIT',
         ],
       );
-    } else if (cleanId == '9876543210' || cleanId.contains('farmer')) {
+    } else if (cleanId == '9822334455') {
+      // Sabhasad 2 (आनंद देशमुख - सभासद)
+      user = const UserModel(
+        id: 'usr_farmer_002',
+        name: 'आनंद देशमुख',
+        firstName: 'आनंद',
+        lastName: 'देशमुख',
+        email: 'anand.deshmukh@wua.gov.in',
+        phone: '9822334455',
+        role: 'farmer',
+        isVerified: true,
+        createdAt: '2023-04-10T10:00:00.000Z',
+        societyId: 1503,
+        username: '9822334455',
+        refTable: 'SocietyFarmer',
+        refTableId: 502,
+        roles: ['सभासद (शेतकरी)'],
+      );
+    } else if (cleanId == '9876543210' || cleanId.contains('farmer') || cleanId.contains('sabhasad')) {
+      // Sabhasad 1 (Ramesh Patel / रमेश पाटील - सभासद)
       user = const UserModel(
         id: 'usr_farmer_001',
         name: 'Ramesh Patel',
@@ -214,6 +235,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         createdAt: '2023-01-15T08:30:00.000Z',
         societyId: 1503,
         username: '9876543210',
+        refTable: 'SocietyFarmer',
+        refTableId: 501,
         roles: ['सभासद (शेतकरी)'],
       );
     } else if (cleanId == 'official@wua.gov.in' || cleanId.contains('official')) {

@@ -245,6 +245,55 @@ class _LoginPageViewState extends State<_LoginPageView> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
+                              // Portal Role Header (Farmer / Sabhasad specific)
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(AppSpacing.xs),
+                                    decoration: BoxDecoration(
+                                      color: isDark
+                                          ? AppColors.sproutGreen.withValues(alpha: 0.15)
+                                          : AppColors.sproutGreen.withValues(alpha: 0.12),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.agriculture_rounded,
+                                      size: 20,
+                                      color: AppColors.sproutGreen,
+                                    ),
+                                  ),
+                                  const SizedBox(width: AppSpacing.xs),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          context.isMarathi
+                                              ? 'शेतकरी / सभासद लॉगिन'
+                                              : 'Farmer / Sabhasad Login',
+                                          style: context.titleSmall.bold.withColor(
+                                            isDark
+                                                ? AppColors.textPrimaryDark
+                                                : AppColors.textPrimary,
+                                          ),
+                                        ),
+                                        Text(
+                                          context.isMarathi
+                                              ? 'पाणी वापर संस्था सभासद पोर्टल'
+                                              : 'WUA Farmer Member Portal',
+                                          style: context.caption.withColor(
+                                            isDark
+                                                ? AppColors.textSecondaryDark
+                                                : AppColors.textSecondary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+
                               // Identifier input
                               AuthTextField(
                                 key: const Key('login_identifier_field'),
@@ -444,7 +493,7 @@ class _LoginPageViewState extends State<_LoginPageView> {
                         ),
                         const SizedBox(height: AppSpacing.md),
 
-                        // Quick Role Test Chips (Executive Demo Helper)
+                        // Quick Sabhasad / Farmer Demo Chips
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: AppSpacing.md,
@@ -454,7 +503,7 @@ class _LoginPageViewState extends State<_LoginPageView> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
-                                'QUICK ROLE DEMO',
+                                'सभासद / शेतकरी लॉगिन (SABHASAD DEMO)',
                                 style: context.badgeText.withColor(
                                   isDark
                                       ? AppColors.textSecondaryDark
@@ -468,24 +517,7 @@ class _LoginPageViewState extends State<_LoginPageView> {
                                 alignment: WrapAlignment.center,
                                 children: [
                                   ActionChip(
-                                    label: const Text('सचिव (9922322710)'),
-                                    avatar: const Icon(
-                                      Icons.manage_accounts_rounded,
-                                      size: 16,
-                                      color: AppColors.canalGreen,
-                                    ),
-                                    onPressed: isLoading
-                                        ? null
-                                        : () => _quickFill(
-                                            '9922322710',
-                                            'admin',
-                                          ),
-                                  ),
-                                  ActionChip(
-                                    label: Text(
-                                      l10n.roleFarmer,
-                                      style: context.labelSmall.semiBold,
-                                    ),
+                                    label: const Text('सभासद १ (9876543210)'),
                                     avatar: const Icon(
                                       Icons.agriculture_rounded,
                                       size: 16,
@@ -499,39 +531,33 @@ class _LoginPageViewState extends State<_LoginPageView> {
                                           ),
                                   ),
                                   ActionChip(
-                                    label: Text(
-                                      l10n.roleOfficial,
-                                      style: context.labelSmall.semiBold,
-                                    ),
+                                    label: const Text('सभासद २ (9822334455)'),
                                     avatar: const Icon(
-                                      Icons.badge_rounded,
+                                      Icons.grass_rounded,
                                       size: 16,
-                                      color: AppColors.primaryLight,
+                                      color: AppColors.canalGreen,
                                     ),
                                     onPressed: isLoading
                                         ? null
                                         : () => _quickFill(
-                                            'official@wua.gov.in',
-                                            'Official@123',
+                                            '9822334455',
+                                            'Farmer@123',
                                           ),
                                   ),
-                                  // ActionChip(
-                                  //   label: Text(
-                                  //     l10n.roleAdmin,
-                                  //     style: context.labelSmall.semiBold,
-                                  //   ),
-                                  //   avatar: const Icon(
-                                  //     Icons.admin_panel_settings_rounded,
-                                  //     size: 16,
-                                  //     color: AppColors.harvestAmber,
-                                  //   ),
-                                  //   onPressed: isLoading
-                                  //       ? null
-                                  //       : () => _quickFill(
-                                  //           'admin@wrd.gov.in',
-                                  //           'Admin@123',
-                                  //         ),
-                                  // ),
+                                  ActionChip(
+                                    label: const Text('सभासद ३ (9922322710)'),
+                                    avatar: const Icon(
+                                      Icons.person_pin_rounded,
+                                      size: 16,
+                                      color: AppColors.harvestAmber,
+                                    ),
+                                    onPressed: isLoading
+                                        ? null
+                                        : () => _quickFill(
+                                            '9922322710',
+                                            'admin',
+                                          ),
+                                  ),
                                 ],
                               ),
                             ],

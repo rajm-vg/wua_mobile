@@ -66,6 +66,10 @@ void main() {
         findsOneWidget,
       );
 
+      // Farmer / Sabhasad Portal Header
+      expect(find.text('Farmer / Sabhasad Login'), findsOneWidget);
+      expect(find.text('WUA Farmer Member Portal'), findsOneWidget);
+
       // Form Fields
       expect(find.byKey(const Key('login_identifier_field')), findsOneWidget);
       expect(find.byKey(const Key('login_password_field')), findsOneWidget);
@@ -73,11 +77,11 @@ void main() {
       expect(find.byKey(const Key('forgot_password_button')), findsOneWidget);
       expect(find.byKey(const Key('login_submit_button')), findsOneWidget);
 
-      // Support & Demo UI
-      expect(find.text('QUICK ROLE DEMO'), findsOneWidget);
-      expect(find.text('Farmer'), findsOneWidget);
-      expect(find.text('WUA Official'), findsOneWidget);
-      expect(find.text('सचिव (9922322710)'), findsOneWidget);
+      // Support & Demo UI (Exclusively Sabhasad / Farmer)
+      expect(find.text('सभासद / शेतकरी लॉगिन (SABHASAD DEMO)'), findsOneWidget);
+      expect(find.text('सभासद १ (9876543210)'), findsOneWidget);
+      expect(find.text('सभासद २ (9822334455)'), findsOneWidget);
+      expect(find.text('सभासद ३ (9922322710)'), findsOneWidget);
       expect(find.text("Don't have an account?"), findsOneWidget);
       expect(find.text('Register'), findsOneWidget);
       expect(
@@ -89,6 +93,11 @@ void main() {
     testWidgets('shows validation errors when submitting empty form', (
       tester,
     ) async {
+      tester.view.physicalSize = const Size(1080, 1920);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
@@ -138,15 +147,22 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
-      // Tap Farmer demo chip
-      await tester.tap(find.text('Farmer'));
+      // Tap Sabhasad 1 demo chip
+      await tester.tap(find.text('सभासद १ (9876543210)'));
       await tester.pumpAndSettle();
 
       expect(find.text('9876543210'), findsOneWidget);
       expect(find.text('Farmer@123'), findsOneWidget);
 
-      // Tap Secretary (wrd_backend) demo chip
-      await tester.tap(find.text('सचिव (9922322710)'));
+      // Tap Sabhasad 2 demo chip
+      await tester.tap(find.text('सभासद २ (9822334455)'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('9822334455'), findsOneWidget);
+      expect(find.text('Farmer@123'), findsOneWidget);
+
+      // Tap Sabhasad 3 demo chip
+      await tester.tap(find.text('सभासद ३ (9922322710)'));
       await tester.pumpAndSettle();
 
       expect(find.text('9922322710'), findsOneWidget);
@@ -156,6 +172,11 @@ void main() {
     testWidgets('dispatches AuthLoginRequested with valid credentials', (
       tester,
     ) async {
+      tester.view.physicalSize = const Size(1080, 1920);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
@@ -194,7 +215,9 @@ void main() {
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('displays SnackBar when AuthFailure is emitted', (tester) async {
+    testWidgets('displays SnackBar when AuthFailure is emitted', (
+      tester,
+    ) async {
       whenListen(
         mockAuthBloc,
         Stream.fromIterable([
@@ -207,10 +230,7 @@ void main() {
       await tester.pump();
       await tester.pumpAndSettle();
 
-      expect(
-        find.text('Invalid mobile number or password'),
-        findsOneWidget,
-      );
+      expect(find.text('Invalid mobile number or password'), findsOneWidget);
     });
   });
 }
