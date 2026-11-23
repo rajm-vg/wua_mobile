@@ -77,22 +77,25 @@ class PaniPattiBillCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // Amount and land info
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '₹ 1,240',
-                    style: context.headlineLarge.bold
-                        .withColor(colors.textPrimary)
-                        .withSize(32),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    l10n.waterPerAcreLand,
-                    style: context.caption.withSize(11.5),
-                  ),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '₹ 1,240',
+                      style: context.headlineLarge.bold
+                          .withColor(colors.textPrimary)
+                          .withSize(32),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      l10n.waterPerAcreLand,
+                      style: context.caption.withSize(11.5),
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: AppSpacing.sm),
 
               // Pay via UPI Button
               ElevatedButton.icon(

@@ -1,5 +1,34 @@
 import 'package:wua_mobile/features/water_usage/domain/entities/water_usage_entity.dart';
 
+// ─── Parsing Helpers ──────────────────────────────────────────
+
+String _parseString(dynamic value, {String defaultValue = ''}) {
+  if (value == null) return defaultValue;
+  return value.toString().trim();
+}
+
+int _parseInt(dynamic value, {int defaultValue = 0}) {
+  if (value == null) return defaultValue;
+  if (value is int) return value;
+  if (value is num) return value.toInt();
+  if (value is String) return int.tryParse(value) ?? defaultValue;
+  return defaultValue;
+}
+
+double _parseDouble(dynamic value, {double defaultValue = 0.0}) {
+  if (value == null) return defaultValue;
+  if (value is num) return value.toDouble();
+  if (value is String) return double.tryParse(value) ?? defaultValue;
+  return defaultValue;
+}
+
+DateTime? _parseDateTime(dynamic value) {
+  if (value == null) return null;
+  if (value is DateTime) return value;
+  if (value is String) return DateTime.tryParse(value);
+  return null;
+}
+
 /// Data model for [CropWaterUsage].
 class CropWaterUsageModel extends CropWaterUsage {
   const CropWaterUsageModel({
@@ -13,12 +42,24 @@ class CropWaterUsageModel extends CropWaterUsage {
 
   factory CropWaterUsageModel.fromJson(Map<String, dynamic> json) {
     return CropWaterUsageModel(
-      cropName: json['crop_name'] as String? ?? 'General Crop',
-      cropNameMarathi: json['crop_name_marathi'] as String? ?? 'पीक',
-      allocatedHaCm: (json['allocated_ha_cm'] as num?)?.toDouble() ?? 0.0,
-      usedHaCm: (json['used_ha_cm'] as num?)?.toDouble() ?? 0.0,
-      areaAcres: (json['area_acres'] as num?)?.toDouble() ?? 0.0,
-      percentage: (json['percentage'] as num?)?.toDouble() ?? 0.0,
+      cropName: _parseString(
+        json['crop_name'] ?? json['cropName'] ?? json['sCrop'],
+        defaultValue: 'General Crop',
+      ),
+      cropNameMarathi: _parseString(
+        json['crop_name_marathi'] ?? json['cropNameMarathi'],
+        defaultValue: 'पीक',
+      ),
+      allocatedHaCm: _parseDouble(
+        json['allocated_ha_cm'] ?? json['allocatedHaCm'],
+      ),
+      usedHaCm: _parseDouble(
+        json['used_ha_cm'] ?? json['usedHaCm'] ?? json['waterUsed'],
+      ),
+      areaAcres: _parseDouble(
+        json['area_acres'] ?? json['areaAcres'] ?? json['area'],
+      ),
+      percentage: _parseDouble(json['percentage']),
     );
   }
 
@@ -61,29 +102,75 @@ class WaterQuotaModel extends WaterQuotaEntity {
             .toList()
         : <CropWaterUsageModel>[];
 
+    final totalQuota = _parseDouble(
+      json['total_quota_ha_cm'] ?? json['totalQuotaHaCm'] ?? json['quota'],
+      defaultValue: 20.0,
+    );
+    final usedQuota = _parseDouble(
+      json['used_quota_ha_cm'] ?? json['usedQuotaHaCm'] ?? json['waterUsed'],
+      defaultValue: 14.2,
+    );
+    final remainingQuota = _parseDouble(
+      json['remaining_quota_ha_cm'] ?? json['remainingQuotaHaCm'],
+      defaultValue: (totalQuota > usedQuota ? (totalQuota - usedQuota) : 0.0),
+    );
+    final percentage = _parseDouble(
+      json['percentage_used'] ?? json['percentageUsed'],
+      defaultValue:
+          (totalQuota > 0 ? ((usedQuota / totalQuota) * 100).roundToDouble() : 0.0),
+    );
+
     return WaterQuotaModel(
-      season: json['season'] as String? ?? 'Rabi Season (2024-25)',
-      totalQuotaHaCm: (json['total_quota_ha_cm'] as num?)?.toDouble() ?? 20.0,
-      usedQuotaHaCm: (json['used_quota_ha_cm'] as num?)?.toDouble() ?? 14.2,
-      remainingQuotaHaCm:
-          (json['remaining_quota_ha_cm'] as num?)?.toDouble() ?? 5.8,
-      percentageUsed: (json['percentage_used'] as num?)?.toDouble() ?? 71.0,
-      canalName: json['canal_name'] as String? ?? 'Minor-3, Distributary 7',
-      canalStatus: json['canal_status'] as String? ?? 'Active • 125 Cusecs',
-      currentFlowCusecs:
-          (json['current_flow_cusecs'] as num?)?.toDouble() ?? 125.0,
-      outletNumber: json['outlet_number'] as String? ?? 'Outlet 12 (Gate #4)',
-      wuaSocietyName: json['wua_society_name'] as String? ??
-          'Ganga-Godavari WUA Society #12',
-      farmerName: json['farmer_name'] as String? ?? 'Ramesh Patil',
-      totalTurnsCount: json['total_turns_count'] as int? ?? 5,
-      completedTurnsCount: json['completed_turns_count'] as int? ?? 3,
+      season: _parseString(
+        json['season'] ?? json['sSeason'],
+        defaultValue: 'Rabi Season (2024-25)',
+      ),
+      totalQuotaHaCm: totalQuota,
+      usedQuotaHaCm: usedQuota,
+      remainingQuotaHaCm: remainingQuota,
+      percentageUsed: percentage,
+      canalName: _parseString(
+        json['canal_name'] ?? json['canalName'],
+        defaultValue: 'Minor-3, Distributary 7',
+      ),
+      canalStatus: _parseString(
+        json['canal_status'] ?? json['canalStatus'],
+        defaultValue: 'Active Rotational Flow',
+      ),
+      currentFlowCusecs: _parseDouble(
+        json['current_flow_cusecs'] ?? json['currentFlowCusecs'] ?? json['cumecs'],
+        defaultValue: 125.0,
+      ),
+      outletNumber: _parseString(
+        json['outlet_number'] ?? json['outletNumber'] ?? json['sOutlet'],
+        defaultValue: 'Outlet 12 (Gate #4)',
+      ),
+      wuaSocietyName: _parseString(
+        json['wua_society_name'] ??
+            json['society_name'] ??
+            json['wuaSocietyName'] ??
+            json['sWuaName'],
+        defaultValue: 'Ganga-Godavari WUA Society #12',
+      ),
+      farmerName: _parseString(
+        json['farmer_name'] ?? json['farmerName'] ?? json['sFarmerName'],
+        defaultValue: 'Ramesh Patil',
+      ),
+      totalTurnsCount: _parseInt(
+        json['total_turns_count'] ?? json['totalTurnsCount'],
+        defaultValue: 5,
+      ),
+      completedTurnsCount: _parseInt(
+        json['completed_turns_count'] ?? json['completedTurnsCount'],
+        defaultValue: 3,
+      ),
       cropBreakdown: crops,
-      soilMoistureStatus:
-          json['soil_moisture_status'] as String? ?? 'Optimal (68%)',
-      nextCanalRotationDate: json['next_canal_rotation_date'] != null
-          ? DateTime.tryParse(json['next_canal_rotation_date'] as String)
-          : null,
+      soilMoistureStatus: json['soil_moisture_status'] as String? ??
+          json['soilMoistureStatus'] as String? ??
+          'Scheduled Warabandi',
+      nextCanalRotationDate: _parseDateTime(
+        json['next_canal_rotation_date'] ?? json['startDate'],
+      ),
     );
   }
 
@@ -134,33 +221,99 @@ class IrrigationTurnModel extends IrrigationTurnEntity {
   });
 
   factory IrrigationTurnModel.fromJson(Map<String, dynamic> json) {
+    final startTimeParsed = _parseDateTime(
+      json['scheduled_start_time'] ??
+          json['scheduledStartTime'] ??
+          json['startDate'],
+    );
+    final endTimeParsed = _parseDateTime(
+      json['scheduled_end_time'] ??
+          json['scheduledEndTime'] ??
+          json['endDate'],
+    );
+
+    final start = startTimeParsed ?? DateTime.now();
+    final duration = _parseDouble(
+      json['duration_hours'] ?? json['durationHours'] ?? json['totalHours'],
+      defaultValue: 10.0,
+    );
+    final end = endTimeParsed ?? start.add(Duration(hours: duration.toInt()));
+
+    String status = json['status'] as String? ?? '';
+    if (status.isEmpty) {
+      final now = DateTime.now();
+      if (now.isAfter(end)) {
+        status = TurnStatus.completed;
+      } else if (now.isBefore(start)) {
+        status = TurnStatus.upcoming;
+      } else {
+        status = TurnStatus.active;
+      }
+    }
+
     return IrrigationTurnModel(
-      id: json['id'] as String,
-      turnNumber: json['turn_number'] as int? ?? 1,
-      season: json['season'] as String? ?? 'Rabi Season (2024-25)',
-      status: json['status'] as String? ?? TurnStatus.upcoming,
-      scheduledStartTime: DateTime.parse(json['scheduled_start_time'] as String),
-      scheduledEndTime: DateTime.parse(json['scheduled_end_time'] as String),
-      actualStartTime: json['actual_start_time'] != null
-          ? DateTime.tryParse(json['actual_start_time'] as String)
-          : null,
-      actualEndTime: json['actual_end_time'] != null
-          ? DateTime.tryParse(json['actual_end_time'] as String)
-          : null,
-      durationHours: (json['duration_hours'] as num?)?.toDouble() ?? 12.0,
-      outletNo: json['outlet_no'] as String? ?? 'Outlet No. 12',
-      gateNo: json['gate_no'] as String? ?? 'Gate #4',
-      dischargeCusecs: (json['discharge_cusecs'] as num?)?.toDouble() ?? 50.0,
-      waterDeliveredHaCm:
-          (json['water_delivered_ha_cm'] as num?)?.toDouble() ?? 3.5,
-      crop: json['crop'] as String? ?? 'Wheat (गहू)',
-      fieldParcel:
-          json['field_parcel'] as String? ?? 'Survey No. 42/1A (3.5 Acres)',
-      inspectorName:
-          json['inspector_name'] as String? ?? 'S. K. Deshmukh (Patkari)',
-      isVerified: json['is_verified'] as bool? ?? false,
-      notes: json['notes'] as String?,
-      canRequestSwap: json['can_request_swap'] as bool? ?? true,
+      id: _parseString(json['id']),
+      turnNumber: _parseInt(
+        json['turn_number'] ??
+            json['turnNumber'] ??
+            json['sRotation'],
+        defaultValue: 1,
+      ),
+      season: _parseString(
+        json['season'] ?? json['sSeason'],
+        defaultValue: 'Rabi Season (2024-25)',
+      ),
+      status: status,
+      scheduledStartTime: start,
+      scheduledEndTime: end,
+      actualStartTime: _parseDateTime(
+        json['actual_start_time'] ?? json['actualStartTime'],
+      ),
+      actualEndTime: _parseDateTime(
+        json['actual_end_time'] ?? json['actualEndTime'],
+      ),
+      durationHours: duration,
+      outletNo: _parseString(
+        json['outlet_no'] ?? json['outletNo'] ?? json['sOutlet'],
+        defaultValue: 'Outlet No. 12',
+      ),
+      gateNo: _parseString(
+        json['gate_no'] ?? json['gateNo'] ?? json['sGate'],
+        defaultValue: 'Gate #4',
+      ),
+      dischargeCusecs: _parseDouble(
+        json['discharge_cusecs'] ??
+            json['dischargeCusecs'] ??
+            json['cumecs'],
+        defaultValue: 50.0,
+      ),
+      waterDeliveredHaCm: _parseDouble(
+        json['water_delivered_ha_cm'] ??
+            json['waterDeliveredHaCm'] ??
+            json['waterUsed'],
+        defaultValue: 3.5,
+      ),
+      crop: _parseString(
+        json['crop'] ?? json['sCrop'],
+        defaultValue: 'Wheat (गहू)',
+      ),
+      fieldParcel: _parseString(
+        json['field_parcel'] ??
+            json['fieldParcel'] ??
+            (json['surveyNo'] != null ? 'Survey No. ${json['surveyNo']}' : null),
+        defaultValue: 'Survey No. 42/1A (3.5 Acres)',
+      ),
+      inspectorName: _parseString(
+        json['inspector_name'] ?? json['inspectorName'],
+        defaultValue: 'S. K. Deshmukh (Patkari)',
+      ),
+      isVerified: json['is_verified'] as bool? ??
+          json['isVerified'] as bool? ??
+          false,
+      notes: json['notes'] as String? ?? json['sRemarks'] as String?,
+      canRequestSwap: json['can_request_swap'] as bool? ??
+          json['canRequestSwap'] as bool? ??
+          true,
     );
   }
 
@@ -223,4 +376,3 @@ class WaterUsageSummaryModel extends WaterUsageSummaryEntity {
     );
   }
 }
-

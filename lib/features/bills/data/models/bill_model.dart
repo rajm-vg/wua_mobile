@@ -35,38 +35,103 @@ class BillModel extends BillEntity {
   });
 
   factory BillModel.fromJson(Map<String, dynamic> json) {
+    // Resolve payment status considering backend isPaymentDone flag
+    final isPaid = json['isPaymentDone'] == true ||
+        json['is_payment_done'] == true ||
+        (json['status']?.toString().toUpperCase() == BillStatus.paid.toUpperCase());
+
+    final dueDateParsed = _parseDateTime(
+      json['due_date'] ?? json['dueDate'] ?? json['dDueDate'],
+    );
+
+    String resolvedStatus;
+    if (isPaid) {
+      resolvedStatus = BillStatus.paid;
+    } else if (json['status'] != null && json['status'].toString().isNotEmpty) {
+      resolvedStatus = _parseString(json['status']);
+    } else if (dueDateParsed != null && dueDateParsed.isBefore(DateTime.now())) {
+      resolvedStatus = BillStatus.overdue;
+    } else {
+      resolvedStatus = BillStatus.pending;
+    }
+
+    final total = _parseDouble(
+      json['total_amount'] ??
+          json['totalAmount'] ??
+          json['amount'] ??
+          json['nBillAmount'],
+    );
+    final paid = _parseDouble(
+      json['paid_amount'] ?? json['paidAmount'] ?? json['nPaidAmount'],
+    );
+    final taxesAmount = _parseDouble(
+      json['taxes'] ?? json['govt_cess'] ?? json['nLocalTax'],
+    );
+    final penaltyAmount = _parseDouble(
+      json['penalties'] ?? json['nPenalty'],
+    );
+    final subtotalAmount = _parseDouble(
+      json['subtotal'] ??
+          json['base_water_charges'] ??
+          (total > 0 ? (total - taxesAmount - penaltyAmount) : 0.0),
+    );
+    final outstanding = _parseDouble(
+      json['outstanding_amount'] ??
+          json['outstandingAmount'] ??
+          json['nPreviousBalance'] ??
+          (isPaid ? 0.0 : (total - paid)),
+    );
+
     return BillModel(
       id: _parseString(json['id']),
       billNumber: _parseString(
-        json['bill_number'] ?? json['billNumber'] ?? json['bill_no'],
+        json['bill_number'] ??
+            json['billNumber'] ??
+            json['bill_no'] ??
+            json['sKhateNumber'] ??
+            (json['id'] != null ? 'BILL-${json['id']}' : 'BILL-000'),
       ),
-      status: _parseString(json['status'], defaultValue: BillStatus.pending),
-      consumerId: _parseStringOrNull(json['consumer_id'] ?? json['consumerId']),
+      status: resolvedStatus,
+      consumerId: _parseStringOrNull(
+        json['consumer_id'] ?? json['consumerId'] ?? json['iFarmerMemberId'],
+      ),
       consumerName: _parseStringOrNull(
-        json['consumer_name'] ?? json['consumerName'] ?? json['customer'],
+        json['consumer_name'] ??
+            json['consumerName'] ??
+            json['customer'] ??
+            json['sFarmerName'],
       ),
       wuaSocietyName: _parseStringOrNull(
         json['wua_society_name'] ??
             json['society_name'] ??
             json['societyName'] ??
-            json['wuaSocietyName'],
+            json['wuaSocietyName'] ??
+            json['sWuaName'],
       ),
       canalSection: _parseStringOrNull(
-        json['canal_section'] ?? json['canalSection'],
+        json['canal_section'] ??
+            json['canalSection'] ??
+            json['sSection'] ??
+            json['sSubDivision'],
       ),
       season: _parseString(
-        json['season'],
+        json['season'] ?? json['sSeason'],
         defaultValue: 'Rabi Season (2024-25)',
       ),
       cropType: _parseString(
-        json['crop_type'] ?? json['cropType'],
+        json['crop_type'] ?? json['cropType'] ?? json['sCrop'],
         defaultValue: 'Wheat',
       ),
       landAreaAcres: _parseDouble(
-        json['land_area_acres'] ?? json['landAreaAcres'],
+        json['land_area_acres'] ??
+            json['landAreaAcres'] ??
+            json['nIrrigatedArea'] ??
+            json['area'],
       ),
       waterQuantityLiters: _parseDouble(
-        json['water_quantity_liters'] ?? json['waterQuantityLiters'],
+        json['water_quantity_liters'] ??
+            json['waterQuantityLiters'] ??
+            json['cumecs'],
       ),
       rotationsCount: _parseInt(
         json['rotations_count'] ?? json['rotationsCount'],
@@ -75,17 +140,15 @@ class BillModel extends BillEntity {
       billDate: _parseDateTime(
         json['bill_date'] ?? json['billDate'] ?? json['dBillDate'],
       ),
-      dueDate: _parseDateTime(
-        json['due_date'] ?? json['dueDate'] ?? json['dDueDate'],
-      ),
-      subtotal: _parseDouble(json['subtotal'] ?? json['base_water_charges']),
-      taxes: _parseDouble(json['taxes'] ?? json['govt_cess']),
+      dueDate: dueDateParsed,
+      subtotal: subtotalAmount,
+      taxes: taxesAmount,
       maintenanceCess: _parseDouble(
         json['maintenance_cess'] ??
             json['maintenanceCess'] ??
             json['wua_maintenance'],
       ),
-      penalties: _parseDouble(json['penalties']),
+      penalties: penaltyAmount,
       interestAmount: _parseDouble(
         json['interest_amount'] ?? json['interestAmount'],
       ),
@@ -93,17 +156,15 @@ class BillModel extends BillEntity {
       adjustmentAmount: _parseDouble(
         json['adjustment_amount'] ?? json['adjustmentAmount'],
       ),
-      totalAmount: _parseDouble(
-        json['total_amount'] ?? json['totalAmount'] ?? json['amount'],
-      ),
-      paidAmount: _parseDouble(json['paid_amount'] ?? json['paidAmount']),
-      outstandingAmount: _parseDouble(
-        json['outstanding_amount'] ?? json['outstandingAmount'],
-      ),
+      totalAmount: total,
+      paidAmount: paid,
+      outstandingAmount: outstanding,
       paymentReference: _parseStringOrNull(
         json['payment_reference'] ?? json['paymentReference'] ?? json['txnid'],
       ),
-      paymentDate: _parseDateTime(json['payment_date'] ?? json['paymentDate']),
+      paymentDate: _parseDateTime(
+        json['payment_date'] ?? json['paymentDate'] ?? json['dPaymentDate'],
+      ),
       paymentMethod: _parseStringOrNull(
         json['payment_method'] ?? json['paymentMethod'],
       ),

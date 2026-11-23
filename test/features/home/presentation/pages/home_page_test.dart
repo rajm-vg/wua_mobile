@@ -57,14 +57,14 @@ void main() {
       // 1. Executive Header components
       expect(find.text('Gat No. 142 • Mulshi WUA'), findsOneWidget);
       expect(find.text('En'), findsOneWidget);
-      expect(find.text('MR'), findsOneWidget);
+      expect(find.text('मराठी'), findsOneWidget);
       expect(find.byIcon(Icons.notifications_none_rounded), findsOneWidget);
 
       // 2. Next Canal Turn • Wari Card
       expect(find.text('NEXT CANAL TURN • WARI'), findsOneWidget);
       expect(find.text('In 2 Days'), findsOneWidget);
       expect(find.text('Thursday, 31 Oct'), findsOneWidget);
-      expect(find.text('Timeline →'), findsOneWidget);
+      expect(find.text('Timeline'), findsOneWidget);
       expect(find.text('08:00 AM – 08:00 PM (12 Hours)'), findsOneWidget);
       expect(find.text('Gate #4'), findsOneWidget);
       expect(find.text('Outlet No. 12 • 50 Cusecs Flow'), findsOneWidget);
@@ -74,7 +74,7 @@ void main() {
       expect(find.text('Rabi Season (2024-25)'), findsOneWidget);
       expect(find.text('Due 25 Nov'), findsOneWidget);
       expect(find.text('₹ 1,240'), findsWidgets); // Appears in Bill & Dues cards
-      expect(find.text('Pay via UPI →'), findsOneWidget);
+      expect(find.text('Pay via UPI'), findsOneWidget);
       expect(find.text('18,500 L water for 4.5 Acres land'), findsOneWidget);
       expect(find.text('Base Water'), findsOneWidget);
       expect(find.text('Govt Cess & Tax'), findsOneWidget);

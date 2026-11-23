@@ -1,5 +1,6 @@
 import 'package:wua_mobile/core/logger/app_logger.dart';
 import 'package:wua_mobile/core/network/api_client.dart';
+import 'package:wua_mobile/core/network/api_endpoints.dart';
 import 'package:wua_mobile/features/payments/data/models/payment_model.dart';
 import 'package:wua_mobile/features/payments/domain/entities/payment_entity.dart';
 
@@ -141,12 +142,65 @@ class PaymentRemoteDataSourceImpl implements PaymentRemoteDataSource {
     String? status,
     String? query,
   }) async {
-    await Future<void>.delayed(const Duration(milliseconds: 350));
-
     AppLogger.repository(
-      '📦 [PAYMENTS REMOTE] Fetching payments (status: $status, query: $query)',
+      '📦 [PAYMENTS REMOTE] Fetching payments (consumerId: $consumerId, status: $status, query: $query)',
     );
 
+    try {
+      final farmerId = int.tryParse(consumerId ?? '');
+      final endpoint = farmerId != null
+          ? ApiEndpoints.receiptsHistory(farmerMemberId: farmerId)
+          : ApiEndpoints.payments;
+
+      final response = await apiClient.get<dynamic>(endpoint);
+      if (response.statusCode == 200 && response.data != null) {
+        List<dynamic> items = [];
+        if (response.data is List<dynamic>) {
+          items = response.data as List<dynamic>;
+        } else if (response.data is Map<String, dynamic> &&
+            (response.data as Map<String, dynamic>)['content'] is List<dynamic>) {
+          items = (response.data as Map<String, dynamic>)['content'] as List<dynamic>;
+        }
+
+        if (items.isNotEmpty) {
+          final remotePayments = items
+              .map((item) => PaymentModel.fromJson(item as Map<String, dynamic>))
+              .toList();
+
+          var results = remotePayments;
+          if (consumerId != null && consumerId.isNotEmpty) {
+            results = results
+                .where((p) => p.consumerId?.toLowerCase() == consumerId.toLowerCase())
+                .toList();
+          }
+
+          if (status != null && status.isNotEmpty && status.toUpperCase() != 'ALL') {
+            final s = status.toUpperCase();
+            results = results.where((p) => p.status.toUpperCase() == s).toList();
+          }
+
+          if (query != null && query.trim().isNotEmpty) {
+            final q = query.trim().toLowerCase();
+            results = results.where((p) {
+              return p.paymentNumber.toLowerCase().contains(q) ||
+                  p.season.toLowerCase().contains(q) ||
+                  (p.gatewayTransactionId?.toLowerCase().contains(q) ?? false) ||
+                  (p.billNumber?.toLowerCase().contains(q) ?? false) ||
+                  p.paymentMode.toLowerCase().contains(q);
+            }).toList();
+          }
+
+          results.sort((a, b) => b.paymentDate.compareTo(a.paymentDate));
+          return results;
+        }
+      }
+    } catch (e) {
+      AppLogger.warning(
+        'Receipts API unavailable ($e), falling back to simulated payments dataset.',
+      );
+    }
+
+    await Future<void>.delayed(const Duration(milliseconds: 150));
     var results = List<PaymentModel>.from(_mockPayments);
 
     if (consumerId != null && consumerId.isNotEmpty) {
@@ -179,10 +233,19 @@ class PaymentRemoteDataSourceImpl implements PaymentRemoteDataSource {
 
   @override
   Future<PaymentModel> getPaymentById(String id) async {
-    await Future<void>.delayed(const Duration(milliseconds: 250));
-
     AppLogger.repository('📦 [PAYMENTS REMOTE] Fetching payment detail for id: $id');
 
+    try {
+      final endpoint = ApiEndpoints.paymentDetail(id);
+      final response = await apiClient.get<Map<String, dynamic>>(endpoint);
+      if (response.statusCode == 200 && response.data != null) {
+        return PaymentModel.fromJson(response.data!);
+      }
+    } catch (e) {
+      AppLogger.warning('Payment detail API fallback: $e');
+    }
+
+    await Future<void>.delayed(const Duration(milliseconds: 100));
     final payment = _mockPayments.firstWhere(
       (p) => p.id == id || p.paymentNumber == id,
       orElse: () => throw Exception('Payment with ID "$id" not found'),
@@ -193,8 +256,34 @@ class PaymentRemoteDataSourceImpl implements PaymentRemoteDataSource {
 
   @override
   Future<PaymentModel> processPayment(PaymentModel payment) async {
-    await Future<void>.delayed(const Duration(milliseconds: 300));
     AppLogger.repository('📦 [PAYMENTS REMOTE] Processing payment: ${payment.paymentNumber}');
+
+    try {
+      final receiptPayload = {
+        'nAmount': payment.amount,
+        'dReceiptDate': payment.paymentDate.toIso8601String(),
+        'sInstrumentType': payment.paymentMode.toUpperCase().contains('UPI') ? 'UPI' : 'ONLINE',
+        'sTransactionId': payment.gatewayTransactionId ?? payment.paymentNumber,
+        'billNo': int.tryParse(payment.billId ?? '') ?? payment.billId,
+        'iFarmerMemberId': int.tryParse(payment.consumerId ?? ''),
+        'sFarmerName': payment.consumerName,
+        'sWuaName': payment.wuaSocietyName,
+        'sStatus': 'A',
+      };
+      final response = await apiClient.post<Map<String, dynamic>>(
+        ApiEndpoints.postReceiptDetails,
+        data: receiptPayload,
+      );
+      if ((response.statusCode == 200 || response.statusCode == 201) && response.data != null) {
+        final created = PaymentModel.fromJson(response.data!);
+        _mockPayments.insert(0, created);
+        return created;
+      }
+    } catch (e) {
+      AppLogger.warning('Process payment API error ($e), caching locally.');
+    }
+
+    await Future<void>.delayed(const Duration(milliseconds: 150));
     _mockPayments.insert(0, payment);
     return payment;
   }

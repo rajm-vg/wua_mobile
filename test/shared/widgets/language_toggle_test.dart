@@ -23,7 +23,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('En'), findsOneWidget);
-      expect(find.text('MR'), findsOneWidget);
+      expect(find.text('मराठी'), findsOneWidget);
     });
 
     testWidgets('renders custom labels and triggers onChanged callback', (
@@ -122,8 +122,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('En'), findsNWidgets(2));
-      expect(find.text('MR'), findsOneWidget);
-      expect(find.text('मराठी'), findsOneWidget);
+      expect(find.text('मराठी'), findsNWidgets(2));
     });
   });
 }

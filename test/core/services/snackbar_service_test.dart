@@ -155,11 +155,11 @@ void main() {
       );
 
       await tester.tap(find.text('Trigger Action'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text('UNDO'), findsOneWidget);
-      await tester.tap(find.text('UNDO'));
-      await tester.pump();
+      await tester.tap(find.text('UNDO'), warnIfMissed: false);
+      await tester.pumpAndSettle();
 
       expect(actionTapped, isTrue);
     });

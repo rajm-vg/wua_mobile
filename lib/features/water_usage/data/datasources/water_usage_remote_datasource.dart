@@ -186,11 +186,28 @@ class WaterUsageRemoteDataSourceImpl implements WaterUsageRemoteDataSource {
     bool forceRefresh = false,
   }) async {
     try {
-      final response = await apiClient.get<Map<String, dynamic>>(
-        ApiEndpoints.waterUsageSummary,
+      final response = await apiClient.get<dynamic>(
+        ApiEndpoints.waterUsage,
       );
       if (response.statusCode == 200 && response.data != null) {
-        return WaterUsageSummaryModel.fromJson(response.data!);
+        if (response.data is Map<String, dynamic>) {
+          return WaterUsageSummaryModel.fromJson(response.data as Map<String, dynamic>);
+        } else if (response.data is List<dynamic>) {
+          final list = response.data as List<dynamic>;
+          if (list.isNotEmpty) {
+            final turns = list
+                .map((t) => IrrigationTurnModel.fromJson(t as Map<String, dynamic>))
+                .toList();
+            turns.sort((a, b) => a.scheduledStartTime.compareTo(b.scheduledStartTime));
+            final next = turns.where((t) => t.isUpcoming || t.isActive).firstOrNull;
+
+            return WaterUsageSummaryModel(
+              quota: _mockQuota,
+              nextTurn: next ?? turns.firstOrNull,
+              allTurns: turns,
+            );
+          }
+        }
       }
     } catch (e) {
       AppLogger.warning(

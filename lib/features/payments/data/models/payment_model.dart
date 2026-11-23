@@ -24,43 +24,91 @@ class PaymentModel extends PaymentEntity {
   });
 
   factory PaymentModel.fromJson(Map<String, dynamic> json) {
+    final statusStr = json['status']?.toString();
+    final sStatus = json['sStatus']?.toString();
+    String resolvedStatus;
+    if (sStatus == 'A' || json['isPaymentDone'] == true) {
+      resolvedStatus = PaymentStatus.success;
+    } else if (sStatus == 'P') {
+      resolvedStatus = PaymentStatus.pending;
+    } else if (sStatus == 'F') {
+      resolvedStatus = PaymentStatus.failed;
+    } else if (statusStr != null && statusStr.isNotEmpty) {
+      resolvedStatus = statusStr;
+    } else {
+      resolvedStatus = PaymentStatus.success;
+    }
+
     return PaymentModel(
       id: _parseString(json['id']),
       paymentNumber: _parseString(
-        json['payment_number'] ?? json['receipt_number'] ?? json['receiptNumber'] ?? json['txnid'],
+        json['payment_number'] ??
+            json['receipt_number'] ??
+            json['receiptNumber'] ??
+            json['nReceiptNo'] ??
+            json['txnid'] ??
+            (json['id'] != null ? 'REC-${json['id']}' : 'REC-000'),
       ),
-      status: _parseString(json['status'], defaultValue: PaymentStatus.success),
-      amount: _parseDouble(json['amount'] ?? json['paid_amount']),
+      status: resolvedStatus,
+      amount: _parseDouble(json['amount'] ?? json['paid_amount'] ?? json['nAmount']),
       paymentDate: _parseDateTime(
-            json['payment_date'] ?? json['paymentDate'] ?? json['created_at'],
+            json['payment_date'] ??
+                json['paymentDate'] ??
+                json['dReceiptDate'] ??
+                json['dPayDate'] ??
+                json['created_at'],
           ) ??
           DateTime.now(),
-      billId: _parseStringOrNull(json['bill_id'] ?? json['billId']),
-      billNumber: _parseStringOrNull(json['bill_number'] ?? json['billNumber']),
-      consumerId: _parseStringOrNull(json['consumer_id'] ?? json['consumerId']),
+      billId: _parseStringOrNull(json['bill_id'] ?? json['billId'] ?? json['billNo']),
+      billNumber: _parseStringOrNull(
+        json['bill_number'] ??
+            json['billNumber'] ??
+            (json['billNo'] != null ? 'BILL-${json['billNo']}' : null),
+      ),
+      consumerId: _parseStringOrNull(
+        json['consumer_id'] ?? json['consumerId'] ?? json['iFarmerMemberId'],
+      ),
       consumerName: _parseStringOrNull(
-        json['consumer_name'] ?? json['consumerName'] ?? json['customer'],
+        json['consumer_name'] ??
+            json['consumerName'] ??
+            json['customer'] ??
+            json['sFarmerName'],
       ),
       wuaSocietyName: _parseStringOrNull(
-        json['wua_society_name'] ?? json['society_name'] ?? json['societyName'],
+        json['wua_society_name'] ??
+            json['society_name'] ??
+            json['societyName'] ??
+            json['sWuaName'],
       ),
-      season: _parseString(json['season'], defaultValue: 'Current Season'),
-      cropType: _parseString(json['crop_type'] ?? json['cropType'], defaultValue: 'Wheat'),
+      season: _parseString(json['season'] ?? json['sSeason'], defaultValue: 'Current Season'),
+      cropType: _parseString(
+        json['crop_type'] ?? json['cropType'] ?? json['sCrop'],
+        defaultValue: 'General Crop',
+      ),
       paymentMode: _parseString(
-        json['payment_mode'] ?? json['paymentMode'] ?? json['mode'],
+        json['payment_mode'] ??
+            json['paymentMode'] ??
+            json['sInstrumentType'] ??
+            json['mode'],
         defaultValue: 'UPI',
       ),
       gatewayTransactionId: _parseStringOrNull(
-        json['gateway_transaction_id'] ?? json['gatewayTransactionId'] ?? json['reference_id'],
+        json['gateway_transaction_id'] ??
+            json['gatewayTransactionId'] ??
+            json['reference_id'] ??
+            json['sTransactionId'],
       ),
       bankReference: _parseStringOrNull(
-        json['bank_reference'] ?? json['bankReference'] ?? json['bank_ref_no'],
+        json['bank_reference'] ??
+            json['bankReference'] ??
+            json['bank_ref_no'] ??
+            json['sBranch'],
       ),
       gatewayName: _parseString(
-        json['gateway_name'] ?? json['gatewayName'],
+        json['gateway_name'] ?? json['gatewayName'] ?? json['sBankName'],
         defaultValue: 'MahaGov WRD Gateway',
       ),
-      remarks: _parseStringOrNull(json['remarks'] ?? json['notes']),
+      remarks: _parseStringOrNull(json['remarks'] ?? json['notes'] ?? json['sRemarks']),
       metadata: json['metadata'] as Map<String, dynamic>?,
     );
   }

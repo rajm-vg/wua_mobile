@@ -1,5 +1,6 @@
 import 'package:wua_mobile/core/logger/app_logger.dart';
 import 'package:wua_mobile/core/network/api_client.dart';
+import 'package:wua_mobile/core/network/api_endpoints.dart';
 import 'package:wua_mobile/features/bills/data/models/bill_model.dart';
 import 'package:wua_mobile/features/bills/domain/entities/bill_entity.dart';
 
@@ -209,13 +210,78 @@ class BillRemoteDataSourceImpl implements BillRemoteDataSource {
     String? status,
     String? query,
   }) async {
-    // Simulated realistic network delay
-    await Future<void>.delayed(const Duration(milliseconds: 350));
-
     AppLogger.repository(
-      '📦 [BILLS REMOTE] Fetching bills (status: $status, query: $query)',
+      '📦 [BILLS REMOTE] Fetching bills (consumerId: $consumerId, status: $status, query: $query)',
     );
 
+    try {
+      final farmerId = int.tryParse(consumerId ?? '');
+      final endpoint = farmerId != null
+          ? ApiEndpoints.billHeaders(farmerMemberId: farmerId)
+          : ApiEndpoints.bills;
+
+      final response = await apiClient.get<dynamic>(endpoint);
+      if (response.statusCode == 200 && response.data != null) {
+        List<dynamic> items = [];
+        if (response.data is List<dynamic>) {
+          items = response.data as List<dynamic>;
+        } else if (response.data is Map<String, dynamic> &&
+            (response.data as Map<String, dynamic>)['content'] is List<dynamic>) {
+          items = (response.data as Map<String, dynamic>)['content'] as List<dynamic>;
+        }
+
+        if (items.isNotEmpty) {
+          final remoteBills = items
+              .map((item) => BillModel.fromJson(item as Map<String, dynamic>))
+              .toList();
+
+          var results = remoteBills;
+          if (consumerId != null && consumerId.isNotEmpty) {
+            results = results
+                .where((b) => b.consumerId?.toLowerCase() == consumerId.toLowerCase())
+                .toList();
+          }
+
+          if (status != null && status.isNotEmpty && status.toUpperCase() != 'ALL') {
+            final cleanStatus = status.toUpperCase();
+            if (cleanStatus == 'DUE' || cleanStatus == 'PENDING') {
+              results = results.where((b) => !b.isPaid && !b.isOverdue).toList();
+            } else if (cleanStatus == 'OVERDUE') {
+              results = results.where((b) => b.isOverdue).toList();
+            } else if (cleanStatus == 'PAID') {
+              results = results.where((b) => b.isPaid).toList();
+            } else {
+              results = results.where((b) => b.status.toUpperCase() == cleanStatus).toList();
+            }
+          }
+
+          if (query != null && query.trim().isNotEmpty) {
+            final q = query.trim().toLowerCase();
+            results = results.where((b) {
+              return b.billNumber.toLowerCase().contains(q) ||
+                  b.season.toLowerCase().contains(q) ||
+                  b.cropType.toLowerCase().contains(q) ||
+                  (b.wuaSocietyName?.toLowerCase().contains(q) ?? false);
+            }).toList();
+          }
+
+          results.sort((a, b) {
+            final dateA = a.billDate ?? DateTime(2000);
+            final dateB = b.billDate ?? DateTime(2000);
+            return dateB.compareTo(dateA);
+          });
+
+          return results;
+        }
+      }
+    } catch (e) {
+      AppLogger.warning(
+        'Bills API unavailable ($e), falling back to simulated WUA bills dataset.',
+      );
+    }
+
+    // Fallback to simulated WUA bills dataset
+    await Future<void>.delayed(const Duration(milliseconds: 150));
     var results = List<BillModel>.from(_mockBills);
 
     if (consumerId != null && consumerId.isNotEmpty) {
@@ -247,7 +313,6 @@ class BillRemoteDataSourceImpl implements BillRemoteDataSource {
       }).toList();
     }
 
-    // Sort by billDate descending (most recent first)
     results.sort((a, b) {
       final dateA = a.billDate ?? DateTime(2000);
       final dateB = b.billDate ?? DateTime(2000);
@@ -259,10 +324,24 @@ class BillRemoteDataSourceImpl implements BillRemoteDataSource {
 
   @override
   Future<BillModel> getBillById(String id) async {
-    await Future<void>.delayed(const Duration(milliseconds: 250));
-
     AppLogger.repository('📦 [BILLS REMOTE] Fetching bill details for id: $id');
 
+    try {
+      final intId = int.tryParse(id);
+      final endpoint = intId != null
+          ? ApiEndpoints.billHeaderDetail(intId)
+          : ApiEndpoints.billDetail(id);
+      final response = await apiClient.get<Map<String, dynamic>>(endpoint);
+      if (response.statusCode == 200 && response.data != null) {
+        return BillModel.fromJson(response.data!);
+      }
+    } catch (e) {
+      AppLogger.warning(
+        'BillDetail API unavailable ($e), falling back to simulated bill.',
+      );
+    }
+
+    await Future<void>.delayed(const Duration(milliseconds: 100));
     final bill = _mockBills.firstWhere(
       (b) => b.id == id || b.billNumber == id,
       orElse: () => throw Exception('Bill with ID "$id" not found'),
@@ -278,7 +357,24 @@ class BillRemoteDataSourceImpl implements BillRemoteDataSource {
     required String paymentMethod,
     required double paidAmount,
   }) async {
-    await Future<void>.delayed(const Duration(milliseconds: 300));
+    try {
+      final receiptPayload = {
+        'nAmount': paidAmount,
+        'dReceiptDate': DateTime.now().toIso8601String(),
+        'sInstrumentType': paymentMethod.toUpperCase().contains('UPI') ? 'UPI' : 'ONLINE',
+        'sTransactionId': paymentReference,
+        'billNo': int.tryParse(id) ?? id,
+        'sStatus': 'A',
+      };
+      await apiClient.post<Map<String, dynamic>>(
+        ApiEndpoints.postReceiptDetails,
+        data: receiptPayload,
+      );
+    } catch (e) {
+      AppLogger.warning('Direct receipt post failed ($e), updating local state.');
+    }
+
+    await Future<void>.delayed(const Duration(milliseconds: 150));
     final index = _mockBills.indexWhere((b) => b.id == id || b.billNumber == id);
     if (index == -1) {
       throw Exception('Bill with ID "$id" not found');
