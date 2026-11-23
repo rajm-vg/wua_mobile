@@ -92,9 +92,7 @@ class BillRemoteDataSourceImpl implements BillRemoteDataSource {
       paidAmount: 0.0,
       outstandingAmount: 380.0,
       notes: 'Overdue grace period expired on 15 Oct. Late penalty of ₹50 applied.',
-      metadata: const {
-        'resolution_no': 'WUA-RES-2024-88',
-      },
+      metadata: const {'resolution_no': 'WUA-RES-2024-88'},
     ),
 
     // 3. Paid Kharif Bill (matches Dashboard Recent Activity)
@@ -163,9 +161,7 @@ class BillRemoteDataSourceImpl implements BillRemoteDataSource {
       paymentDate: DateTime(2026, 5, 2, 11, 15),
       paymentMethod: 'Net Banking (SBI)',
       notes: 'Paid via State Bank of India NetBanking portal.',
-      metadata: const {
-        'receipt_no': 'REC-WUA-2024-S041',
-      },
+      metadata: const {'receipt_no': 'REC-WUA-2024-S041'},
     ),
 
     // 5. Previous Year Rabi Bill
@@ -198,9 +194,7 @@ class BillRemoteDataSourceImpl implements BillRemoteDataSource {
       paymentDate: DateTime(2025, 12, 10, 14, 00),
       paymentMethod: 'Cash at Society Kendra',
       notes: 'Paid in cash directly at WUA Society Office, Shrirampur.',
-      metadata: const {
-        'receipt_no': 'REC-WUA-2023-R077',
-      },
+      metadata: const {'receipt_no': 'REC-WUA-2023-R077'},
     ),
   ];
 
@@ -226,8 +220,11 @@ class BillRemoteDataSourceImpl implements BillRemoteDataSource {
         if (response.data is List<dynamic>) {
           items = response.data as List<dynamic>;
         } else if (response.data is Map<String, dynamic> &&
-            (response.data as Map<String, dynamic>)['content'] is List<dynamic>) {
-          items = (response.data as Map<String, dynamic>)['content'] as List<dynamic>;
+            (response.data as Map<String, dynamic>)['content']
+                is List<dynamic>) {
+          items =
+              (response.data as Map<String, dynamic>)['content']
+                  as List<dynamic>;
         }
 
         if (items.isNotEmpty) {
@@ -238,20 +235,29 @@ class BillRemoteDataSourceImpl implements BillRemoteDataSource {
           var results = remoteBills;
           if (consumerId != null && consumerId.isNotEmpty) {
             results = results
-                .where((b) => b.consumerId?.toLowerCase() == consumerId.toLowerCase())
+                .where(
+                  (b) =>
+                      b.consumerId?.toLowerCase() == consumerId.toLowerCase(),
+                )
                 .toList();
           }
 
-          if (status != null && status.isNotEmpty && status.toUpperCase() != 'ALL') {
+          if (status != null &&
+              status.isNotEmpty &&
+              status.toUpperCase() != 'ALL') {
             final cleanStatus = status.toUpperCase();
             if (cleanStatus == 'DUE' || cleanStatus == 'PENDING') {
-              results = results.where((b) => !b.isPaid && !b.isOverdue).toList();
+              results = results
+                  .where((b) => !b.isPaid && !b.isOverdue)
+                  .toList();
             } else if (cleanStatus == 'OVERDUE') {
               results = results.where((b) => b.isOverdue).toList();
             } else if (cleanStatus == 'PAID') {
               results = results.where((b) => b.isPaid).toList();
             } else {
-              results = results.where((b) => b.status.toUpperCase() == cleanStatus).toList();
+              results = results
+                  .where((b) => b.status.toUpperCase() == cleanStatus)
+                  .toList();
             }
           }
 
@@ -299,7 +305,9 @@ class BillRemoteDataSourceImpl implements BillRemoteDataSource {
       } else if (cleanStatus == 'PAID') {
         results = results.where((b) => b.isPaid).toList();
       } else {
-        results = results.where((b) => b.status.toUpperCase() == cleanStatus).toList();
+        results = results
+            .where((b) => b.status.toUpperCase() == cleanStatus)
+            .toList();
       }
     }
 
@@ -361,7 +369,9 @@ class BillRemoteDataSourceImpl implements BillRemoteDataSource {
       final receiptPayload = {
         'nAmount': paidAmount,
         'dReceiptDate': DateTime.now().toIso8601String(),
-        'sInstrumentType': paymentMethod.toUpperCase().contains('UPI') ? 'UPI' : 'ONLINE',
+        'sInstrumentType': paymentMethod.toUpperCase().contains('UPI')
+            ? 'UPI'
+            : 'ONLINE',
         'sTransactionId': paymentReference,
         'billNo': int.tryParse(id) ?? id,
         'sStatus': 'A',
@@ -371,11 +381,15 @@ class BillRemoteDataSourceImpl implements BillRemoteDataSource {
         data: receiptPayload,
       );
     } catch (e) {
-      AppLogger.warning('Direct receipt post failed ($e), updating local state.');
+      AppLogger.warning(
+        'Direct receipt post failed ($e), updating local state.',
+      );
     }
 
     await Future<void>.delayed(const Duration(milliseconds: 150));
-    final index = _mockBills.indexWhere((b) => b.id == id || b.billNumber == id);
+    final index = _mockBills.indexWhere(
+      (b) => b.id == id || b.billNumber == id,
+    );
     if (index == -1) {
       throw Exception('Bill with ID "$id" not found');
     }
@@ -414,8 +428,9 @@ class BillRemoteDataSourceImpl implements BillRemoteDataSource {
     );
 
     _mockBills[index] = updated;
-    AppLogger.repository('📦 [BILLS REMOTE] Marked bill ${old.billNumber} as PAID');
+    AppLogger.repository(
+      '📦 [BILLS REMOTE] Marked bill ${old.billNumber} as PAID',
+    );
     return updated;
   }
 }
-
