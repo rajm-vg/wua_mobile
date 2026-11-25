@@ -224,7 +224,11 @@ class _PaymentDetailPageView extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  payment.season,
+                  _hasValue(payment.season)
+                      ? payment.season
+                      : (payment.fiscalYear != null
+                          ? 'FY ${payment.fiscalYear}'
+                          : l10n.paymentReceipt),
                   style: context.titleMedium.bold.withColor(colors.textPrimary),
                 ),
               ),
@@ -310,6 +314,12 @@ class _PaymentDetailPageView extends StatelessWidget {
     );
   }
 
+  bool _hasValue(String? value) {
+    return value != null &&
+        value.trim().isNotEmpty &&
+        value.trim().toUpperCase() != 'N/A';
+  }
+
   // ─── 2. Transaction Details Card ─────────────────────────────
 
   Widget _buildTransactionDetailsCard(
@@ -344,18 +354,24 @@ class _PaymentDetailPageView extends StatelessWidget {
           Divider(color: colors.billDivider, height: 1),
           const SizedBox(height: AppSpacing.sm),
           _buildInfoRow(l10n.officialReceiptNo, payment.paymentNumber, context),
-          _buildInfoRow(l10n.paymentMode, payment.paymentMode, context),
-          _buildInfoRow(l10n.paymentGateway, payment.gatewayName, context),
-          _buildInfoRow(
-            l10n.gatewayRefId,
-            payment.gatewayTransactionId ?? l10n.notAvailable,
-            context,
-          ),
-          _buildInfoRow(
-            l10n.bankReferenceNo,
-            payment.bankReference ?? l10n.notAvailable,
-            context,
-          ),
+          if (_hasValue(payment.paymentMode))
+            _buildInfoRow(l10n.paymentMode, payment.paymentMode, context),
+          if (_hasValue(payment.gatewayName))
+            _buildInfoRow(l10n.paymentGateway, payment.gatewayName, context),
+          if (_hasValue(payment.gatewayTransactionId))
+            _buildInfoRow(
+              l10n.gatewayRefId,
+              payment.gatewayTransactionId!,
+              context,
+            ),
+          if (_hasValue(payment.bankReference))
+            _buildInfoRow(
+              l10n.bankReferenceNo,
+              payment.bankReference!,
+              context,
+            ),
+          if (_hasValue(payment.fiscalYear))
+            _buildInfoRow('Fiscal Year', payment.fiscalYear!, context),
           _buildInfoRow(
             l10n.paymentDateTime,
             payment.formattedDateTime,
@@ -374,6 +390,25 @@ class _PaymentDetailPageView extends StatelessWidget {
   ) {
     final colors = context.colors;
     final l10n = context.l10n;
+
+    final rows = <Widget>[
+      if (_hasValue(payment.consumerName))
+        _buildInfoRow(l10n.farmerName, payment.consumerName!, context),
+      if (_hasValue(payment.consumerId))
+        _buildInfoRow(l10n.kisanConsumerId, payment.consumerId!, context),
+      if (_hasValue(payment.wuaSocietyName))
+        _buildInfoRow(l10n.wuaSociety, payment.wuaSocietyName!, context),
+      if (_hasValue(payment.billNumber))
+        _buildInfoRow(l10n.billNumber, payment.billNumber!, context),
+      if (_hasValue(payment.season))
+        _buildInfoRow(l10n.season, payment.season, context),
+      if (_hasValue(payment.cropType))
+        _buildInfoRow(l10n.cropCultivated, payment.cropType, context),
+    ];
+
+    if (rows.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return Container(
       decoration: BoxDecoration(
@@ -402,28 +437,7 @@ class _PaymentDetailPageView extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
           Divider(color: colors.billDivider, height: 1),
           const SizedBox(height: AppSpacing.sm),
-          _buildInfoRow(
-            l10n.farmerName,
-            payment.consumerName ?? 'Ramesh Patil',
-            context,
-          ),
-          _buildInfoRow(
-            l10n.kisanConsumerId,
-            payment.consumerId ?? 'KISAN-MH-41201',
-            context,
-          ),
-          _buildInfoRow(
-            l10n.wuaSociety,
-            payment.wuaSocietyName ?? 'Ganga-Godavari WUA #12',
-            context,
-          ),
-          _buildInfoRow(
-            l10n.billNumber,
-            payment.billNumber ?? 'WUA-PANI-BILL',
-            context,
-          ),
-          _buildInfoRow(l10n.season, payment.season, context),
-          _buildInfoRow(l10n.cropCultivated, payment.cropType, context),
+          ...rows,
         ],
       ),
     );

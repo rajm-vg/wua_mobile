@@ -1,7 +1,15 @@
 import 'dart:async';
+import 'dart:convert';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wua_mobile/core/constants/env_config.dart';
+import 'package:wua_mobile/core/errors/exceptions.dart';
 import 'package:wua_mobile/core/logger/app_logger.dart';
 import 'package:wua_mobile/features/bills/domain/entities/bill_entity.dart';
+import 'package:wua_mobile/features/payments/data/datasources/easebuzz_sdk_service.dart';
+import 'package:wua_mobile/features/payments/data/datasources/payment_remote_datasource.dart';
+import 'package:wua_mobile/features/payments/data/models/easebuzz_order_model.dart';
+import 'package:wua_mobile/features/payments/data/models/easebuzz_verify_model.dart';
 import 'package:wua_mobile/features/payments/domain/entities/payment_entity.dart';
 import 'package:wua_mobile/features/payments/domain/usecases/process_payment_usecase.dart';
 import 'package:wua_mobile/features/payments/presentation/bloc/payment_checkout/payment_checkout_event.dart';
@@ -10,16 +18,17 @@ import 'package:wua_mobile/features/payments/presentation/bloc/payment_checkout/
 class PaymentCheckoutBloc
     extends Bloc<PaymentCheckoutEvent, PaymentCheckoutState> {
   PaymentCheckoutBloc({
-    required this.processPaymentUseCase,
+    this.processPaymentUseCase,
     required BillEntity initialBill,
+    this.paymentRemoteDataSource,
+    this.easebuzzSdkService,
     String? initialMethod,
-    this.delayDuration = const Duration(milliseconds: 600),
   }) : super(
-          PaymentCheckoutState(
-            bill: initialBill,
-            selectedMethod: _parseInitialMethod(initialMethod),
-          ),
-        ) {
+         PaymentCheckoutState(
+           bill: initialBill,
+           selectedMethod: _parseInitialMethod(initialMethod),
+         ),
+       ) {
     on<InitPaymentCheckoutEvent>(_onInitCheckout);
     on<SelectPaymentMethodEvent>(_onSelectMethod);
     on<SelectUpiSubModeEvent>(_onSelectUpiSubMode);
@@ -28,14 +37,15 @@ class PaymentCheckoutBloc
     on<VerifyUpiVpaEvent>(_onVerifyUpiVpa);
     on<SelectBankEvent>(_onSelectBank);
     on<UpdateCardDetailsEvent>(_onUpdateCardDetails);
-    on<ToggleSimulateFailureEvent>(_onToggleSimulateFailure);
     on<AdvanceProcessingStageEvent>(_onAdvanceProcessingStage);
     on<ExecutePaymentEvent>(_onExecutePayment);
     on<ResetPaymentCheckoutEvent>(_onResetCheckout);
+    on<UpdatePaymentAmountEvent>(_onUpdatePaymentAmount);
   }
 
-  final ProcessPaymentUseCase processPaymentUseCase;
-  final Duration delayDuration;
+  final ProcessPaymentUseCase? processPaymentUseCase;
+  final PaymentRemoteDataSource? paymentRemoteDataSource;
+  final EasebuzzSdkService? easebuzzSdkService;
 
   static PaymentMethodType _parseInitialMethod(String? method) {
     if (method == null) return PaymentMethodType.upi;
@@ -64,21 +74,21 @@ class PaymentCheckoutBloc
     SelectPaymentMethodEvent event,
     Emitter<PaymentCheckoutState> emit,
   ) {
-    emit(state.copyWith(selectedMethod: event.method));
+    emit(state.copyWith(selectedMethod: event.method, errorMessage: null));
   }
 
   void _onSelectUpiSubMode(
     SelectUpiSubModeEvent event,
     Emitter<PaymentCheckoutState> emit,
   ) {
-    emit(state.copyWith(upiSubMode: event.mode));
+    emit(state.copyWith(upiSubMode: event.mode, errorMessage: null));
   }
 
   void _onSelectUpiApp(
     SelectUpiAppEvent event,
     Emitter<PaymentCheckoutState> emit,
   ) {
-    emit(state.copyWith(selectedUpiApp: event.appName));
+    emit(state.copyWith(selectedUpiApp: event.appName, errorMessage: null));
   }
 
   void _onUpdateUpiVpa(
@@ -90,6 +100,7 @@ class PaymentCheckoutBloc
         upiVpa: event.vpa,
         isVpaVerified: false,
         clearVerifiedName: true,
+        errorMessage: null,
       ),
     );
   }
@@ -104,7 +115,8 @@ class PaymentCheckoutBloc
         state.copyWith(
           upiVpa: vpa,
           isVpaVerified: true,
-          vpaVerifiedName: 'Ramesh D. Patil',
+          vpaVerifiedName: vpa,
+          errorMessage: null,
         ),
       );
     } else {
@@ -122,7 +134,7 @@ class PaymentCheckoutBloc
     SelectBankEvent event,
     Emitter<PaymentCheckoutState> emit,
   ) {
-    emit(state.copyWith(selectedBank: event.bankName));
+    emit(state.copyWith(selectedBank: event.bankName, errorMessage: null));
   }
 
   void _onUpdateCardDetails(
@@ -136,15 +148,9 @@ class PaymentCheckoutBloc
         cardExpiry: event.cardExpiry ?? state.cardExpiry,
         cardCvv: event.cardCvv ?? state.cardCvv,
         saveCard: event.saveCard ?? state.saveCard,
+        errorMessage: null,
       ),
     );
-  }
-
-  void _onToggleSimulateFailure(
-    ToggleSimulateFailureEvent event,
-    Emitter<PaymentCheckoutState> emit,
-  ) {
-    emit(state.copyWith(simulateFailure: event.simulate));
   }
 
   void _onAdvanceProcessingStage(
@@ -158,7 +164,43 @@ class PaymentCheckoutBloc
     ExecutePaymentEvent event,
     Emitter<PaymentCheckoutState> emit,
   ) async {
-    AppLogger.bloc('⚡ [PAYMENT CHECKOUT BLOC] Starting payment execution');
+    AppLogger.bloc('⚡ [PAYMENT CHECKOUT BLOC] Starting Easebuzz payment flow');
+
+    final remote = paymentRemoteDataSource;
+    final sdk = easebuzzSdkService;
+    if (remote == null || sdk == null) {
+      emit(
+        state.copyWith(
+          step: PaymentCheckoutStep.failure,
+          errorMessage: 'Easebuzz payment gateway is not configured.',
+        ),
+      );
+      return;
+    }
+
+    final maxPayable = state.maxPayableAmount;
+    final amountToPay = state.effectivePaymentAmount;
+
+    if (maxPayable <= 0) {
+      emit(
+        state.copyWith(
+          step: PaymentCheckoutStep.failure,
+          errorMessage: 'No payable outstanding amount found for this bill.',
+        ),
+      );
+      return;
+    }
+
+    if (amountToPay <= 0 || amountToPay > maxPayable) {
+      emit(
+        state.copyWith(
+          step: PaymentCheckoutStep.methodSelection,
+          errorMessage:
+              'Please enter a valid payment amount between ₹ 1 and ₹ ${maxPayable.toStringAsFixed(2)}.',
+        ),
+      );
+      return;
+    }
 
     emit(
       state.copyWith(
@@ -168,100 +210,231 @@ class PaymentCheckoutBloc
       ),
     );
 
-    // Processing simulation step 1: Contacting banking gateway
-    if (delayDuration.inMilliseconds > 0) {
-      await Future<void>.delayed(delayDuration);
-    }
-    emit(state.copyWith(processingStage: 2));
-
-    // Processing simulation step 2: Authorizing with NPCI / Bank
-    if (delayDuration.inMilliseconds > 0) {
-      await Future<void>.delayed(delayDuration);
-    }
-    emit(state.copyWith(processingStage: 3));
-
-    // Processing simulation step 3: Treasury challan generation
-    if (delayDuration.inMilliseconds > 0) {
-      await Future<void>.delayed(delayDuration);
-    }
-
-    if (state.simulateFailure) {
-      AppLogger.warning('⚡ [PAYMENT CHECKOUT BLOC] Simulating failed payment');
-      emit(
-        state.copyWith(
-          step: PaymentCheckoutStep.failure,
-          errorMessage:
-              'Bank gateway response timed out (ERR_NPCI_TIMED_OUT). No funds were deducted.',
+    try {
+      AppLogger.bloc(
+        '⚡ [PAYMENT CHECKOUT BLOC] Initiating Easebuzz Gateway Order',
+      );
+      // Omit memberId/societyId here so backend does not run its incomplete
+      // auto-sync (which lacks fiscalYear & bankLedgerId). We post the full
+      // receipt entry after SDK success + server-side verification succeed.
+      final order = await remote.createPaymentOrder(
+        EasebuzzOrderRequest(
+          amount: amountToPay,
+          currency: 'INR',
+          description: 'Water bill payment',
+          provider: 'EASEBUZZ',
+          billId: int.tryParse(state.bill.id),
         ),
       );
-      return;
-    }
 
-    final now = DateTime.now();
-    final amountToPay = state.bill.outstandingAmount > 0
-        ? state.bill.outstandingAmount
-        : (state.bill.totalAmount > 0 ? state.bill.totalAmount : 1240.0);
-
-    final paymentEntity = PaymentEntity(
-      id: 'pay_${now.millisecondsSinceEpoch}',
-      paymentNumber:
-          'REC/WUA/${now.year}-${(now.year + 1).toString().substring(2)}/${1000 + (now.millisecond % 9000)}',
-      status: PaymentStatus.success,
-      amount: amountToPay,
-      paymentDate: now,
-      billId: state.bill.id,
-      billNumber: state.bill.billNumber,
-      consumerId: state.bill.consumerId ?? 'KISAN-MH-41201',
-      consumerName: state.bill.consumerName ?? 'Ramesh Patil',
-      wuaSocietyName: state.bill.wuaSocietyName ?? 'Ganga-Godavari WUA Society #12',
-      season: state.bill.season,
-      cropType: state.bill.cropType,
-      paymentMode: state.paymentModeDisplay,
-      gatewayTransactionId:
-          'TXN/WRD/${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}/${100000 + (now.microsecond % 900000)}',
-      bankReference:
-          'MHA-TREASURY-${now.millisecondsSinceEpoch.toString().substring(6)}',
-      gatewayName: 'MahaGov WRD Cyber Treasury Gateway',
-      remarks: event.customRemarks ??
-          'Pani Patti Irrigation Cess settled via ${state.paymentModeDisplay}',
-      metadata: {
-        'challan_grn': 'GRN-WRD-${now.millisecondsSinceEpoch}',
-        'canal_section': state.bill.canalSection ?? 'Minor-3 (Outlet 4B)',
-        'water_quantity_liters': state.bill.waterQuantityLiters,
-        'land_area_acres': state.bill.landAreaAcres,
-      },
-    );
-
-    final result = await processPaymentUseCase(
-      ProcessPaymentParams(
-        payment: paymentEntity,
-        bill: state.bill,
-      ),
-    );
-
-    result.fold(
-      (failure) {
+      final accessKey = order.accessKey.trim();
+      if (accessKey.isEmpty ||
+          accessKey.startsWith('access_key_mock_') ||
+          !RegExp(r'^[a-zA-Z0-9]+$').hasMatch(accessKey)) {
         AppLogger.error(
-          '❌ [PAYMENT CHECKOUT BLOC] Failed to record payment: ${failure.message}',
+          '❌ [PAYMENT CHECKOUT BLOC] Invalid Easebuzz accessKey received: "$accessKey"',
         );
         emit(
           state.copyWith(
             step: PaymentCheckoutStep.failure,
-            errorMessage: failure.message,
+            errorMessage: accessKey.isEmpty
+                ? 'Unable to initialize Easebuzz payment session (empty access key).'
+                : 'Backend returned an invalid/mock Easebuzz access key ($accessKey). Please verify Easebuzz merchant configuration on the server.',
           ),
         );
-      },
-      (savedPayment) {
+        return;
+      }
+
+      emit(state.copyWith(processingStage: 2));
+      final payMode = EnvConfig.easebuzzPayMode;
+      AppLogger.bloc(
+        '⚡ [PAYMENT CHECKOUT BLOC] Launching Easebuzz SDK (payMode: $payMode)',
+      );
+
+      final sdkResult = await sdk.payWithEasebuzz(
+        accessKey: accessKey,
+        payMode: payMode,
+      );
+
+      if (sdkResult.isCancelled) {
         AppLogger.info(
-          '✅ [PAYMENT CHECKOUT BLOC] Payment successful: ${savedPayment.paymentNumber}',
+          '⚡ [PAYMENT CHECKOUT BLOC] Easebuzz payment cancelled by user',
         );
         emit(
           state.copyWith(
-            step: PaymentCheckoutStep.success,
-            completedPayment: savedPayment,
+            step: PaymentCheckoutStep.methodSelection,
+            processingStage: 1,
+            errorMessage:
+                sdkResult.errorMessage ?? 'Payment cancelled by user.',
           ),
         );
-      },
+        return;
+      }
+
+      if (sdkResult.isFailed) {
+        AppLogger.warning(
+          '⚡ [PAYMENT CHECKOUT BLOC] Easebuzz payment failed: ${sdkResult.errorMessage}',
+        );
+        emit(
+          state.copyWith(
+            step: PaymentCheckoutStep.failure,
+            errorMessage: sdkResult.errorMessage ?? 'Easebuzz checkout failed.',
+          ),
+        );
+        return;
+      }
+
+      emit(state.copyWith(processingStage: 3));
+      AppLogger.bloc(
+        '⚡ [PAYMENT CHECKOUT BLOC] Verifying Easebuzz transaction: ${order.transactionId}',
+      );
+
+      final verifyPayload =
+          (sdkResult.paymentResponse != null &&
+              sdkResult.paymentResponse!.isNotEmpty)
+          ? jsonEncode(sdkResult.paymentResponse)
+          : (sdkResult.rawResponse ?? '{}');
+
+      final verifyResult = await remote.verifyPaymentOrder(
+        EasebuzzVerifyRequest(
+          transactionId: order.transactionId,
+          orderId: order.orderId,
+          paymentId: sdkResult.paymentId ?? order.transactionId,
+          signature: sdkResult.signature ?? '',
+          amount: amountToPay,
+          payload: verifyPayload,
+        ),
+      );
+
+      if (!verifyResult.verified) {
+        AppLogger.error(
+          '❌ [PAYMENT CHECKOUT BLOC] Easebuzz verification failed: ${verifyResult.message}',
+        );
+        emit(
+          state.copyWith(
+            step: PaymentCheckoutStep.failure,
+            errorMessage:
+                verifyResult.message ??
+                'Payment verification failed with Easebuzz gateway.',
+          ),
+        );
+        return;
+      }
+
+      final verifiedPaymentId =
+          verifyResult.paymentId ?? sdkResult.paymentId ?? order.transactionId;
+      final verifiedTxnId =
+          verifyResult.transactionId ??
+          sdkResult.transactionId ??
+          order.transactionId;
+
+      final settledRemarks =
+          event.customRemarks ??
+          'Settled via Easebuzz (${state.paymentModeDisplay})';
+
+      await remote.postReceiptEntry(
+        amount: amountToPay,
+        transactionRefNo: verifiedPaymentId,
+        farmerMemberId:
+            state.bill.farmerMemberId ??
+            int.tryParse(state.bill.consumerId ?? ''),
+        societyId: state.bill.societyId,
+        fiscalYear: state.bill.fiscalYear,
+        season: state.bill.season,
+        remarks: settledRemarks,
+      );
+
+      final now = DateTime.now();
+
+      final settledPayment = PaymentEntity(
+        id: verifiedPaymentId,
+        paymentNumber: verifiedTxnId,
+        status: PaymentStatus.success,
+        amount: amountToPay,
+        paymentDate: now,
+        billId: state.bill.id,
+        billNumber: state.bill.billNumber,
+        consumerId: state.bill.consumerId,
+        consumerName: state.bill.consumerName,
+        wuaSocietyName: state.bill.wuaSocietyName,
+        season: state.bill.season,
+        cropType: state.bill.cropType,
+        paymentMode: state.paymentModeDisplay,
+        gatewayTransactionId: verifiedPaymentId,
+        bankReference: verifiedTxnId,
+        gatewayName: 'Easebuzz Payment Gateway',
+        remarks: settledRemarks,
+        farmerMemberId:
+            state.bill.farmerMemberId ??
+            int.tryParse(state.bill.consumerId ?? ''),
+        societyId: state.bill.societyId,
+        fiscalYear: state.bill.fiscalYear,
+      );
+
+      AppLogger.info(
+        '✅ [PAYMENT CHECKOUT BLOC] Easebuzz payment verified: ${settledPayment.paymentNumber}',
+      );
+      emit(
+        state.copyWith(
+          step: PaymentCheckoutStep.success,
+          completedPayment: settledPayment,
+        ),
+      );
+    } on UnauthorizedException catch (e) {
+      AppLogger.error('❌ [PAYMENT CHECKOUT BLOC] Unauthorized: ${e.message}');
+      emit(
+        state.copyWith(
+          step: PaymentCheckoutStep.failure,
+          errorMessage: e.message.isNotEmpty
+              ? e.message
+              : 'Session expired. Please log in again.',
+        ),
+      );
+    } on NetworkException catch (e) {
+      AppLogger.error('❌ [PAYMENT CHECKOUT BLOC] Network error: ${e.message}');
+      emit(
+        state.copyWith(
+          step: PaymentCheckoutStep.failure,
+          errorMessage: e.message,
+        ),
+      );
+    } on TimeoutException catch (e) {
+      AppLogger.error('❌ [PAYMENT CHECKOUT BLOC] Timeout: ${e.message}');
+      emit(
+        state.copyWith(
+          step: PaymentCheckoutStep.failure,
+          errorMessage: e.message,
+        ),
+      );
+    } on ServerException catch (e) {
+      AppLogger.error('❌ [PAYMENT CHECKOUT BLOC] Server error: ${e.message}');
+      emit(
+        state.copyWith(
+          step: PaymentCheckoutStep.failure,
+          errorMessage: e.message,
+        ),
+      );
+    } catch (e) {
+      AppLogger.error('❌ [PAYMENT CHECKOUT BLOC] Easebuzz checkout error: $e');
+      emit(
+        state.copyWith(
+          step: PaymentCheckoutStep.failure,
+          errorMessage: 'Easebuzz payment failed: $e',
+        ),
+      );
+    }
+  }
+
+  void _onUpdatePaymentAmount(
+    UpdatePaymentAmountEvent event,
+    Emitter<PaymentCheckoutState> emit,
+  ) {
+    emit(
+      state.copyWith(
+        customAmount: event.amount,
+        clearCustomAmount: event.amount == null,
+        errorMessage: null,
+      ),
     );
   }
 

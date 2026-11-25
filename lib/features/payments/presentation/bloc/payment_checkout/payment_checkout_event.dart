@@ -95,15 +95,6 @@ class UpdateCardDetailsEvent extends PaymentCheckoutEvent {
   List<Object?> get props => [cardNumber, cardHolder, cardExpiry, cardCvv, saveCard];
 }
 
-class ToggleSimulateFailureEvent extends PaymentCheckoutEvent {
-  const ToggleSimulateFailureEvent(this.simulate);
-
-  final bool simulate;
-
-  @override
-  List<Object?> get props => [simulate];
-}
-
 class ExecutePaymentEvent extends PaymentCheckoutEvent {
   const ExecutePaymentEvent({this.customRemarks});
 
@@ -124,4 +115,13 @@ class AdvanceProcessingStageEvent extends PaymentCheckoutEvent {
 
 class ResetPaymentCheckoutEvent extends PaymentCheckoutEvent {
   const ResetPaymentCheckoutEvent();
+}
+
+class UpdatePaymentAmountEvent extends PaymentCheckoutEvent {
+  const UpdatePaymentAmountEvent(this.amount);
+
+  final double? amount;
+
+  @override
+  List<Object?> get props => [amount];
 }

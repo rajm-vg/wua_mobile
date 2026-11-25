@@ -1,6 +1,8 @@
+import 'package:wua_mobile/core/errors/exceptions.dart';
 import 'package:wua_mobile/core/logger/app_logger.dart';
 import 'package:wua_mobile/core/network/api_client.dart';
 import 'package:wua_mobile/core/network/api_endpoints.dart';
+import 'package:wua_mobile/features/authentication/data/datasources/auth_local_datasource.dart';
 import 'package:wua_mobile/features/bills/data/models/bill_model.dart';
 import 'package:wua_mobile/features/bills/domain/entities/bill_entity.dart';
 
@@ -22,181 +24,13 @@ abstract class BillRemoteDataSource {
   });
 }
 
-/// Remote Bills data source with simulated WUA & WRD irrigation backend dataset.
-/// Integrates with [ApiClient] and supports offline/development mock datasets.
+/// Remote Bills data source connecting directly to `wrd_backend` (`/api/bill-details`).
+/// Returns pure live data; if no records exist, returns an empty list so that UI empty states render cleanly.
 class BillRemoteDataSourceImpl implements BillRemoteDataSource {
-  BillRemoteDataSourceImpl({required this.apiClient});
+  BillRemoteDataSourceImpl({required this.apiClient, this.authLocalDataSource});
 
   final ApiClient apiClient;
-
-  // In-memory simulated database for realistic stateful actions during the session.
-  final List<BillModel> _mockBills = [
-    // 1. Current Active Rabi Bill (matches Dashboard PaniPattiBillCard)
-    BillModel(
-      id: 'bill_rabi_2024_01',
-      billNumber: 'WUA/PANI/2024-25/0842',
-      status: BillStatus.pending,
-      consumerId: 'KISAN-MH-41201',
-      consumerName: 'Ramesh Patil',
-      wuaSocietyName: 'Ganga-Godavari WUA Society #12',
-      canalSection: 'Minor-3 (Outlet 4B), Distributary 7',
-      season: 'Rabi Season (2024-25)',
-      cropType: 'Wheat (गहू) & Gram',
-      landAreaAcres: 4.5,
-      waterQuantityLiters: 18500,
-      rotationsCount: 3,
-      billDate: DateTime(2026, 10, 15),
-      dueDate: DateTime(2026, 11, 25),
-      subtotal: 1110.0,
-      taxes: 90.0,
-      maintenanceCess: 40.0,
-      penalties: 0.0,
-      interestAmount: 0.0,
-      discounts: 0.0,
-      adjustmentAmount: 0.0,
-      totalAmount: 1240.0,
-      paidAmount: 0.0,
-      outstandingAmount: 1240.0,
-      notes: 'Please clear dues before 25 Nov to maintain uninterrupted canal rotational turn.',
-      metadata: const {
-        'meter_reading_start': 10420,
-        'meter_reading_end': 12270,
-        'water_gauge_officer': 'S. K. Deshmukh',
-      },
-    ),
-
-    // 2. Overdue Canal Desilting & Maintenance Bill
-    BillModel(
-      id: 'bill_spec_2024_02',
-      billNumber: 'WUA/MAINT/2024-25/0194',
-      status: BillStatus.overdue,
-      consumerId: 'KISAN-MH-41201',
-      consumerName: 'Ramesh Patil',
-      wuaSocietyName: 'Ganga-Godavari WUA Society #12',
-      canalSection: 'Minor-3, Outlet 4B',
-      season: 'Annual Canal Desilting & Sluice Gate Cess',
-      cropType: 'Command Area Maintenance',
-      landAreaAcres: 4.5,
-      waterQuantityLiters: 0,
-      rotationsCount: 0,
-      billDate: DateTime(2026, 9, 1),
-      dueDate: DateTime(2026, 10, 15),
-      subtotal: 300.0,
-      taxes: 30.0,
-      maintenanceCess: 0.0,
-      penalties: 50.0,
-      interestAmount: 0.0,
-      discounts: 0.0,
-      adjustmentAmount: 0.0,
-      totalAmount: 380.0,
-      paidAmount: 0.0,
-      outstandingAmount: 380.0,
-      notes: 'Overdue grace period expired on 15 Oct. Late penalty of ₹50 applied.',
-      metadata: const {'resolution_no': 'WUA-RES-2024-88'},
-    ),
-
-    // 3. Paid Kharif Bill (matches Dashboard Recent Activity)
-    BillModel(
-      id: 'bill_kharif_2024_03',
-      billNumber: 'WUA/PANI/2024-25/0319',
-      status: BillStatus.paid,
-      consumerId: 'KISAN-MH-41201',
-      consumerName: 'Ramesh Patil',
-      wuaSocietyName: 'Ganga-Godavari WUA Society #12',
-      canalSection: 'Minor-3 (Outlet 4B), Distributary 7',
-      season: 'Kharif Season (2024-25)',
-      cropType: 'Sugarcane & Soybean',
-      landAreaAcres: 5.0,
-      waterQuantityLiters: 28400,
-      rotationsCount: 4,
-      billDate: DateTime(2026, 7, 10),
-      dueDate: DateTime(2026, 8, 20),
-      subtotal: 2150.0,
-      taxes: 180.0,
-      maintenanceCess: 80.0,
-      penalties: 0.0,
-      interestAmount: 0.0,
-      discounts: 50.0, // Early payment rebate
-      adjustmentAmount: 0.0,
-      totalAmount: 2360.0,
-      paidAmount: 2360.0,
-      outstandingAmount: 0.0,
-      paymentReference: 'UPI/WRD/20240814/894123',
-      paymentDate: DateTime(2026, 8, 14, 15, 30),
-      paymentMethod: 'BHIM UPI (GPay)',
-      notes: 'Early payment incentive rebate of ₹50 applied. Payment verified by WUA Treasurer.',
-      metadata: const {
-        'receipt_no': 'REC-WUA-2024-K089',
-        'auth_code': 'APV-99214',
-      },
-    ),
-
-    // 4. Paid Summer Irrigation Bill
-    BillModel(
-      id: 'bill_summer_2024_04',
-      billNumber: 'WUA/PANI/2023-24/1102',
-      status: BillStatus.paid,
-      consumerId: 'KISAN-MH-41201',
-      consumerName: 'Ramesh Patil',
-      wuaSocietyName: 'Ganga-Godavari WUA Society #12',
-      canalSection: 'Minor-3 (Outlet 4B), Distributary 7',
-      season: 'Summer Season (2023-24)',
-      cropType: 'Fodder & Summer Vegetables',
-      landAreaAcres: 2.5,
-      waterQuantityLiters: 9800,
-      rotationsCount: 2,
-      billDate: DateTime(2026, 4, 12),
-      dueDate: DateTime(2026, 5, 25),
-      subtotal: 750.0,
-      taxes: 60.0,
-      maintenanceCess: 30.0,
-      penalties: 0.0,
-      interestAmount: 0.0,
-      discounts: 0.0,
-      adjustmentAmount: 0.0,
-      totalAmount: 840.0,
-      paidAmount: 840.0,
-      outstandingAmount: 0.0,
-      paymentReference: 'NETBANK/WRD/20240502/102938',
-      paymentDate: DateTime(2026, 5, 2, 11, 15),
-      paymentMethod: 'Net Banking (SBI)',
-      notes: 'Paid via State Bank of India NetBanking portal.',
-      metadata: const {'receipt_no': 'REC-WUA-2024-S041'},
-    ),
-
-    // 5. Previous Year Rabi Bill
-    BillModel(
-      id: 'bill_rabi_2023_05',
-      billNumber: 'WUA/PANI/2023-24/0711',
-      status: BillStatus.paid,
-      consumerId: 'KISAN-MH-41201',
-      consumerName: 'Ramesh Patil',
-      wuaSocietyName: 'Ganga-Godavari WUA Society #12',
-      canalSection: 'Minor-3 (Outlet 4B)',
-      season: 'Rabi Season (2023-24)',
-      cropType: 'Wheat',
-      landAreaAcres: 4.5,
-      waterQuantityLiters: 17800,
-      rotationsCount: 3,
-      billDate: DateTime(2025, 11, 5),
-      dueDate: DateTime(2025, 12, 20),
-      subtotal: 1100.0,
-      taxes: 85.0,
-      maintenanceCess: 40.0,
-      penalties: 0.0,
-      interestAmount: 0.0,
-      discounts: 0.0,
-      adjustmentAmount: 0.0,
-      totalAmount: 1225.0,
-      paidAmount: 1225.0,
-      outstandingAmount: 0.0,
-      paymentReference: 'CASH/WUA/20251210/4482',
-      paymentDate: DateTime(2025, 12, 10, 14, 00),
-      paymentMethod: 'Cash at Society Kendra',
-      notes: 'Paid in cash directly at WUA Society Office, Shrirampur.',
-      metadata: const {'receipt_no': 'REC-WUA-2023-R077'},
-    ),
-  ];
+  final AuthLocalDataSource? authLocalDataSource;
 
   @override
   Future<List<BillModel>> getBills({
@@ -208,126 +42,80 @@ class BillRemoteDataSourceImpl implements BillRemoteDataSource {
       '📦 [BILLS REMOTE] Fetching bills (consumerId: $consumerId, status: $status, query: $query)',
     );
 
-    try {
-      final farmerId = int.tryParse(consumerId ?? '');
-      final endpoint = farmerId != null
-          ? ApiEndpoints.billHeaders(farmerMemberId: farmerId)
-          : ApiEndpoints.bills;
+    int? farmerId = int.tryParse(consumerId ?? '');
+    int? societyId;
+    var isFarmer = true;
 
-      final response = await apiClient.get<dynamic>(endpoint);
-      if (response.statusCode == 200 && response.data != null) {
-        List<dynamic> items = [];
-        if (response.data is List<dynamic>) {
-          items = response.data as List<dynamic>;
-        } else if (response.data is Map<String, dynamic> &&
-            (response.data as Map<String, dynamic>)['content']
-                is List<dynamic>) {
-          items =
-              (response.data as Map<String, dynamic>)['content']
-                  as List<dynamic>;
+    if (farmerId == null && authLocalDataSource != null) {
+      try {
+        final cachedUser = await authLocalDataSource!.getCachedUser();
+        societyId = cachedUser.societyId;
+        isFarmer = cachedUser.isFarmerMember;
+        farmerId = cachedUser.effectiveFarmerMemberId;
+      } catch (_) {}
+    }
+
+    final endpoint = farmerId != null
+        ? ApiEndpoints.memberBillDetails(farmerMemberId: farmerId)
+        : (!isFarmer && societyId != null
+            ? ApiEndpoints.societyBillDetails(societyId: societyId)
+            : ApiEndpoints.bills);
+
+    final response = await apiClient.get<dynamic>(endpoint);
+    if (response.statusCode == 200 && response.data != null) {
+      final items = ApiClient.extractListData(response.data);
+
+      if (items.isNotEmpty) {
+        final remoteBills = items.map(BillModel.fromJson).toList();
+
+        var results = remoteBills;
+        if (consumerId != null && consumerId.isNotEmpty) {
+          results = results
+              .where(
+                (b) => b.consumerId?.toLowerCase() == consumerId.toLowerCase(),
+              )
+              .toList();
         }
 
-        if (items.isNotEmpty) {
-          final remoteBills = items
-              .map((item) => BillModel.fromJson(item as Map<String, dynamic>))
-              .toList();
-
-          var results = remoteBills;
-          if (consumerId != null && consumerId.isNotEmpty) {
+        if (status != null &&
+            status.isNotEmpty &&
+            status.toUpperCase() != 'ALL') {
+          final cleanStatus = status.toUpperCase();
+          if (cleanStatus == 'DUE' || cleanStatus == 'PENDING') {
             results = results
-                .where(
-                  (b) =>
-                      b.consumerId?.toLowerCase() == consumerId.toLowerCase(),
-                )
+                .where((b) => !b.isPaid && !b.isOverdue)
+                .toList();
+          } else if (cleanStatus == 'OVERDUE') {
+            results = results.where((b) => b.isOverdue).toList();
+          } else if (cleanStatus == 'PAID') {
+            results = results.where((b) => b.isPaid).toList();
+          } else {
+            results = results
+                .where((b) => b.status.toUpperCase() == cleanStatus)
                 .toList();
           }
-
-          if (status != null &&
-              status.isNotEmpty &&
-              status.toUpperCase() != 'ALL') {
-            final cleanStatus = status.toUpperCase();
-            if (cleanStatus == 'DUE' || cleanStatus == 'PENDING') {
-              results = results
-                  .where((b) => !b.isPaid && !b.isOverdue)
-                  .toList();
-            } else if (cleanStatus == 'OVERDUE') {
-              results = results.where((b) => b.isOverdue).toList();
-            } else if (cleanStatus == 'PAID') {
-              results = results.where((b) => b.isPaid).toList();
-            } else {
-              results = results
-                  .where((b) => b.status.toUpperCase() == cleanStatus)
-                  .toList();
-            }
-          }
-
-          if (query != null && query.trim().isNotEmpty) {
-            final q = query.trim().toLowerCase();
-            results = results.where((b) {
-              return b.billNumber.toLowerCase().contains(q) ||
-                  b.season.toLowerCase().contains(q) ||
-                  b.cropType.toLowerCase().contains(q) ||
-                  (b.wuaSocietyName?.toLowerCase().contains(q) ?? false);
-            }).toList();
-          }
-
-          results.sort((a, b) {
-            final dateA = a.billDate ?? DateTime(2000);
-            final dateB = b.billDate ?? DateTime(2000);
-            return dateB.compareTo(dateA);
-          });
-
-          return results;
         }
-      }
-    } catch (e) {
-      AppLogger.warning(
-        'Bills API unavailable ($e), falling back to simulated WUA bills dataset.',
-      );
-    }
 
-    // Fallback to simulated WUA bills dataset
-    await Future<void>.delayed(const Duration(milliseconds: 150));
-    var results = List<BillModel>.from(_mockBills);
+        if (query != null && query.trim().isNotEmpty) {
+          final q = query.trim().toLowerCase();
+          results = results.where((b) {
+            return b.billNumber.toLowerCase().contains(q) ||
+                b.season.toLowerCase().contains(q) ||
+                b.cropType.toLowerCase().contains(q) ||
+                (b.wuaSocietyName?.toLowerCase().contains(q) ?? false);
+          }).toList();
+        }
 
-    if (consumerId != null && consumerId.isNotEmpty) {
-      results = results
-          .where((b) => b.consumerId?.toLowerCase() == consumerId.toLowerCase())
-          .toList();
-    }
+        results.sort((a, b) {
+          final dateA = a.billDate ?? DateTime(2000);
+          final dateB = b.billDate ?? DateTime(2000);
+          return dateB.compareTo(dateA);
+        });
 
-    if (status != null && status.isNotEmpty && status.toUpperCase() != 'ALL') {
-      final cleanStatus = status.toUpperCase();
-      if (cleanStatus == 'DUE' || cleanStatus == 'PENDING') {
-        results = results.where((b) => !b.isPaid && !b.isOverdue).toList();
-      } else if (cleanStatus == 'OVERDUE') {
-        results = results.where((b) => b.isOverdue).toList();
-      } else if (cleanStatus == 'PAID') {
-        results = results.where((b) => b.isPaid).toList();
-      } else {
-        results = results
-            .where((b) => b.status.toUpperCase() == cleanStatus)
-            .toList();
+        return results;
       }
     }
-
-    if (query != null && query.trim().isNotEmpty) {
-      final q = query.trim().toLowerCase();
-      results = results.where((b) {
-        return b.billNumber.toLowerCase().contains(q) ||
-            b.season.toLowerCase().contains(q) ||
-            b.cropType.toLowerCase().contains(q) ||
-            (b.wuaSocietyName?.toLowerCase().contains(q) ?? false);
-      }).toList();
-    }
-
-    results.sort((a, b) {
-      final dateA = a.billDate ?? DateTime(2000);
-      final dateB = b.billDate ?? DateTime(2000);
-      return dateB.compareTo(dateA);
-    });
-
-    return results;
+    return const <BillModel>[];
   }
 
   @override
@@ -335,27 +123,17 @@ class BillRemoteDataSourceImpl implements BillRemoteDataSource {
     AppLogger.repository('📦 [BILLS REMOTE] Fetching bill details for id: $id');
 
     try {
-      final intId = int.tryParse(id);
-      final endpoint = intId != null
-          ? ApiEndpoints.billHeaderDetail(intId)
-          : ApiEndpoints.billDetail(id);
+      final endpoint = ApiEndpoints.billDetail(id);
       final response = await apiClient.get<Map<String, dynamic>>(endpoint);
       if (response.statusCode == 200 && response.data != null) {
-        return BillModel.fromJson(response.data!);
+        final data = Map<String, dynamic>.from(response.data!);
+        return BillModel.fromJson(data);
       }
     } catch (e) {
-      AppLogger.warning(
-        'BillDetail API unavailable ($e), falling back to simulated bill.',
-      );
+      AppLogger.warning('BillDetail API error ($e)');
     }
 
-    await Future<void>.delayed(const Duration(milliseconds: 100));
-    final bill = _mockBills.firstWhere(
-      (b) => b.id == id || b.billNumber == id,
-      orElse: () => throw Exception('Bill with ID "$id" not found'),
-    );
-
-    return bill;
+    throw ServerException(message: 'Bill with ID "$id" not found');
   }
 
   @override
@@ -365,72 +143,51 @@ class BillRemoteDataSourceImpl implements BillRemoteDataSource {
     required String paymentMethod,
     required double paidAmount,
   }) async {
+    int? farmerId;
+    int? societyId;
+    if (authLocalDataSource != null) {
+      try {
+        final cachedUser = await authLocalDataSource!.getCachedUser();
+        farmerId = cachedUser.refTableId ?? int.tryParse(cachedUser.id);
+        societyId = cachedUser.societyId;
+      } catch (_) {}
+    }
+
+    final receiptPayload = {
+      'nAmount': paidAmount,
+      'dReceiptDate': DateTime.now().toIso8601String(),
+      'sInstrumentType': paymentMethod.toUpperCase().contains('UPI')
+          ? 'UPI'
+          : 'ONLINE',
+      'sTransactionId': paymentReference,
+      'billNo': int.tryParse(id) ?? id,
+      'iFarmerMemberId': ?farmerId,
+      'iSocietyId': ?societyId,
+      'sStatus': 'A',
+    };
+
     try {
-      final receiptPayload = {
-        'nAmount': paidAmount,
-        'dReceiptDate': DateTime.now().toIso8601String(),
-        'sInstrumentType': paymentMethod.toUpperCase().contains('UPI')
-            ? 'UPI'
-            : 'ONLINE',
-        'sTransactionId': paymentReference,
-        'billNo': int.tryParse(id) ?? id,
-        'sStatus': 'A',
-      };
       await apiClient.post<Map<String, dynamic>>(
         ApiEndpoints.postReceiptDetails,
         data: receiptPayload,
       );
     } catch (e) {
-      AppLogger.warning(
-        'Direct receipt post failed ($e), updating local state.',
+      AppLogger.warning('Direct receipt post error ($e)');
+    }
+
+    try {
+      return await getBillById(id);
+    } catch (_) {
+      return BillModel(
+        id: id,
+        billNumber: 'BILL-$id',
+        status: BillStatus.paid,
+        paidAmount: paidAmount,
+        outstandingAmount: 0.0,
+        paymentReference: paymentReference,
+        paymentDate: DateTime.now(),
+        paymentMethod: paymentMethod,
       );
     }
-
-    await Future<void>.delayed(const Duration(milliseconds: 150));
-    final index = _mockBills.indexWhere(
-      (b) => b.id == id || b.billNumber == id,
-    );
-    if (index == -1) {
-      throw Exception('Bill with ID "$id" not found');
-    }
-
-    final old = _mockBills[index];
-    final updated = BillModel(
-      id: old.id,
-      billNumber: old.billNumber,
-      status: BillStatus.paid,
-      consumerId: old.consumerId,
-      consumerName: old.consumerName,
-      wuaSocietyName: old.wuaSocietyName,
-      canalSection: old.canalSection,
-      season: old.season,
-      cropType: old.cropType,
-      landAreaAcres: old.landAreaAcres,
-      waterQuantityLiters: old.waterQuantityLiters,
-      rotationsCount: old.rotationsCount,
-      billDate: old.billDate,
-      dueDate: old.dueDate,
-      subtotal: old.subtotal,
-      taxes: old.taxes,
-      maintenanceCess: old.maintenanceCess,
-      penalties: old.penalties,
-      interestAmount: old.interestAmount,
-      discounts: old.discounts,
-      adjustmentAmount: old.adjustmentAmount,
-      totalAmount: old.totalAmount,
-      paidAmount: paidAmount > 0 ? paidAmount : old.totalAmount,
-      outstandingAmount: 0.0,
-      paymentReference: paymentReference,
-      paymentDate: DateTime.now(),
-      paymentMethod: paymentMethod,
-      notes: old.notes,
-      metadata: old.metadata,
-    );
-
-    _mockBills[index] = updated;
-    AppLogger.repository(
-      '📦 [BILLS REMOTE] Marked bill ${old.billNumber} as PAID',
-    );
-    return updated;
   }
 }

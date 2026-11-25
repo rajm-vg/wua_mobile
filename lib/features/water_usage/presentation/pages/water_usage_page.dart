@@ -16,7 +16,7 @@ import 'package:wua_mobile/features/water_usage/presentation/widgets/water_usage
 import 'package:wua_mobile/shared/widgets/wua_bottom_sheet.dart';
 import 'package:wua_mobile/shared/widgets/wua_scaffold.dart';
 
-/// Comprehensive Water Usage, Canal Quota & Rotational Wari Scheduling Screen.
+/// Comprehensive Water Usage, Crop Consumption & Canal Turn Screen.
 class WaterUsagePage extends StatelessWidget {
   const WaterUsagePage({super.key});
 
@@ -86,111 +86,11 @@ class _WaterUsagePageView extends StatelessWidget {
     );
   }
 
-  void _showHelpModal(BuildContext context) {
-    final colors = context.colors;
-
-    showWuaBottomSheet<void>(
-      context: context,
-      builder: (ctx) => Container(
-        padding: EdgeInsets.fromLTRB(
-          AppSpacing.lg,
-          AppSpacing.lg,
-          AppSpacing.lg,
-          AppSpacing.lg + MediaQuery.paddingOf(ctx).bottom,
-        ),
-        decoration: BoxDecoration(
-          color: colors.cardBackground,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: colors.divider,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Row(
-              children: [
-                Icon(Icons.support_agent_rounded, color: colors.canalGreen),
-                const SizedBox(width: AppSpacing.xs),
-                Text(
-                  context.l10n.canalHelpline,
-                  style: context.titleMedium.bold.withColor(colors.textPrimary),
-                ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              'For canal gate operations, desilting issues, or turn dispute redressal:',
-              style: context.bodySmall.withColor(colors.textSecondary),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: colors.canalGreen.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  Icons.phone_in_talk_rounded,
-                  color: colors.canalGreen,
-                ),
-              ),
-              title: Text(
-                'Kisan Toll-Free Helpline',
-                style: context.bodySmall.bold,
-              ),
-              subtitle: Text(
-                '1800-180-1551 (24x7 WRD Support)',
-                style: context.caption,
-              ),
-            ),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.info.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(
-                  Icons.person_pin_rounded,
-                  color: AppColors.info,
-                ),
-              ),
-              title: Text(
-                'S. K. Deshmukh (Patkari)',
-                style: context.bodySmall.bold,
-              ),
-              subtitle: Text(
-                '+91 98220 12345 • Minor-3 In-charge',
-                style: context.caption,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-          ],
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return WuaScaffold(
       title: 'Water Usage',
-      subtitle: 'Canal Wari & Quota Monitoring • पाणी वापर',
+      subtitle: 'Crop Irrigation & Water Used • पाणी वापर',
       showBackButton: true,
       scrollable: false,
       padding: EdgeInsets.zero,
@@ -198,12 +98,7 @@ class _WaterUsagePageView extends StatelessWidget {
       maxWidth: 850.0,
       actions: [
         IconButton(
-          tooltip: 'Canal Helpline',
-          icon: const Icon(Icons.help_outline_rounded),
-          onPressed: () => _showHelpModal(context),
-        ),
-        IconButton(
-          tooltip: 'Refresh',
+          tooltip: context.l10n.refresh,
           icon: const Icon(Icons.refresh_rounded),
           onPressed: () => _onRefresh(context),
         ),
@@ -280,8 +175,69 @@ class _WaterUsagePageView extends StatelessWidget {
     );
   }
 
+  Widget _buildEmptyState(BuildContext context) {
+    final colors = context.colors;
+
+    return RefreshIndicator(
+      onRefresh: () => _onRefresh(context),
+      color: colors.canalGreen,
+      child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        slivers: [
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.xl),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 64,
+                      height: 64,
+                      decoration: BoxDecoration(
+                        color: colors.surfaceVariant,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.water_drop_outlined,
+                        size: 34,
+                        color: colors.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Text(
+                      'No water usage records found',
+                      style: context.titleMedium.bold.withColor(
+                        colors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Recorded crop irrigation entries from your WUA society will appear here.',
+                      textAlign: TextAlign.center,
+                      style: context.caption.withColor(colors.textSecondary),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildLoadedContent(BuildContext context, WaterUsageLoaded state) {
     final colors = context.colors;
+    final hasHaCmQuota =
+        state.quota.totalQuotaHaCm > 0 || state.quota.usedQuotaHaCm > 0;
+    final hasCrops = state.quota.cropBreakdown.isNotEmpty;
+    final hasTurns = state.allTurns.isNotEmpty;
+
+    if (!hasHaCmQuota && !hasCrops && !hasTurns) {
+      return _buildEmptyState(context);
+    }
 
     return RefreshIndicator(
       onRefresh: () => _onRefresh(context),
@@ -295,11 +251,11 @@ class _WaterUsagePageView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 1. Quota & Live Canal Status Hero
+                  // 1. Quota & Water Usage Overview
                   WaterQuotaHeroCard(quota: state.quota),
                   const SizedBox(height: AppSpacing.md),
 
-                  // 2. Next Upcoming Canal Turn (Wari)
+                  // 2. Next Upcoming Canal Turn (only if turn data exists)
                   if (state.nextTurn != null) ...[
                     UpcomingCanalTurnCard(
                       turn: state.nextTurn!,
@@ -309,47 +265,49 @@ class _WaterUsagePageView extends StatelessWidget {
                     const SizedBox(height: AppSpacing.md),
                   ],
 
-                  // 3. Crop-wise Water Consumption Breakdown
-                  if (state.quota.cropBreakdown.isNotEmpty) ...[
+                  // 3. Crop-wise Water Consumption Breakdown (only if crop entries exist)
+                  if (hasCrops) ...[
                     CropWaterBreakdownCard(crops: state.quota.cropBreakdown),
                     const SizedBox(height: AppSpacing.lg),
                   ],
 
-                  // 4. Rotational Turns Header & Filter Chips
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        context.l10n.rotationalCanalTurns,
-                        style: context.caption.bold.withColor(
-                          colors.textSecondary,
+                  // 4. Rotational Turns Header & Filter Chips (only if turn data exists)
+                  if (hasTurns) ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          context.l10n.rotationalCanalTurns,
+                          style: context.caption.bold.withColor(
+                            colors.textSecondary,
+                          ),
                         ),
-                      ),
-                      Text(
-                        '${state.filteredTurns.length} Turns',
-                        style: context.caption.semiBold.withColor(
-                          colors.canalGreen,
+                        Text(
+                          '${state.filteredTurns.length} Turns',
+                          style: context.caption.semiBold.withColor(
+                            colors.canalGreen,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  WaterUsageFilterChips(
-                    selectedFilter: state.selectedStatusFilter,
-                    onFilterChanged: (status) {
-                      context.read<WaterUsageBloc>().add(
-                        FilterTurnsByStatusEvent(status),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    WaterUsageFilterChips(
+                      selectedFilter: state.selectedStatusFilter,
+                      onFilterChanged: (status) {
+                        context.read<WaterUsageBloc>().add(
+                          FilterTurnsByStatusEvent(status),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                  ],
                 ],
               ),
             ),
           ),
 
-          // 5. Turns List
-          if (state.filteredTurns.isEmpty)
+          // 5. Turns List (only rendered when turns exist)
+          if (hasTurns && state.filteredTurns.isEmpty)
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
@@ -376,7 +334,7 @@ class _WaterUsagePageView extends StatelessWidget {
                 ),
               ),
             )
-          else
+          else if (hasTurns)
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
               sliver: SliverList(
@@ -385,59 +343,11 @@ class _WaterUsagePageView extends StatelessWidget {
                   return CanalTurnCard(
                     turn: turn,
                     onRequestSwap: () => _openSwapSheet(context, turn),
-                    onTap: () {
-                      // Show brief turn details modal
-                    },
+                    onTap: () {},
                   );
                 }, childCount: state.filteredTurns.length),
               ),
             ),
-
-          // 6. Canal Advisory & Bottom Info Card
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              child: Container(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                decoration: BoxDecoration(
-                  color: colors.surfaceVariant,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: colors.cardBorder),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Icon(
-                      Icons.shield_outlined,
-                      size: 22,
-                      color: colors.canalGreen,
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'WUA Canal Roster Regulations',
-                            style: context.bodySmall.bold.withColor(
-                              colors.textPrimary,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Water delivery operates on a strict rotational basis (Wari). Unauthorized tampering with sluice gates or canal banks is prohibited under Irrigation Act Sec. 58.',
-                            style: context.caption.withColor(
-                              colors.textSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
 
           const SliverToBoxAdapter(child: SizedBox(height: 80)),
         ],

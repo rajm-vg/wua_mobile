@@ -184,11 +184,17 @@ class _LoginPageViewState extends State<_LoginPageView> {
                               ),
                               decoration: BoxDecoration(
                                 color: isDark
-                                    ? AppColors.sproutGreen.withValues(alpha: 0.15)
-                                    : AppColors.sproutGreen.withValues(alpha: 0.10),
+                                    ? AppColors.sproutGreen.withValues(
+                                        alpha: 0.15,
+                                      )
+                                    : AppColors.sproutGreen.withValues(
+                                        alpha: 0.10,
+                                      ),
                                 borderRadius: AppRadius.borderRadiusFull,
                                 border: Border.all(
-                                  color: AppColors.sproutGreen.withValues(alpha: 0.4),
+                                  color: AppColors.sproutGreen.withValues(
+                                    alpha: 0.4,
+                                  ),
                                 ),
                               ),
                               child: Row(
@@ -468,23 +474,11 @@ class _LoginPageViewState extends State<_LoginPageView> {
                                 alignment: WrapAlignment.center,
                                 children: [
                                   ActionChip(
-                                    label: const Text('सचिव (9922322710)'),
-                                    avatar: const Icon(
-                                      Icons.manage_accounts_rounded,
-                                      size: 16,
-                                      color: AppColors.canalGreen,
+                                    key: const Key(
+                                      'quick_demo_sabhasad_chip_1',
                                     ),
-                                    onPressed: isLoading
-                                        ? null
-                                        : () => _quickFill(
-                                            '9922322710',
-                                            'admin',
-                                          ),
-                                  ),
-                                  ActionChip(
-                                    label: Text(
-                                      l10n.roleFarmer,
-                                      style: context.labelSmall.semiBold,
+                                    label: const Text(
+                                      'सभासद / Farmer (9923638738)',
                                     ),
                                     avatar: const Icon(
                                       Icons.agriculture_rounded,
@@ -493,45 +487,26 @@ class _LoginPageViewState extends State<_LoginPageView> {
                                     ),
                                     onPressed: isLoading
                                         ? null
-                                        : () => _quickFill(
-                                            '9876543210',
-                                            'Farmer@123',
-                                          ),
+                                        : () =>
+                                              _quickFill('9923638738', 'admin'),
                                   ),
                                   ActionChip(
-                                    label: Text(
-                                      l10n.roleOfficial,
-                                      style: context.labelSmall.semiBold,
+                                    key: const Key(
+                                      'quick_demo_sabhasad_chip_2',
+                                    ),
+                                    label: const Text(
+                                      'सभासद / Farmer (9156915656)',
                                     ),
                                     avatar: const Icon(
-                                      Icons.badge_rounded,
+                                      Icons.agriculture_rounded,
                                       size: 16,
-                                      color: AppColors.primaryLight,
+                                      color: AppColors.sproutGreen,
                                     ),
                                     onPressed: isLoading
                                         ? null
-                                        : () => _quickFill(
-                                            'official@wua.gov.in',
-                                            'Official@123',
-                                          ),
+                                        : () =>
+                                              _quickFill('9156915656', 'admin'),
                                   ),
-                                  // ActionChip(
-                                  //   label: Text(
-                                  //     l10n.roleAdmin,
-                                  //     style: context.labelSmall.semiBold,
-                                  //   ),
-                                  //   avatar: const Icon(
-                                  //     Icons.admin_panel_settings_rounded,
-                                  //     size: 16,
-                                  //     color: AppColors.harvestAmber,
-                                  //   ),
-                                  //   onPressed: isLoading
-                                  //       ? null
-                                  //       : () => _quickFill(
-                                  //           'admin@wrd.gov.in',
-                                  //           'Admin@123',
-                                  //         ),
-                                  // ),
                                 ],
                               ),
                             ],

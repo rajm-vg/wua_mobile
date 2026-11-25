@@ -1,0 +1,122 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Flutter: Run Dev",
+            "type": "shell",
+            "command": "flutter",
+            "args": [
+                "run",
+                "--dart-define=ENV=dev"
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            }
+        },
+        {
+            "label": "Flutter: Run QA",
+            "type": "shell",
+            "command": "flutter",
+            "args": [
+                "run",
+                "--dart-define=ENV=qa"
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            }
+        },
+        {
+            "label": "Flutter: Run QA (Release)",
+            "type": "shell",
+            "command": "flutter",
+            "args": [
+                "run",
+                "--release",
+                "--dart-define=ENV=qa"
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            }
+        },
+        {
+            "label": "Flutter: Build APK (Dev - Debug)",
+            "type": "shell",
+            "command": "flutter",
+            "args": [
+                "build",
+                "apk",
+                "--debug",
+                "--dart-define=ENV=dev"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Flutter: Build APK (QA - Debug)",
+            "type": "shell",
+            "command": "flutter",
+            "args": [
+                "build",
+                "apk",
+                "--debug",
+                "--dart-define=ENV=qa"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Flutter: Build APK (QA - Release)",
+            "type": "shell",
+            "command": "flutter",
+            "args": [
+                "build",
+                "apk",
+                "--release",
+                "--dart-define=ENV=qa"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Flutter: Pub Get",
+            "type": "shell",
+            "command": "flutter",
+            "args": [
+                "pub",
+                "get"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Flutter: Analyze",
+            "type": "shell",
+            "command": "flutter",
+            "args": [
+                "analyze"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Flutter: Test",
+            "type": "shell",
+            "command": "flutter",
+            "args": [
+                "test"
+            ],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        }
+    ]
+}

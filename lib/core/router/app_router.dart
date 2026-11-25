@@ -69,29 +69,7 @@ class AppRouter {
             const _PlaceholderPage(title: 'Forgot Password'),
       ),
 
-      // ─── Standalone Full-Screen Payment Gateways & UPI Mock Simulators ──
-      GoRoute(
-        path: '/payments/upi-app',
-        name: RouteNames.upiAppSimulator,
-        builder: (context, state) {
-          final bill = state.extra is BillEntity
-              ? state.extra as BillEntity
-              : null;
-          final appName = state.uri.queryParameters['app'] ?? 'Google Pay';
-          return UpiAppSimulatorPage(bill: bill, appName: appName);
-        },
-      ),
-      GoRoute(
-        path: '/payments/gateway',
-        name: RouteNames.paymentGateway,
-        builder: (context, state) {
-          final bill = state.extra is BillEntity
-              ? state.extra as BillEntity
-              : null;
-          final mode = state.uri.queryParameters['mode'] ?? 'netbanking';
-          return PaymentGatewayPage(bill: bill, initialMode: mode);
-        },
-      ),
+      // ─── Easebuzz Payment Checkout ────────────────────────────────────────
       GoRoute(
         path: '/payments/checkout',
         name: RouteNames.paymentCheckout,
@@ -155,13 +133,9 @@ class AppRouter {
                     path: ':id',
                     redirect: (context, state) {
                       final id = state.pathParameters['id'];
-                      if (id == 'upi-app') {
-                        return '/payments/upi-app?${state.uri.query}';
-                      }
-                      if (id == 'gateway') {
-                        return '/payments/gateway?${state.uri.query}';
-                      }
-                      if (id == 'checkout') {
+                      if (id == 'checkout' ||
+                          id == 'upi-app' ||
+                          id == 'gateway') {
                         return '/payments/checkout?${state.uri.query}';
                       }
                       return null;

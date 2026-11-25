@@ -247,7 +247,8 @@ class _BillsPageViewState extends State<_BillsPageView> {
                         const SizedBox(width: 8),
                         _buildFilterChip(
                           context,
-                          label: '${l10n.filterOverdue} (${state.overdueCount})',
+                          label:
+                              '${l10n.filterOverdue} (${state.overdueCount})',
                           statusKey: 'OVERDUE',
                           isSelected: state.selectedStatus == 'OVERDUE',
                           isDanger: true,

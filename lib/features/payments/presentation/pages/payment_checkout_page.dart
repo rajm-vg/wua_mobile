@@ -1,84 +1,151 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:wua_mobile/core/di/injection_container.dart';
 import 'package:wua_mobile/core/extensions/extensions.dart';
 import 'package:wua_mobile/features/bills/domain/entities/bill_entity.dart';
+import 'package:wua_mobile/features/payments/data/datasources/easebuzz_sdk_service.dart';
+import 'package:wua_mobile/features/payments/data/datasources/payment_remote_datasource.dart';
 import 'package:wua_mobile/features/payments/domain/usecases/process_payment_usecase.dart';
 import 'package:wua_mobile/features/payments/presentation/bloc/payment_checkout/payment_checkout_bloc.dart';
 import 'package:wua_mobile/features/payments/presentation/bloc/payment_checkout/payment_checkout_event.dart';
 import 'package:wua_mobile/features/payments/presentation/bloc/payment_checkout/payment_checkout_state.dart';
 import 'package:wua_mobile/features/payments/presentation/widgets/checkout/bill_summary_card.dart';
-import 'package:wua_mobile/features/payments/presentation/widgets/checkout/card_payment_view.dart';
-import 'package:wua_mobile/features/payments/presentation/widgets/checkout/net_banking_view.dart';
 import 'package:wua_mobile/features/payments/presentation/widgets/checkout/payment_failure_view.dart';
 import 'package:wua_mobile/features/payments/presentation/widgets/checkout/payment_processing_view.dart';
 import 'package:wua_mobile/features/payments/presentation/widgets/checkout/payment_success_view.dart';
-import 'package:wua_mobile/features/payments/presentation/widgets/checkout/upi_payment_view.dart';
 import 'package:wua_mobile/shared/widgets/wua_scaffold.dart';
 
-/// Full-detail, theme-aware interactive payment checkout screen for WUA irrigation dues.
-/// Supports UPI (Apps, VPA, BharatQR), Net Banking, and Debit / RuPay Kisan Credit Cards.
+/// Direct Easebuzz payment checkout screen for WUA irrigation dues.
+/// Supports full or partial payment amounts before launching the Easebuzz SDK.
 class PaymentCheckoutPage extends StatelessWidget {
   const PaymentCheckoutPage({
     super.key,
     this.bill,
     this.initialMethod,
+    this.autoLaunch = false,
   });
 
   final BillEntity? bill;
   final String? initialMethod;
+  final bool autoLaunch;
 
   static const BillEntity defaultRabiBill = BillEntity(
-    id: 'bill_rabi_2024_01',
-    billNumber: 'WUA/PANI/2024-25/0842',
+    id: '',
+    billNumber: 'N/A',
     status: BillStatus.pending,
-    consumerId: 'KISAN-MH-41201',
-    consumerName: 'Ramesh Patil',
-    wuaSocietyName: 'Ganga-Godavari WUA Society #12',
-    canalSection: 'Minor-3 (Outlet 4B), Distributary 7',
-    season: 'Rabi Season (2024-25)',
-    cropType: 'Wheat (गहू) & Gram',
-    landAreaAcres: 4.5,
-    waterQuantityLiters: 18500,
-    rotationsCount: 3,
-    subtotal: 1110.0,
-    taxes: 90.0,
-    maintenanceCess: 40.0,
-    totalAmount: 1240.0,
-    outstandingAmount: 1240.0,
+    consumerId: null,
+    consumerName: null,
+    wuaSocietyName: null,
+    canalSection: null,
+    season: 'N/A',
+    cropType: 'N/A',
+    landAreaAcres: 0.0,
+    waterQuantityLiters: 0,
+    rotationsCount: 0,
+    subtotal: 0.0,
+    taxes: 0.0,
+    maintenanceCess: 0.0,
+    totalAmount: 0.0,
+    outstandingAmount: 0.0,
   );
 
   @override
   Widget build(BuildContext context) {
     final activeBill = bill ?? defaultRabiBill;
+    final hasPayableAmount =
+        activeBill.outstandingAmount > 0 || activeBill.totalAmount > 0;
 
     return BlocProvider<PaymentCheckoutBloc>(
-      create: (context) => PaymentCheckoutBloc(
-        processPaymentUseCase: sl<ProcessPaymentUseCase>(),
-        initialBill: activeBill,
-        initialMethod: initialMethod,
-      ),
+      create: (context) {
+        final bloc = PaymentCheckoutBloc(
+          processPaymentUseCase: sl.isRegistered<ProcessPaymentUseCase>()
+              ? sl<ProcessPaymentUseCase>()
+              : null,
+          paymentRemoteDataSource: sl.isRegistered<PaymentRemoteDataSource>()
+              ? sl<PaymentRemoteDataSource>()
+              : null,
+          easebuzzSdkService: sl.isRegistered<EasebuzzSdkService>()
+              ? sl<EasebuzzSdkService>()
+              : null,
+          initialBill: activeBill,
+          initialMethod: initialMethod,
+        );
+        if (autoLaunch && hasPayableAmount) {
+          bloc.add(const ExecutePaymentEvent());
+        }
+        return bloc;
+      },
       child: const _PaymentCheckoutPageView(),
     );
   }
 }
 
-class _PaymentCheckoutPageView extends StatelessWidget {
+class _PaymentCheckoutPageView extends StatefulWidget {
   const _PaymentCheckoutPageView();
+
+  @override
+  State<_PaymentCheckoutPageView> createState() =>
+      _PaymentCheckoutPageViewState();
+}
+
+class _PaymentCheckoutPageViewState extends State<_PaymentCheckoutPageView> {
+  late final TextEditingController _amountController;
+
+  @override
+  void initState() {
+    super.initState();
+    final state = context.read<PaymentCheckoutBloc>().state;
+    final initialAmount = state.effectivePaymentAmount;
+    _amountController = TextEditingController(
+      text: initialAmount > 0
+          ? (initialAmount.truncateToDouble() == initialAmount
+                ? initialAmount.toStringAsFixed(0)
+                : initialAmount.toStringAsFixed(2))
+          : '',
+    );
+  }
+
+  @override
+  void dispose() {
+    _amountController.dispose();
+    super.dispose();
+  }
+
+  void _setPaymentAmount(double amount) {
+    final formatted = amount.truncateToDouble() == amount
+        ? amount.toStringAsFixed(0)
+        : amount.toStringAsFixed(2);
+    _amountController.value = TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
+    );
+    context.read<PaymentCheckoutBloc>().add(UpdatePaymentAmountEvent(amount));
+  }
+
+  String _formatCurrency(double amount) {
+    final format = NumberFormat.currency(
+      locale: 'en_IN',
+      symbol: '₹ ',
+      decimalDigits: amount.truncateToDouble() == amount ? 0 : 2,
+    );
+    return format.format(amount);
+  }
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<PaymentCheckoutBloc, PaymentCheckoutState>(
       builder: (context, state) {
         String title = 'Pani Patti Payment';
-        String subtitle = 'MahaGov WRD Cyber Gateway';
+        String subtitle = 'Easebuzz Payment Gateway';
 
         if (state.step == PaymentCheckoutStep.success) {
           title = 'Settlement Receipt';
           subtitle = 'Government Treasury Approved';
         } else if (state.step == PaymentCheckoutStep.processing) {
           title = 'Processing Payment';
-          subtitle = 'Securing Gateway Session';
+          subtitle = 'Securing Easebuzz Session';
         } else if (state.step == PaymentCheckoutStep.failure) {
           title = 'Payment Status';
           subtitle = 'Gateway Response';
@@ -88,10 +155,10 @@ class _PaymentCheckoutPageView extends StatelessWidget {
           title: title,
           subtitle: subtitle,
           showBackButton: state.step == PaymentCheckoutStep.methodSelection,
-          scrollable: state.step != PaymentCheckoutStep.processing,
-          padding: const EdgeInsets.all(AppSpacing.md),
+          scrollable: false,
+          padding: EdgeInsets.zero,
           enableMaxConstraint: true,
-          maxWidth: 960.0,
+          maxWidth: 720.0,
           body: _buildStepContent(context, state),
         );
       },
@@ -101,218 +168,208 @@ class _PaymentCheckoutPageView extends StatelessWidget {
   Widget _buildStepContent(BuildContext context, PaymentCheckoutState state) {
     switch (state.step) {
       case PaymentCheckoutStep.processing:
-        return const Padding(
-          padding: EdgeInsets.symmetric(vertical: 40),
-          child: PaymentProcessingView(),
+        return const Center(
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(AppSpacing.md),
+            child: PaymentProcessingView(),
+          ),
         );
       case PaymentCheckoutStep.success:
-        return PaymentSuccessView(state: state);
+        return Align(
+          alignment: Alignment.topCenter,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: PaymentSuccessView(state: state),
+          ),
+        );
       case PaymentCheckoutStep.failure:
-        return PaymentFailureView(state: state);
+        return Align(
+          alignment: Alignment.topCenter,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: PaymentFailureView(state: state),
+          ),
+        );
       case PaymentCheckoutStep.methodSelection:
-        return LayoutBuilder(
-          builder: (context, constraints) {
-            final isWide = constraints.maxWidth >= 900;
+        final maxPayable = state.maxPayableAmount;
+        final payableAmount = state.effectivePaymentAmount;
+        final isValidAmount = payableAmount > 0 && payableAmount <= maxPayable;
 
-            if (isWide) {
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Left Column: Bill Summary & Security Seals
-                  Expanded(
-                    flex: 5,
-                    child: Column(
-                      children: [
-                        BillSummaryCard(bill: state.bill),
-                        const SizedBox(height: AppSpacing.md),
-                        _buildSecurityCard(context, state),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.lg),
-
-                  // Right Column: Method Selector & Forms
-                  Expanded(
-                    flex: 7,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        _buildMethodSelector(context, state),
-                        const SizedBox(height: AppSpacing.md),
-                        _buildMethodDetails(context, state),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            }
-
-            // Mobile Layout
-            return Column(
+        return Align(
+          alignment: Alignment.topCenter,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.md,
+              AppSpacing.sm,
+              AppSpacing.md,
+              AppSpacing.xl,
+            ),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                if (state.errorMessage?.isNotEmpty == true) ...[
+                  _buildNoticeBanner(context, state.errorMessage!),
+                  const SizedBox(height: AppSpacing.sm),
+                ],
                 BillSummaryCard(bill: state.bill),
                 const SizedBox(height: AppSpacing.md),
-                _buildMethodSelector(context, state),
+                _buildPartialPaymentCard(context, state, maxPayable),
                 const SizedBox(height: AppSpacing.md),
-                _buildMethodDetails(context, state),
-                const SizedBox(height: AppSpacing.md),
-                _buildSecurityCard(context, state),
-                const SizedBox(height: 32),
+                _buildSecurityCard(context),
+                const SizedBox(height: AppSpacing.lg),
+                ElevatedButton.icon(
+                  onPressed: isValidAmount
+                      ? () {
+                          context
+                              .read<PaymentCheckoutBloc>()
+                              .add(const ExecutePaymentEvent());
+                        }
+                      : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.canalGreen,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    elevation: 2,
+                  ),
+                  icon: const Icon(Icons.payment_rounded, size: 20),
+                  label: Text(
+                    isValidAmount
+                        ? 'Pay ${_formatCurrency(payableAmount)} via Easebuzz'
+                        : 'Enter Valid Payment Amount',
+                    style: context.buttonText.bold.white,
+                  ),
+                ),
               ],
-            );
-          },
+            ),
+          ),
         );
     }
   }
 
-  // ─── Method Selector Segmented Tabs ────────────────────────────────────────
-
-  Widget _buildMethodSelector(
+  Widget _buildPartialPaymentCard(
     BuildContext context,
     PaymentCheckoutState state,
+    double maxPayable,
   ) {
     final colors = context.colors;
+    final entered = state.effectivePaymentAmount;
+    final isExceeding = entered > maxPayable;
+    final isZeroOrNegative = entered <= 0;
 
     return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: colors.cardBackground,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: colors.cardBorder),
-        boxShadow: [
-          BoxShadow(
-            color: colors.cardShadow,
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
       ),
-      padding: const EdgeInsets.all(6),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildMethodButton(
-            context,
-            title: 'UPI',
-            subtitle: 'GPay, QR',
-            icon: Icons.flash_on_rounded,
-            isSelected: state.selectedMethod == PaymentMethodType.upi,
-            onTap: () {
-              context.read<PaymentCheckoutBloc>().add(
-                    const SelectPaymentMethodEvent(PaymentMethodType.upi),
-                  );
-            },
-          ),
-          _buildMethodButton(
-            context,
-            title: 'Net Banking',
-            subtitle: 'SBI, HDFC',
-            icon: Icons.account_balance_rounded,
-            isSelected: state.selectedMethod == PaymentMethodType.netBanking,
-            onTap: () {
-              context.read<PaymentCheckoutBloc>().add(
-                    const SelectPaymentMethodEvent(
-                      PaymentMethodType.netBanking,
-                    ),
-                  );
-            },
-          ),
-          _buildMethodButton(
-            context,
-            title: 'Cards & KCC',
-            subtitle: 'RuPay, Debit',
-            icon: Icons.credit_card_rounded,
-            isSelected: state.selectedMethod == PaymentMethodType.card,
-            onTap: () {
-              context.read<PaymentCheckoutBloc>().add(
-                    const SelectPaymentMethodEvent(PaymentMethodType.card),
-                  );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMethodButton(
-    BuildContext context, {
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
-    final colors = context.colors;
-
-    return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(14),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
-          decoration: BoxDecoration(
-            color: isSelected
-                ? colors.primary.withValues(alpha: 0.12)
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(14),
-            border: isSelected
-                ? Border.all(color: colors.primary, width: 1.5)
-                : null,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(
-                icon,
-                size: 20,
-                color: isSelected ? colors.primary : colors.textSecondary,
-              ),
-              const SizedBox(height: 4),
               Text(
-                title,
-                style: context.bodySmall.bold.withColor(
-                  isSelected ? colors.primary : colors.textPrimary,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                'Payment Amount (Partial / Full)',
+                style: context.labelMedium.bold.withColor(colors.textPrimary),
               ),
               Text(
-                subtitle,
-                style: context.caption.withSize(10).withColor(
-                      isSelected ? colors.primary : colors.textSecondary,
-                    ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                'Dues: ${_formatCurrency(maxPayable)}',
+                style: context.caption.bold.withColor(colors.primary),
               ),
             ],
           ),
-        ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: _amountController,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+            ],
+            onChanged: (value) {
+              final parsed = double.tryParse(value.trim()) ?? 0.0;
+              context
+                  .read<PaymentCheckoutBloc>()
+                  .add(UpdatePaymentAmountEvent(parsed));
+            },
+            decoration: InputDecoration(
+              prefixText: '₹ ',
+              hintText: 'Enter amount to pay',
+              errorText: isExceeding
+                  ? 'Cannot exceed remaining dues (${_formatCurrency(maxPayable)})'
+                  : (isZeroOrNegative && _amountController.text.isNotEmpty
+                        ? 'Amount must be greater than ₹ 0'
+                        : null),
+              filled: true,
+              fillColor: colors.surfaceVariant.withValues(alpha: 0.4),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+          if (maxPayable > 0) ...[
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 6,
+              children: [
+                ActionChip(
+                  label: Text('Full (${_formatCurrency(maxPayable)})'),
+                  onPressed: () => _setPaymentAmount(maxPayable),
+                ),
+                if (maxPayable >= 2)
+                  ActionChip(
+                    label: Text(
+                      '50% (${_formatCurrency((maxPayable / 2).roundToDouble())})',
+                    ),
+                    onPressed: () =>
+                        _setPaymentAmount((maxPayable / 2).roundToDouble()),
+                  ),
+                if (maxPayable > 500)
+                  ActionChip(
+                    label: const Text('₹ 500'),
+                    onPressed: () => _setPaymentAmount(500),
+                  ),
+              ],
+            ),
+          ],
+        ],
       ),
     );
   }
 
-  // ─── Active Method Content ─────────────────────────────────────────────────
-
-  Widget _buildMethodDetails(
-    BuildContext context,
-    PaymentCheckoutState state,
-  ) {
-    switch (state.selectedMethod) {
-      case PaymentMethodType.upi:
-        return const UpiPaymentView();
-      case PaymentMethodType.netBanking:
-        return const NetBankingView();
-      case PaymentMethodType.card:
-        return const CardPaymentView();
-    }
+  Widget _buildNoticeBanner(BuildContext context, String message) {
+    final colors = context.colors;
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.sm),
+      decoration: BoxDecoration(
+        color: AppColors.warning.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.warning.withValues(alpha: 0.4)),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.info_outline_rounded,
+            size: 18,
+            color: AppColors.warning,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              message,
+              style: context.caption.medium.withColor(colors.textPrimary),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
-  // ─── Security Seals & Simulator Controls Card ──────────────────────────────
-
-  Widget _buildSecurityCard(
-    BuildContext context,
-    PaymentCheckoutState state,
-  ) {
+  Widget _buildSecurityCard(BuildContext context) {
     final colors = context.colors;
 
     return Container(
@@ -333,57 +390,21 @@ class _PaymentCheckoutPageView extends StatelessWidget {
                 color: AppColors.canalGreen,
               ),
               const SizedBox(width: 8),
-              Text(
-                'Trust & Security Guarantees',
-                style: context.labelSmall.bold.withColor(colors.textPrimary),
+              Expanded(
+                child: Text(
+                  'Easebuzz & Cyber Treasury Security',
+                  style: context.labelSmall.bold.withColor(colors.textPrimary),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           ),
           const SizedBox(height: 8),
           Text(
-            '• NPCI & Reserve Bank of India regulated online gateway.\n'
-            '• Auto-reconciliation with Water User Association accounts.\n'
-            '• Instant digital receipt recognized for canal turn entitlement.',
+            '• Supports full or partial payments via UPI, Cards, and Net Banking.\n'
+            '• Secured by Easebuzz Payment Gateway (RBI Regulated).\n'
+            '• Instant digital receipt synced with Water User Association accounts.',
             style: context.caption.withSize(11.5),
-          ),
-          const SizedBox(height: 10),
-          Divider(color: colors.divider, height: 1),
-          const SizedBox(height: 6),
-
-          // Simulation Switch (For testing & demos)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.bug_report_outlined,
-                      size: 14,
-                      color: AppColors.warning,
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        'Simulate Gateway Failure',
-                        style: context.caption.bold
-                            .withColor(colors.textSecondary),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Switch.adaptive(
-                value: state.simulateFailure,
-                activeTrackColor: AppColors.error,
-                onChanged: (val) {
-                  context.read<PaymentCheckoutBloc>().add(
-                        ToggleSimulateFailureEvent(val),
-                      );
-                },
-              ),
-            ],
           ),
         ],
       ),

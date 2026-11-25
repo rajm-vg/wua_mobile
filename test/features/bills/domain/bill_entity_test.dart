@@ -61,5 +61,20 @@ void main() {
       expect(BillStatus.toLabel('PARTIALLY_PAID'), equals('Partially Paid'));
       expect(BillStatus.toLabel('APPROVED'), equals('Approved'));
     });
+
+    test('uses clean N/A and empty defaults instead of fake fallback data', () {
+      const emptyBill = BillEntity(
+        id: 'bill_empty',
+        billNumber: 'WUA/EMPTY/01',
+        status: BillStatus.pending,
+      );
+
+      expect(emptyBill.season, isEmpty);
+      expect(emptyBill.cropType, isEmpty);
+      expect(emptyBill.rotationsCount, equals(0));
+      expect(emptyBill.formattedMonth, equals('N/A'));
+      expect(emptyBill.formattedDueDate, equals('N/A'));
+      expect(emptyBill.formattedBillDate, equals('N/A'));
+    });
   });
 }

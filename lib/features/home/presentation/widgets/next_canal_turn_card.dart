@@ -6,16 +6,92 @@ import 'package:wua_mobile/core/router/route_names.dart';
 import 'package:wua_mobile/core/theme/radius.dart';
 import 'package:wua_mobile/core/theme/spacing.dart';
 import 'package:wua_mobile/core/theme/theme_extensions.dart';
+import 'package:wua_mobile/features/water_usage/domain/entities/water_usage_entity.dart';
 
 /// Next Canal Turn • Wari scheduling card with mint border, timeline CTA, and outlet flow metrics.
 /// All colors sourced declaratively from [BuildContext.colors] without manual isDark checks.
 class NextCanalTurnCard extends StatelessWidget {
-  const NextCanalTurnCard({super.key});
+  const NextCanalTurnCard({
+    super.key,
+    this.turn,
+    this.isEmpty = false,
+  });
+
+  final IrrigationTurnEntity? turn;
+  final bool isEmpty;
 
   @override
   Widget build(BuildContext context) {
     final colors = context.colors;
     final l10n = context.l10n;
+
+    if (isEmpty || turn == null) {
+      return Container(
+        decoration: BoxDecoration(
+          color: colors.cardBackground,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: colors.turnCardBorder,
+            width: 1.4,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: colors.cardShadow,
+              blurRadius: 14,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.sm),
+              decoration: BoxDecoration(
+                color: colors.surfaceVariant,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.water_drop_outlined,
+                size: 36,
+                color: colors.turnCardTitle,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              l10n.noTurnsFound,
+              style: context.titleSmall.bold.withColor(colors.textPrimary),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'No upcoming canal turns scheduled for this rotation period.',
+              textAlign: TextAlign.center,
+              style: context.caption.withColor(colors.textSecondary),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final scheduleDateText = turn!.formattedDate.isNotEmpty
+        ? turn!.formattedDate
+        : 'N/A';
+
+    final days = turn!.scheduledStartTime.difference(DateTime.now()).inDays;
+
+    final badgeText = days > 0
+        ? 'In $days Days'
+        : (days == 0 ? 'Today' : TurnStatus.toLabel(turn!.status));
+
+    final durationText = turn!.formattedTimeRange.isNotEmpty
+        ? turn!.formattedTimeRange
+        : 'N/A';
+
+    final gateText = turn!.gateNo.isNotEmpty ? turn!.gateNo : 'N/A';
+
+    final outletText = turn!.outletNo.isNotEmpty
+        ? 'Outlet No. ${turn!.outletNo} • ${turn!.dischargeCusecs.toStringAsFixed(0)} Cusecs Flow'
+        : 'N/A';
 
     return Container(
       decoration: BoxDecoration(
@@ -70,7 +146,7 @@ class NextCanalTurnCard extends StatelessWidget {
                   borderRadius: AppRadius.borderRadiusFull,
                 ),
                 child: Text(
-                  l10n.inDays,
+                  badgeText,
                   style: context.labelSmall.bold.withColor(
                     colors.turnCardBadgeText,
                   ).withSize(11),
@@ -99,7 +175,7 @@ class NextCanalTurnCard extends StatelessWidget {
                   ),
                   const SizedBox(width: AppSpacing.xs),
                   Text(
-                    'Thursday, 31 Oct',
+                    scheduleDateText,
                     style: context.titleMedium.bold.withColor(
                       colors.textPrimary,
                     ).withSize(17),
@@ -156,7 +232,7 @@ class NextCanalTurnCard extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacing.xs),
               Text(
-                l10n.turnDuration,
+                durationText,
                 style: context.bodyMedium.medium.withColor(
                   colors.textPrimary,
                 ),
@@ -181,7 +257,7 @@ class NextCanalTurnCard extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  l10n.gateNumber,
+                  gateText,
                   style: context.labelSmall.bold.withColor(
                     colors.textPrimary,
                   ),
@@ -190,7 +266,7 @@ class NextCanalTurnCard extends StatelessWidget {
               const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(
-                  l10n.outletFlow,
+                  outletText,
                   style: context.caption.medium.withColor(
                     colors.textSecondary,
                   ),

@@ -5,34 +5,37 @@ import 'package:wua_mobile/core/theme/radius.dart';
 import 'package:wua_mobile/core/theme/spacing.dart';
 import 'package:wua_mobile/core/theme/theme_extensions.dart';
 
+class HomeAdvisoryItem {
+  const HomeAdvisoryItem({
+    required this.icon,
+    required this.iconColor,
+    required this.bgColor,
+    required this.title,
+    required this.description,
+    required this.tag,
+  });
+
+  final IconData icon;
+  final Color iconColor;
+  final Color bgColor;
+  final String title;
+  final String description;
+  final String tag;
+}
+
 /// Department advisories, canal alerts, and localized agricultural weather forecast.
 class HomeAdvisoriesCard extends StatelessWidget {
-  const HomeAdvisoriesCard({super.key});
+  const HomeAdvisoriesCard({super.key, this.advisories = const []});
+
+  final List<HomeAdvisoryItem> advisories;
 
   @override
   Widget build(BuildContext context) {
     final isDark = context.isDarkMode;
 
-    final advisories = [
-      (
-        icon: Icons.campaign_rounded,
-        iconColor: AppColors.harvestAmber,
-        bgColor: AppColors.harvestAmber.withValues(alpha: isDark ? 0.2 : 0.12),
-        title: 'Canal Rotational Supply Active',
-        description:
-            'Minor-4 canal running on 7-day rotation. Water users in Ward 4B scheduled for Turn #2 on Oct 24.',
-        tag: 'OFFICIAL NOTICE',
-      ),
-      (
-        icon: Icons.wb_sunny_rounded,
-        iconColor: AppColors.secondary,
-        bgColor: AppColors.secondary.withValues(alpha: isDark ? 0.2 : 0.12),
-        title: 'Weather & Soil Moisture Advisory',
-        description:
-            'Dry weather forecasted for the next 72 hours. Ideal window for pre-sowing irrigation and land levelling.',
-        tag: 'AGRI WEATHER',
-      ),
-    ];
+    if (advisories.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

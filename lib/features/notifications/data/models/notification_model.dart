@@ -1,3 +1,4 @@
+import 'package:wua_mobile/core/utils/json_parse_utils.dart';
 import 'package:wua_mobile/features/notifications/domain/entities/notification_entity.dart';
 
 class NotificationModel extends NotificationEntity {
@@ -17,17 +18,19 @@ class NotificationModel extends NotificationEntity {
 
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
     return NotificationModel(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      message: json['message'] as String,
-      type: _parseType(json['type'] as String?),
-      category: _parseCategory(json['category'] as String?),
-      timestamp: DateTime.parse(json['timestamp'] as String),
-      isRead: json['is_read'] as bool? ?? false,
-      actionRoute: json['action_route'] as String?,
-      referenceId: json['reference_id'] as String?,
-      amount: (json['amount'] as num?)?.toDouble(),
-      metadata: json['metadata'] as Map<String, dynamic>?,
+      id: JsonParseUtils.parseString(json['id']),
+      title: JsonParseUtils.parseString(json['title']),
+      message: JsonParseUtils.parseString(json['message']),
+      type: _parseType(JsonParseUtils.parseStringOrNull(json['type'])),
+      category: _parseCategory(
+        JsonParseUtils.parseStringOrNull(json['category']),
+      ),
+      timestamp: JsonParseUtils.parseDateTimeOrNow(json['timestamp']),
+      isRead: JsonParseUtils.parseBool(json['is_read']),
+      actionRoute: JsonParseUtils.parseStringOrNull(json['action_route']),
+      referenceId: JsonParseUtils.parseStringOrNull(json['reference_id']),
+      amount: JsonParseUtils.parseDoubleOrNull(json['amount']),
+      metadata: JsonParseUtils.parseMapOrNull(json['metadata']),
     );
   }
 

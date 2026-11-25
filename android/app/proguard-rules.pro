@@ -35,3 +35,11 @@
 # Suppress known harmless warnings from third-party libraries
 -dontwarn okio.**
 -dontwarn javax.annotation.**
+
+# ── Easebuzz SDK ──────────────────────────────────────────────────────────────
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}
+-keepattributes JavascriptInterface
+-keep class com.easebuzz.** { *; }
+-dontwarn com.easebuzz.**

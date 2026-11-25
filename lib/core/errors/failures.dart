@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:wua_mobile/core/errors/exceptions.dart';
 
 /// Base failure class for functional error handling.
 /// All failures in the application extend this class.
@@ -97,4 +98,68 @@ class UnknownFailure extends Failure {
     super.code,
     super.originalException,
   });
+}
+
+/// Maps data-layer exceptions into typed domain [Failure] instances.
+Failure mapExceptionToFailure(Object error, {String? fallbackPrefix}) {
+  if (error is UnauthorizedException) {
+    return UnauthorizedFailure(
+      message: error.message.isNotEmpty
+          ? error.message
+          : 'Session expired. Please log in again.',
+      originalException: error,
+    );
+  }
+  if (error is NetworkException) {
+    return NetworkFailure(
+      message: error.message.isNotEmpty
+          ? error.message
+          : 'No internet connection. Please check your network.',
+      originalException: error,
+    );
+  }
+  if (error is TimeoutException) {
+    return TimeoutFailure(
+      message: error.message.isNotEmpty
+          ? error.message
+          : 'Request timed out. Please try again.',
+      originalException: error,
+    );
+  }
+  if (error is CacheException) {
+    return CacheFailure(message: error.message, originalException: error);
+  }
+  if (error is ServerException) {
+    if (error.statusCode == 401) {
+      return UnauthorizedFailure(
+        message: error.message.isNotEmpty
+            ? error.message
+            : 'Session expired. Please log in again.',
+        originalException: error,
+      );
+    }
+    if (error.statusCode == 403) {
+      return ForbiddenFailure(
+        message: error.message.isNotEmpty
+            ? error.message
+            : 'You do not have permission to perform this action.',
+        originalException: error,
+      );
+    }
+    if (error.statusCode == 404) {
+      return NotFoundFailure(
+        message: error.message.isNotEmpty
+            ? error.message
+            : 'The requested resource was not found.',
+        originalException: error,
+      );
+    }
+    return ServerFailure(
+      message: error.message,
+      code: error.statusCode,
+      originalException: error,
+    );
+  }
+  final detail = fallbackPrefix != null ? '$fallbackPrefix: $error' : '$error';
+  return ServerFailure(message: detail, originalException: error);
 }

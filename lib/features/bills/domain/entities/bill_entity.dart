@@ -40,11 +40,11 @@ class BillEntity extends Equatable {
     this.consumerName,
     this.wuaSocietyName,
     this.canalSection,
-    this.season = 'Rabi Season (2024-25)',
-    this.cropType = 'Wheat',
+    this.season = '',
+    this.cropType = '',
     this.landAreaAcres = 0.0,
     this.waterQuantityLiters = 0.0,
-    this.rotationsCount = 1,
+    this.rotationsCount = 0,
     this.billDate,
     this.dueDate,
     this.subtotal = 0.0,
@@ -62,6 +62,13 @@ class BillEntity extends Equatable {
     this.paymentMethod,
     this.notes,
     this.metadata,
+    this.farmerMemberId,
+    this.societyId,
+    this.fiscalYear,
+    this.valueDate,
+    this.glTranId,
+    this.rawStatus,
+    this.details = const [],
   });
 
   final String id;
@@ -94,6 +101,15 @@ class BillEntity extends Equatable {
   final String? notes;
   final Map<String, dynamic>? metadata;
 
+  // ─── Database Fields from `bill_header` (vgwaterresource) ───
+  final int? farmerMemberId;
+  final int? societyId;
+  final String? fiscalYear;
+  final DateTime? valueDate;
+  final int? glTranId;
+  final String? rawStatus;
+  final List<BillDetailEntity> details;
+
   // ─── Semantic Status Helpers ─────────────────────────────────
 
   bool get isPaid =>
@@ -123,12 +139,12 @@ class BillEntity extends Equatable {
     if (dueDate != null) {
       return DateFormat('MMMM yyyy').format(dueDate!);
     }
-    return 'Current Season';
+    return 'N/A';
   }
 
   /// Formatted due date string (e.g., "25 Nov 2026").
   String get formattedDueDate {
-    if (dueDate == null) return 'No due date';
+    if (dueDate == null) return 'N/A';
     return DateFormat('dd MMM yyyy').format(dueDate!);
   }
 
@@ -174,6 +190,13 @@ class BillEntity extends Equatable {
     String? paymentMethod,
     String? notes,
     Map<String, dynamic>? metadata,
+    int? farmerMemberId,
+    int? societyId,
+    String? fiscalYear,
+    DateTime? valueDate,
+    int? glTranId,
+    String? rawStatus,
+    List<BillDetailEntity>? details,
   }) {
     return BillEntity(
       id: id ?? this.id,
@@ -205,6 +228,13 @@ class BillEntity extends Equatable {
       paymentMethod: paymentMethod ?? this.paymentMethod,
       notes: notes ?? this.notes,
       metadata: metadata ?? this.metadata,
+      farmerMemberId: farmerMemberId ?? this.farmerMemberId,
+      societyId: societyId ?? this.societyId,
+      fiscalYear: fiscalYear ?? this.fiscalYear,
+      valueDate: valueDate ?? this.valueDate,
+      glTranId: glTranId ?? this.glTranId,
+      rawStatus: rawStatus ?? this.rawStatus,
+      details: details ?? this.details,
     );
   }
 
@@ -239,5 +269,53 @@ class BillEntity extends Equatable {
     paymentMethod,
     notes,
     metadata,
+    farmerMemberId,
+    societyId,
+    fiscalYear,
+    valueDate,
+    glTranId,
+    rawStatus,
+    details,
+  ];
+}
+
+/// Domain entity representing a line item from `bill_details` table.
+class BillDetailEntity extends Equatable {
+  const BillDetailEntity({
+    this.id,
+    this.billNo,
+    required this.crop,
+    this.irrigatedArea = 0.0,
+    this.rate = 0.0,
+    this.amount = 0.0,
+    this.localTax = 0.0,
+    this.penalty = 0.0,
+    this.isPaymentDone = false,
+    this.paidAmount = 0.0,
+  });
+
+  final int? id;
+  final int? billNo;
+  final String crop;
+  final double irrigatedArea;
+  final double rate;
+  final double amount;
+  final double localTax;
+  final double penalty;
+  final bool isPaymentDone;
+  final double paidAmount;
+
+  @override
+  List<Object?> get props => [
+    id,
+    billNo,
+    crop,
+    irrigatedArea,
+    rate,
+    amount,
+    localTax,
+    penalty,
+    isPaymentDone,
+    paidAmount,
   ];
 }

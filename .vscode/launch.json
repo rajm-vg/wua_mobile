@@ -1,39 +1,63 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
-            "args": [
-                "generator"
-            ],
-            "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen",
-            "name": "Yeoman generator",
-            "program": "${workspaceFolder}/node_modules/yo/lib/cli.js",
-            "request": "launch",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "type": "node"
-        },
-        {
-            "name": "wua_mobile",
-            "request": "launch",
-            "type": "dart"
-        },
-        {
-            "name": "wua_mobile (profile mode)",
+            "name": "wua_mobile (Dev)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "profile"
+            "program": "lib/main.dart",
+            "toolArgs": [
+                "--dart-define=ENV=dev"
+            ]
         },
         {
-            "name": "wua_mobile (release mode)",
+            "name": "wua_mobile (QA)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "release"
+            "program": "lib/main.dart",
+            "toolArgs": [
+                "--dart-define=ENV=qa"
+            ]
+        },
+        {
+            "name": "wua_mobile (Dev - Profile)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "program": "lib/main.dart",
+            "toolArgs": [
+                "--dart-define=ENV=dev"
+            ]
+        },
+        {
+            "name": "wua_mobile (QA - Profile)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "program": "lib/main.dart",
+            "toolArgs": [
+                "--dart-define=ENV=qa"
+            ]
+        },
+        {
+            "name": "wua_mobile (QA - Release)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "program": "lib/main.dart",
+            "toolArgs": [
+                "--dart-define=ENV=qa"
+            ]
+        },
+        {
+            "name": "wua_mobile (Prod - Release)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "program": "lib/main.dart",
+            "toolArgs": [
+                "--dart-define=ENV=prod"
+            ]
         }
     ]
 }

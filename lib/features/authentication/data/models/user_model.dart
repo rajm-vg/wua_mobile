@@ -1,7 +1,8 @@
+import 'package:wua_mobile/core/utils/json_parse_utils.dart';
 import 'package:wua_mobile/features/authentication/domain/entities/user_entity.dart';
 
-/// Data Transfer Object for User.
-/// Handles JSON serialization/deserialization for wrd_backend Spring Boot API (LoginUserDTO)
+/// Data Transfer Object for User aligned with `security_user`, `society_farmer`, and `farm_details`.
+/// Handles JSON serialization/deserialization for wrd_backend Spring Boot API (LoginUserDTO, SocietyFarmerDTO)
 /// as well as cached storage.
 class UserModel {
   const UserModel({
@@ -23,59 +24,68 @@ class UserModel {
     this.status,
     this.authorities = const [],
     this.roles = const [],
+    this.surveyNo,
+    this.village,
+    this.farmArea,
+    this.totalBalance,
+    this.irrigationMethod,
+    this.typeOfCrop,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
-    final rawId = json['id'];
-    final idStr = rawId != null ? rawId.toString() : '';
+    final idStr = JsonParseUtils.parseString(json['id']);
 
-    final firstName = json['firstName'] as String?;
-    final lastName = json['lastName'] as String?;
+    final firstName = JsonParseUtils.parseStringOrNull(json['firstName']);
+    final lastName = JsonParseUtils.parseStringOrNull(json['lastName']);
     String computedName = '';
-    if (firstName != null && firstName.isNotEmpty && lastName != null && lastName.isNotEmpty) {
+    if (firstName != null && lastName != null) {
       computedName = '$firstName $lastName';
-    } else if (firstName != null && firstName.isNotEmpty) {
+    } else if (firstName != null) {
       computedName = firstName;
-    } else if (lastName != null && lastName.isNotEmpty) {
+    } else if (lastName != null) {
       computedName = lastName;
     } else {
-      computedName = json['name'] as String? ?? json['username'] as String? ?? '';
+      computedName = JsonParseUtils.parseString(
+        json['name'] ?? json['sName'] ?? json['username'],
+      );
     }
 
-    final phone = json['mobileNo'] as String? ??
-        json['phone'] as String? ??
-        json['username'] as String? ??
-        '';
+    final phone = JsonParseUtils.parseString(
+      json['mobileNo'] ?? json['phone'] ?? json['username'],
+    );
 
-    final email = json['email'] as String? ?? '';
-    final avatarUrl = json['imageUrl'] as String? ?? json['avatar_url'] as String?;
+    final email = JsonParseUtils.parseString(json['email']);
+    final avatarUrl = JsonParseUtils.parseStringOrNull(
+      json['imageUrl'] ?? json['avatar_url'],
+    );
 
     // Status: 'A' in JHipster backend indicates Active
-    final status = json['status'] as String? ?? '';
-    final isVerified = status == 'A' || (json['is_verified'] as bool? ?? false);
+    final status = JsonParseUtils.parseString(json['status']);
+    final isVerified =
+        status == 'A' || JsonParseUtils.parseBool(json['is_verified']);
 
-    final createdAt = json['createdOn'] as String? ?? json['created_at'] as String? ?? '';
+    final createdAt = JsonParseUtils.parseString(
+      json['createdOn'] ?? json['created_at'],
+    );
 
-    final authorities = (json['authorities'] as List<dynamic>?)
-            ?.map((e) => e.toString())
-            .toList() ??
-        const [];
+    final authorities = JsonParseUtils.parseStringList(json['authorities']);
+    final roles = JsonParseUtils.parseStringList(json['roles']);
 
-    final roles = (json['roles'] as List<dynamic>?)
-            ?.map((e) => e.toString())
-            .toList() ??
-        const [];
+    final societyId = JsonParseUtils.parseIntOrNull(
+      json['societyId'] ?? json['iSocietyId'],
+    );
+    final refTableId = JsonParseUtils.parseIntOrNull(json['refTableId']);
+    final refTable = JsonParseUtils.parseStringOrNull(json['refTable']);
 
-    final societyId = json['societyId'] is int
-        ? json['societyId'] as int
-        : int.tryParse(json['societyId']?.toString() ?? '');
+    final roleStr = JsonParseUtils.parseStringOrNull(json['role']) ??
+        _deriveRoleString(roles, authorities, refTable);
 
-    final refTableId = json['refTableId'] is int
-        ? json['refTableId'] as int
-        : int.tryParse(json['refTableId']?.toString() ?? '');
-
-    final roleStr = json['role'] as String? ??
-        _deriveRoleString(roles, authorities, json['refTable'] as String?);
+    final farmArea = JsonParseUtils.parseDoubleOrNull(
+      json['nFarmArea'] ?? json['farmArea'] ?? json['farm_area'] ?? json['area'],
+    );
+    final totalBalance = JsonParseUtils.parseDoubleOrNull(
+      json['nTotalBalance'] ?? json['totalBalance'] ?? json['total_balance'],
+    );
 
     return UserModel(
       id: idStr,
@@ -89,13 +99,27 @@ class UserModel {
       firstName: firstName,
       lastName: lastName,
       societyId: societyId,
-      username: json['username'] as String?,
-      refTable: json['refTable'] as String?,
+      username: JsonParseUtils.parseStringOrNull(json['username']),
+      refTable: refTable,
       refTableId: refTableId,
-      langKey: json['langKey'] as String?,
+      langKey: JsonParseUtils.parseStringOrNull(json['langKey']),
       status: status,
       authorities: authorities,
       roles: roles,
+      surveyNo: JsonParseUtils.parseStringOrNull(
+        json['sSurveyNo'] ?? json['surveyNo'] ?? json['survey_no'],
+      ),
+      village: JsonParseUtils.parseStringOrNull(
+        json['sVillage'] ?? json['village'],
+      ),
+      farmArea: farmArea,
+      totalBalance: totalBalance,
+      irrigationMethod: JsonParseUtils.parseStringOrNull(
+        json['sIrrigationMethod'] ?? json['irrigationMethod'],
+      ),
+      typeOfCrop: JsonParseUtils.parseStringOrNull(
+        json['sTypeOfCrop'] ?? json['typeOfCrop'],
+      ),
     );
   }
 
@@ -118,6 +142,12 @@ class UserModel {
       refTableId: entity.refTableId,
       authorities: entity.authorities,
       roles: entity.roles,
+      surveyNo: entity.surveyNo,
+      village: entity.village,
+      farmArea: entity.farmArea,
+      totalBalance: entity.totalBalance,
+      irrigationMethod: entity.irrigationMethod,
+      typeOfCrop: entity.typeOfCrop,
     );
   }
 
@@ -140,6 +170,22 @@ class UserModel {
   final List<String> authorities;
   final List<String> roles;
 
+  // ─── Society Farmer & Farm Details ─────────────────────────
+  final String? surveyNo;
+  final String? village;
+  final double? farmArea;
+  final double? totalBalance;
+  final String? irrigationMethod;
+  final String? typeOfCrop;
+
+  bool get isFarmerMember =>
+      refTable == 'SocietyFarmer' ||
+      (refTable == null &&
+          (roles.any((r) => r.contains('सभासद')) || role == 'farmer'));
+
+  int? get effectiveFarmerMemberId =>
+      isFarmerMember ? (refTableId ?? int.tryParse(id)) : null;
+
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -155,6 +201,7 @@ class UserModel {
       'created_at': createdAt,
       'createdOn': createdAt,
       'societyId': societyId,
+      'iSocietyId': societyId,
       'username': username,
       'refTable': refTable,
       'refTableId': refTableId,
@@ -162,6 +209,18 @@ class UserModel {
       'status': status,
       'authorities': authorities,
       'roles': roles,
+      'sSurveyNo': surveyNo,
+      'surveyNo': surveyNo,
+      'sVillage': village,
+      'village': village,
+      'nFarmArea': farmArea,
+      'farmArea': farmArea,
+      'nTotalBalance': totalBalance,
+      'totalBalance': totalBalance,
+      'sIrrigationMethod': irrigationMethod,
+      'irrigationMethod': irrigationMethod,
+      'sTypeOfCrop': typeOfCrop,
+      'typeOfCrop': typeOfCrop,
     };
   }
 
@@ -184,6 +243,12 @@ class UserModel {
       refTableId: refTableId,
       authorities: authorities,
       roles: roles,
+      surveyNo: surveyNo,
+      village: village,
+      farmArea: farmArea,
+      totalBalance: totalBalance,
+      irrigationMethod: irrigationMethod,
+      typeOfCrop: typeOfCrop,
     );
   }
 

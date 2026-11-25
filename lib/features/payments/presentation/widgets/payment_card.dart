@@ -111,7 +111,11 @@ class PaymentCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 3),
                           Text(
-                            payment.season,
+                            payment.season != 'N/A'
+                                ? payment.season
+                                : (payment.fiscalYear != null
+                                    ? 'FY ${payment.fiscalYear}'
+                                    : payment.paymentMode),
                             style: context.titleSmall.bold.withColor(colors.textPrimary),
                           ),
                         ],

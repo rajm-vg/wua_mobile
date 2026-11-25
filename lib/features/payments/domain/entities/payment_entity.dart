@@ -26,7 +26,7 @@ class PaymentStatus {
   }
 }
 
-/// Core domain entity representing a WUA Irrigation Bill payment transaction.
+/// Core domain entity representing a WUA Irrigation Bill payment transaction aligned with `receipt_details`.
 class PaymentEntity extends Equatable {
   const PaymentEntity({
     required this.id,
@@ -39,14 +39,23 @@ class PaymentEntity extends Equatable {
     this.consumerId,
     this.consumerName,
     this.wuaSocietyName,
-    this.season = 'Current Season',
-    this.cropType = 'Wheat',
-    this.paymentMode = 'UPI',
+    this.season = 'N/A',
+    this.cropType = 'N/A',
+    this.paymentMode = 'N/A',
     this.gatewayTransactionId,
     this.bankReference,
-    this.gatewayName = 'MahaGov WRD Gateway',
+    this.gatewayName = 'N/A',
     this.remarks,
     this.metadata,
+    this.farmerMemberId,
+    this.societyId,
+    this.fiscalYear,
+    this.valueDate,
+    this.instrumentType,
+    this.receiptNo,
+    this.bankLedgerId,
+    this.glTranId,
+    this.rawStatus,
   });
 
   final String id;
@@ -67,6 +76,17 @@ class PaymentEntity extends Equatable {
   final String gatewayName;
   final String? remarks;
   final Map<String, dynamic>? metadata;
+
+  // ─── Database Fields from `receipt_details` (vgwaterresource) ───
+  final int? farmerMemberId;
+  final int? societyId;
+  final String? fiscalYear;
+  final DateTime? valueDate;
+  final String? instrumentType;
+  final int? receiptNo;
+  final int? bankLedgerId;
+  final int? glTranId;
+  final String? rawStatus;
 
   // ─── Semantic Status Helpers ─────────────────────────────────
 
@@ -114,6 +134,15 @@ class PaymentEntity extends Equatable {
     String? gatewayName,
     String? remarks,
     Map<String, dynamic>? metadata,
+    int? farmerMemberId,
+    int? societyId,
+    String? fiscalYear,
+    DateTime? valueDate,
+    String? instrumentType,
+    int? receiptNo,
+    int? bankLedgerId,
+    int? glTranId,
+    String? rawStatus,
   }) {
     return PaymentEntity(
       id: id ?? this.id,
@@ -134,6 +163,15 @@ class PaymentEntity extends Equatable {
       gatewayName: gatewayName ?? this.gatewayName,
       remarks: remarks ?? this.remarks,
       metadata: metadata ?? this.metadata,
+      farmerMemberId: farmerMemberId ?? this.farmerMemberId,
+      societyId: societyId ?? this.societyId,
+      fiscalYear: fiscalYear ?? this.fiscalYear,
+      valueDate: valueDate ?? this.valueDate,
+      instrumentType: instrumentType ?? this.instrumentType,
+      receiptNo: receiptNo ?? this.receiptNo,
+      bankLedgerId: bankLedgerId ?? this.bankLedgerId,
+      glTranId: glTranId ?? this.glTranId,
+      rawStatus: rawStatus ?? this.rawStatus,
     );
   }
 
@@ -157,6 +195,14 @@ class PaymentEntity extends Equatable {
     gatewayName,
     remarks,
     metadata,
+    farmerMemberId,
+    societyId,
+    fiscalYear,
+    valueDate,
+    instrumentType,
+    receiptNo,
+    bankLedgerId,
+    glTranId,
+    rawStatus,
   ];
 }
-

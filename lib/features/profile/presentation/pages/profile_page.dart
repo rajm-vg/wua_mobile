@@ -47,7 +47,7 @@ class _ProfilePageViewState extends State<_ProfilePageView> {
 
   String _getInitials(String name) {
     final trimmed = name.trim();
-    if (trimmed.isEmpty) return 'RP';
+    if (trimmed.isEmpty || trimmed == 'N/A') return '-';
     final parts = trimmed.split(RegExp(r'\s+'));
     if (parts.length >= 2) {
       return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
@@ -157,8 +157,18 @@ class _ProfilePageViewState extends State<_ProfilePageView> {
           _cachedUser = state.user;
         }
         final user = state is AuthAuthenticated ? state.user : _cachedUser;
-        final displayName = user?.name.isNotEmpty == true ? user!.name : 'User';
+        final displayName = user?.name.isNotEmpty == true ? user!.name : 'N/A';
         final initials = _getInitials(displayName);
+        final roleLabel = user != null
+            ? (user.roles.isNotEmpty
+                  ? user.roles.first
+                  : user.role.name.toUpperCase())
+            : 'N/A';
+        final organizationLabel = user?.village?.isNotEmpty == true
+            ? '${user!.village!} WUA${user.societyId != null ? ' (#${user.societyId})' : ''}'
+            : (user?.societyId != null
+                  ? 'WUA Society #${user!.societyId}'
+                  : 'N/A');
 
         return WuaScaffold(
           title: 'Profile',
@@ -176,7 +186,12 @@ class _ProfilePageViewState extends State<_ProfilePageView> {
               const SizedBox(height: 28),
 
               // 1. Avatar Circle & Farmer Details
-              _ProfileHeroAvatar(initials: initials, displayName: displayName),
+              _ProfileHeroAvatar(
+                initials: initials,
+                displayName: displayName,
+                roleLabel: roleLabel,
+                organizationLabel: organizationLabel,
+              ),
 
               const SizedBox(height: 24),
 
@@ -303,10 +318,17 @@ class _ProfilePageViewState extends State<_ProfilePageView> {
 }
 
 class _ProfileHeroAvatar extends StatelessWidget {
-  const _ProfileHeroAvatar({required this.initials, required this.displayName});
+  const _ProfileHeroAvatar({
+    required this.initials,
+    required this.displayName,
+    required this.roleLabel,
+    required this.organizationLabel,
+  });
 
   final String initials;
   final String displayName;
+  final String roleLabel;
+  final String organizationLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -346,9 +368,9 @@ class _ProfileHeroAvatar extends StatelessWidget {
         const SizedBox(height: 4),
 
         // WUA Role
-        const Text(
-          'WUA_FARMER_MEMBER',
-          style: TextStyle(
+        Text(
+          roleLabel,
+          style: const TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w700,
             color: Color(0xFF6B8B9B),
@@ -361,7 +383,7 @@ class _ProfileHeroAvatar extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Text(
-            'Mulshi Water User Association (Bhima Sub-Basin), Pune',
+            organizationLabel,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 12,

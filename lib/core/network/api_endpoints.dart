@@ -26,37 +26,93 @@ class ApiEndpoints {
   static const String profile = '/api/account';
   static const String updateProfile = '/api/account';
 
-  // Water Tax Bills (BillHeader & BillDetails)
-  static const String bills = '/api/bill-headers';
-  static String billDetail(String id) => '/api/bill-headers/$id';
+  // Water Tax Bills (BillDetails for Member Payments)
+  static const String bills = '/api/bill-details';
+  static String billDetail(String id) => '/api/bill-details/$id';
+  static String memberBillDetails({
+    required int farmerMemberId,
+    bool? isPaymentDone,
+    String? fiscalYear,
+    int page = 0,
+    int size = 100,
+    String sort = 'id,desc',
+  }) {
+    final paymentFilter = isPaymentDone != null
+        ? '&isPaymentDone.equals=$isPaymentDone'
+        : '';
+    final fiscalYearFilter = fiscalYear != null
+        ? '&sFiscalYear.equals=$fiscalYear'
+        : '';
+    return '/api/bill-details?iFarmerMemberId.equals=$farmerMemberId$paymentFilter$fiscalYearFilter&page=$page&size=$size&sort=$sort';
+  }
+
+  static String societyBillDetails({
+    required int societyId,
+    bool? isPaymentDone,
+    String? fiscalYear,
+    int page = 0,
+    int size = 100,
+    String sort = 'id,desc',
+  }) {
+    final paymentFilter = isPaymentDone != null
+        ? '&isPaymentDone.equals=$isPaymentDone'
+        : '';
+    final fiscalYearFilter = fiscalYear != null
+        ? '&sFiscalYear.equals=$fiscalYear'
+        : '';
+    return '/api/bill-details?iSocietyId.equals=$societyId$paymentFilter$fiscalYearFilter&page=$page&size=$size&sort=$sort';
+  }
+
   static String billHeaders({
     required int farmerMemberId,
     bool? isPaymentDone,
     int page = 0,
-    int size = 20,
+    int size = 100,
     String sort = 'id,desc',
-  }) {
-    final paymentFilter = isPaymentDone != null ? '&isPaymentDone.equals=$isPaymentDone' : '';
-    return '/api/bill-headers?iFarmerMemberId.equals=$farmerMemberId$paymentFilter&page=$page&size=$size&sort=$sort';
-  }
-  static String billHeaderDetail(int id) => '/api/bill-headers/$id';
+  }) => memberBillDetails(
+    farmerMemberId: farmerMemberId,
+    isPaymentDone: isPaymentDone,
+    page: page,
+    size: size,
+    sort: sort,
+  );
+
+  static String billHeaderDetail(int id) => '/api/bill-details/$id';
   static String billDetails({required int billHeaderId}) =>
       '/api/bill-details?iBillNo.equals=$billHeaderId';
 
   // Payments & Receipts (ReceiptDetails & PostReceiptEntry)
   static const String payments = '/api/receipt-details';
   static const String postReceiptDetails = '/api/receipt-details';
-  static const String postReceiptEntryRequest = '/api/post-receipt-entry/request';
+  static const String postReceiptEntryRequest =
+      '/api/post-receipt-entry/request';
+  static String bankLedgers({required int societyId}) =>
+      '/api/account-registrations?iSocietyId.equals=$societyId&sAccountClass.equals=Bank';
   static const String initiatePayment = '/api/post-receipt-entry/request';
   static const String verifyPayment = '/api/receipt-details';
   static String paymentDetail(String id) => '/api/receipt-details/$id';
   static String receiptsHistory({
     required int farmerMemberId,
     int page = 0,
-    int size = 20,
+    int size = 100,
     String sort = 'dReceiptDate,desc',
   }) =>
       '/api/receipt-details?iFarmerMemberId.equals=$farmerMemberId&page=$page&size=$size&sort=$sort';
+
+  static String societyReceiptsHistory({
+    required int societyId,
+    int page = 0,
+    int size = 100,
+    String sort = 'dReceiptDate,desc',
+  }) =>
+      '/api/receipt-details?iSocietyId.equals=$societyId&page=$page&size=$size&sort=$sort';
+
+  // Online Payment Gateways (Easebuzz & Razorpay via PaymentResource)
+  static const String activePaymentProvider = '/api/payments/active-provider';
+  static const String createPaymentOrder = '/api/payments/create-order';
+  static const String verifyPaymentOrder = '/api/payments/verify';
+  static String paymentTransaction(String id) =>
+      '/api/payments/transaction/$id';
 
   // Canal Water Rotations & Crop Allocation (WUAWaterUsage & CropDetails)
   static const String waterUsage = '/api/wua-water-usages';
@@ -66,15 +122,65 @@ class ApiEndpoints {
     String? fiscalYear,
     String sort = 'startDate,asc',
   }) {
-    final yearFilter = fiscalYear != null ? '&sFiscalYear.equals=$fiscalYear' : '';
+    final yearFilter = fiscalYear != null
+        ? '&sFiscalYear.equals=$fiscalYear'
+        : '';
     return '/api/wua-water-usages?iSocietyId.equals=$societyId$yearFilter&sort=$sort';
   }
+
   static String farmerCropUsage({
     required int farmerMemberId,
     String? fiscalYear,
+    int page = 0,
+    int size = 500,
+    String sort = 'id,desc',
   }) {
-    final yearFilter = fiscalYear != null ? '&fiscalYear.equals=$fiscalYear' : '';
-    return '/api/crop-details?farmerMemberId.equals=$farmerMemberId$yearFilter';
+    final yearFilter = fiscalYear != null
+        ? '&fiscalYear.equals=$fiscalYear'
+        : '';
+    return '/api/crop-details?farmerMemberId.equals=$farmerMemberId$yearFilter&page=$page&size=$size&sort=$sort';
+  }
+
+  static String societyCropUsage({
+    required int societyId,
+    String? fiscalYear,
+    int page = 0,
+    int size = 500,
+    String sort = 'id,desc',
+  }) {
+    final yearFilter = fiscalYear != null
+        ? '&fiscalYear.equals=$fiscalYear'
+        : '';
+    return '/api/crop-details?societyId.equals=$societyId$yearFilter&page=$page&size=$size&sort=$sort';
+  }
+
+  static const String cropDetails = '/api/crop-details';
+  static const String waterUsagesOutward = '/api/water-usages';
+
+  static String outwardWaterUsages({
+    required int farmerMemberId,
+    String? fiscalYear,
+    int page = 0,
+    int size = 500,
+    String sort = 'id,desc',
+  }) {
+    final yearFilter = fiscalYear != null
+        ? '&fiscalYear.equals=$fiscalYear'
+        : '';
+    return '/api/water-usages?farmerMemberId.equals=$farmerMemberId$yearFilter&page=$page&size=$size&sort=$sort';
+  }
+
+  static String societyOutwardWaterUsages({
+    required int societyId,
+    String? fiscalYear,
+    int page = 0,
+    int size = 500,
+    String sort = 'id,desc',
+  }) {
+    final yearFilter = fiscalYear != null
+        ? '&fiscalYear.equals=$fiscalYear'
+        : '';
+    return '/api/water-usages?societyId.equals=$societyId$yearFilter&page=$page&size=$size&sort=$sort';
   }
 
   // Irrigation Schedule (Maps to WUAWaterUsage)

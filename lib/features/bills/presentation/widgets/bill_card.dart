@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:wua_mobile/core/l10n/l10n.dart';
+import 'package:wua_mobile/core/router/route_names.dart';
 import 'package:wua_mobile/core/theme/colors.dart';
 import 'package:wua_mobile/core/theme/radius.dart';
 import 'package:wua_mobile/core/theme/spacing.dart';
 import 'package:wua_mobile/core/theme/theme_extensions.dart';
 import 'package:wua_mobile/features/bills/domain/entities/bill_entity.dart';
 import 'package:wua_mobile/features/bills/presentation/widgets/bill_receipt_sheet.dart';
-import 'package:wua_mobile/features/payments/payments.dart';
 
 /// Interactive, theme-aware card representing an individual WUA Pani Patti Bill.
 class BillCard extends StatelessWidget {
@@ -209,7 +209,10 @@ class BillCard extends StatelessWidget {
                         onPressed:
                             onPayPressed ??
                             () {
-                              UpiAppChooserSheet.show(context, bill: bill);
+                              context.pushNamed(
+                                RouteNames.paymentCheckout,
+                                extra: bill,
+                              );
                             },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: colors.billCtaBg,
@@ -228,7 +231,7 @@ class BillCard extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              l10n.payViaUpi,
+                              'Pay Now',
                               style: context.labelMedium.bold.white,
                             ),
                             const SizedBox(width: 4),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:wua_mobile/core/l10n/l10n.dart';
 import 'package:wua_mobile/core/router/route_names.dart';
 import 'package:wua_mobile/core/theme/colors.dart';
@@ -114,9 +113,8 @@ class WuaAppBar extends StatelessWidget implements PreferredSizeWidget {
   final double toolbarHeight;
 
   @override
-  Size get preferredSize => Size.fromHeight(
-        toolbarHeight + (bottom?.preferredSize.height ?? 0.0),
-      );
+  Size get preferredSize =>
+      Size.fromHeight(toolbarHeight + (bottom?.preferredSize.height ?? 0.0));
 
   String _getInitials(String? name) {
     if (name == null || name.trim().isEmpty) return 'U';
@@ -150,9 +148,7 @@ class WuaAppBar extends StatelessWidget implements PreferredSizeWidget {
             decoration: BoxDecoration(
               color: colors.cardBorder,
               shape: BoxShape.circle,
-              border: Border.all(
-                color: colors.cardBorder,
-              ),
+              border: Border.all(color: colors.cardBorder),
             ),
             child: Icon(
               Icons.arrow_back_ios_new_rounded,
@@ -190,9 +186,7 @@ class WuaAppBar extends StatelessWidget implements PreferredSizeWidget {
               const SizedBox(width: AppSpacing.xxxs),
               Text(
                 'WRD • WUA',
-                style: context.badgeText.withSize(10).withColor(
-                      colors.primary,
-                    ),
+                style: context.badgeText.withSize(10).withColor(colors.primary),
               ),
             ],
           ),
@@ -201,9 +195,7 @@ class WuaAppBar extends StatelessWidget implements PreferredSizeWidget {
         if (title != null)
           Text(
             title!,
-            style: context.titleMedium.semiBold.withColor(
-              colors.textPrimary,
-            ),
+            style: context.titleMedium.semiBold.withColor(colors.textPrimary),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -246,7 +238,8 @@ class WuaAppBar extends StatelessWidget implements PreferredSizeWidget {
     if (showNotificationAction) {
       actionList.add(
         IconButton(
-          onPressed: onNotificationPressed ??
+          onPressed:
+              onNotificationPressed ??
               () => context.push(RouteNames.notifications),
           tooltip: context.l10n.notifications,
           icon: Badge(
@@ -280,10 +273,7 @@ class WuaAppBar extends StatelessWidget implements PreferredSizeWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
-                  colors: [
-                    colors.primary,
-                    colors.waterCyan,
-                  ],
+                  colors: [colors.primary, colors.waterCyan],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -335,11 +325,7 @@ class WuaAppBar extends StatelessWidget implements PreferredSizeWidget {
               )
             : null,
         border: showBottomDivider
-            ? Border(
-                bottom: BorderSide(
-                  color: colors.divider,
-                ),
-              )
+            ? Border(bottom: BorderSide(color: colors.divider))
             : null,
       ),
       child: AppBar(

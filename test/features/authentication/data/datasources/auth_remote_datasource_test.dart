@@ -205,20 +205,10 @@ void main() {
     });
   });
 
-  group('AuthRemoteDataSourceImpl (Dev Demo Fallback Enabled)', () {
-    late AuthRemoteDataSourceImpl fallbackDataSource;
+  group('AuthRemoteDataSourceImpl Error Handling (No Fallback)', () {
     const testUsername = '9922322710';
 
-    setUp(() {
-      fallbackDataSource = AuthRemoteDataSourceImpl(
-        apiClient: mockApiClient,
-        enableDemoFallback: true,
-      );
-    });
-
-    test(
-        'smoothly falls back to Subhash Zinjad mock profile when backend connection fails',
-        () async {
+    test('rethrows ServerException when backend connection fails', () async {
       when(
         () => mockApiClient.post<Map<String, dynamic>>(
           ApiEndpoints.authenticate,
@@ -226,36 +216,30 @@ void main() {
         ),
       ).thenThrow(const ServerException(message: 'Connection refused'));
 
-      final result = await fallbackDataSource.login(
-        identifier: testUsername,
-        password: 'admin',
+      expect(
+        () => dataSource.login(
+          identifier: testUsername,
+          password: 'admin',
+        ),
+        throwsA(isA<ServerException>()),
       );
-
-      expect(result.user.username, testUsername);
-      expect(result.user.name, 'सुभाष रंगनाथ झिंजाड');
-      expect(result.user.role, 'wua_official');
-      expect(result.user.societyId, 1503);
-      expect(result.tokens.accessToken, startsWith('mock_jwt_id_token_2100_'));
     });
 
-    test(
-        'smoothly falls back to Farmer mock profile when backend fails for farmer credentials',
-        () async {
+    test('rethrows UnauthorizedException when invalid credentials are provided', () async {
       when(
         () => mockApiClient.post<Map<String, dynamic>>(
           ApiEndpoints.authenticate,
           data: any<dynamic>(named: 'data'),
         ),
-      ).thenThrow(const ServerException(message: 'Connection refused'));
+      ).thenThrow(const UnauthorizedException(message: 'Invalid credentials'));
 
-      final result = await fallbackDataSource.login(
-        identifier: '9876543210',
-        password: 'Farmer@123',
+      expect(
+        () => dataSource.login(
+          identifier: '9876543210',
+          password: 'WrongPassword',
+        ),
+        throwsA(isA<UnauthorizedException>()),
       );
-
-      expect(result.user.phone, '9876543210');
-      expect(result.user.name, 'Ramesh Patel');
-      expect(result.user.role, 'farmer');
     });
   });
 }

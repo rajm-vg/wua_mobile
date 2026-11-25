@@ -75,9 +75,7 @@ void main() {
 
       // Support & Demo UI
       expect(find.text('QUICK ROLE DEMO'), findsOneWidget);
-      expect(find.text('Farmer'), findsOneWidget);
-      expect(find.text('WUA Official'), findsOneWidget);
-      expect(find.text('सचिव (9922322710)'), findsOneWidget);
+      expect(find.text('सभासद / Farmer (9923638738)'), findsOneWidget);
       expect(find.text("Don't have an account?"), findsOneWidget);
       expect(find.text('Register'), findsOneWidget);
       expect(
@@ -138,18 +136,11 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
-      // Tap Farmer demo chip
-      await tester.tap(find.text('Farmer'));
+      // Tap Sabhasad / Farmer demo chip
+      await tester.tap(find.text('सभासद / Farmer (9923638738)'));
       await tester.pumpAndSettle();
 
-      expect(find.text('9876543210'), findsOneWidget);
-      expect(find.text('Farmer@123'), findsOneWidget);
-
-      // Tap Secretary (wrd_backend) demo chip
-      await tester.tap(find.text('सचिव (9922322710)'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('9922322710'), findsOneWidget);
+      expect(find.text('9923638738'), findsOneWidget);
       expect(find.text('admin'), findsOneWidget);
     });
 
