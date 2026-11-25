@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wua_mobile/core/di/injection_container.dart';
+import 'package:wua_mobile/core/events/app_refresh_notifier.dart';
 import 'package:wua_mobile/core/theme/spacing.dart';
 import 'package:wua_mobile/core/theme/theme_extensions.dart';
 import 'package:wua_mobile/features/authentication/domain/entities/user_entity.dart';
@@ -54,8 +55,35 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class _HomePageView extends StatelessWidget {
+class _HomePageView extends StatefulWidget {
   const _HomePageView();
+
+  @override
+  State<_HomePageView> createState() => _HomePageViewState();
+}
+
+class _HomePageViewState extends State<_HomePageView> {
+  @override
+  void initState() {
+    super.initState();
+    paymentRefreshNotifier.addListener(_onPaymentSettled);
+  }
+
+  @override
+  void dispose() {
+    paymentRefreshNotifier.removeListener(_onPaymentSettled);
+    super.dispose();
+  }
+
+  void _onPaymentSettled() {
+    if (!mounted) return;
+    if (sl.isRegistered<BillsBloc>()) {
+      context.read<BillsBloc>().add(const LoadBillsEvent(refresh: true));
+    }
+    if (sl.isRegistered<PaymentsBloc>()) {
+      context.read<PaymentsBloc>().add(const LoadPaymentsEvent(refresh: true));
+    }
+  }
 
   Future<void> _onRefresh(BuildContext context) async {
     context.read<AuthBloc>().add(const AuthCheckRequested());

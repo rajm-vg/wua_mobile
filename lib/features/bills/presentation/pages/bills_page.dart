@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wua_mobile/core/di/injection_container.dart';
+import 'package:wua_mobile/core/events/app_refresh_notifier.dart';
 import 'package:wua_mobile/core/l10n/l10n.dart';
 import 'package:wua_mobile/core/theme/colors.dart';
 import 'package:wua_mobile/core/theme/spacing.dart';
@@ -37,9 +38,21 @@ class _BillsPageViewState extends State<_BillsPageView> {
   final TextEditingController _searchController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    paymentRefreshNotifier.addListener(_onPaymentSettled);
+  }
+
+  @override
   void dispose() {
+    paymentRefreshNotifier.removeListener(_onPaymentSettled);
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _onPaymentSettled() {
+    if (!mounted) return;
+    context.read<BillsBloc>().add(const LoadBillsEvent(refresh: true));
   }
 
   Future<void> _onRefresh(BuildContext context) async {
@@ -308,21 +321,21 @@ class _BillsPageViewState extends State<_BillsPageView> {
 
     if (isSelected) {
       if (isDanger) {
-        bg = AppColors.error;
+        bg = colors.error;
         fg = Colors.white;
       } else if (isSuccess) {
-        bg = AppColors.success;
+        bg = colors.billCtaBg;
         fg = Colors.white;
       } else {
-        bg = AppColors.headerTeal;
+        bg = colors.billCtaBg;
         fg = Colors.white;
       }
       border = BorderSide.none;
     } else {
       bg = colors.cardBackground;
       fg = isDanger
-          ? AppColors.error
-          : (isSuccess ? AppColors.success : colors.textSecondary);
+          ? colors.error
+          : (isSuccess ? colors.success : colors.textSecondary);
       border = BorderSide(color: colors.cardBorder);
     }
 

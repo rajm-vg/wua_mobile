@@ -92,7 +92,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get search => 'खोजें...';
 
   @override
-  String get tryAgain => 'फिर से प्रयास करें';
+  String get tryAgain => 'पुनः प्रयास करें';
 
   @override
   String get roleFarmer => 'किसान';
@@ -762,4 +762,62 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get securedViaWrdGateway => 'WRD सरकारी पेमेंट गेटवे द्वारा सुरक्षित';
+
+  @override
+  String payAmountViaEasebuzz(String amount) {
+    return 'Easebuzz से $amount भुगतान करें';
+  }
+
+  @override
+  String get paymentAmountPartialFull => 'भुगतान राशि (आंशिक / पूर्ण)';
+
+  @override
+  String get paymentSuccessfulTitle => 'भुगतान सफल!';
+
+  @override
+  String get paymentFailedTitle => 'भुगतान विफल';
+
+  @override
+  String get viewLinkedBill => 'संबंधित बिल देखें';
+
+  @override
+  String get fiscalYear => 'वित्तीय वर्ष';
+
+  @override
+  String get sortAndFilter => 'क्रमबद्ध और फ़िल्टर';
+
+  @override
+  String get sortBy => 'इसके अनुसार क्रमबद्ध करें';
+
+  @override
+  String get newestFirst => 'नवीनतम पहले';
+
+  @override
+  String get oldestFirst => 'सबसे पुराना पहले';
+
+  @override
+  String get amountHighToLow => 'राशि: अधिक से कम';
+
+  @override
+  String get amountLowToHigh => 'राशि: कम से अधिक';
+
+  @override
+  String get filters => 'फ़िल्टर';
+
+  @override
+  String get allFiscalYears => 'सभी वित्तीय वर्ष';
+
+  @override
+  String get allSeasons => 'सभी सीज़न';
+
+  @override
+  String get allPaymentModes => 'सभी माध्यम';
+
+  @override
+  String get applyFilters => 'लागू करें';
+
+  @override
+  String showingCountOfTotal(int filtered, int total) {
+    return '$total में से $filtered दिखा रहा है';
+  }
 }

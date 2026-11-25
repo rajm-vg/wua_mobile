@@ -4,7 +4,9 @@ import 'dart:convert';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wua_mobile/core/constants/env_config.dart';
 import 'package:wua_mobile/core/errors/exceptions.dart';
+import 'package:wua_mobile/core/events/app_refresh_notifier.dart';
 import 'package:wua_mobile/core/logger/app_logger.dart';
+import 'package:wua_mobile/core/storage/secure_storage_service.dart';
 import 'package:wua_mobile/features/bills/domain/entities/bill_entity.dart';
 import 'package:wua_mobile/features/payments/data/datasources/easebuzz_sdk_service.dart';
 import 'package:wua_mobile/features/payments/data/datasources/payment_remote_datasource.dart';
@@ -22,6 +24,7 @@ class PaymentCheckoutBloc
     required BillEntity initialBill,
     this.paymentRemoteDataSource,
     this.easebuzzSdkService,
+    this.secureStorage,
     String? initialMethod,
   }) : super(
          PaymentCheckoutState(
@@ -41,11 +44,13 @@ class PaymentCheckoutBloc
     on<ExecutePaymentEvent>(_onExecutePayment);
     on<ResetPaymentCheckoutEvent>(_onResetCheckout);
     on<UpdatePaymentAmountEvent>(_onUpdatePaymentAmount);
+    on<RecoverPendingPaymentEvent>(_onRecoverPendingPayment);
   }
 
   final ProcessPaymentUseCase? processPaymentUseCase;
   final PaymentRemoteDataSource? paymentRemoteDataSource;
   final EasebuzzSdkService? easebuzzSdkService;
+  final SecureStorageService? secureStorage;
 
   static PaymentMethodType _parseInitialMethod(String? method) {
     if (method == null) return PaymentMethodType.upi;
@@ -284,16 +289,37 @@ class PaymentCheckoutBloc
         return;
       }
 
-      emit(state.copyWith(processingStage: 3));
-      AppLogger.bloc(
-        '⚡ [PAYMENT CHECKOUT BLOC] Verifying Easebuzz transaction: ${order.transactionId}',
-      );
-
       final verifyPayload =
           (sdkResult.paymentResponse != null &&
               sdkResult.paymentResponse!.isNotEmpty)
           ? jsonEncode(sdkResult.paymentResponse)
           : (sdkResult.rawResponse ?? '{}');
+
+      final settledRemarks =
+          event.customRemarks ??
+          'Settled via Easebuzz (${state.paymentModeDisplay})';
+
+      if (secureStorage != null) {
+        try {
+          await secureStorage!.savePendingPayment(
+            jsonEncode({
+              'billId': state.bill.id,
+              'transactionId': order.transactionId,
+              'orderId': order.orderId,
+              'paymentId': sdkResult.paymentId ?? order.transactionId,
+              'signature': sdkResult.signature ?? '',
+              'amount': amountToPay,
+              'payload': verifyPayload,
+              'remarks': settledRemarks,
+            }),
+          );
+        } catch (_) {}
+      }
+
+      emit(state.copyWith(processingStage: 3));
+      AppLogger.bloc(
+        '⚡ [PAYMENT CHECKOUT BLOC] Verifying Easebuzz transaction: ${order.transactionId}',
+      );
 
       final verifyResult = await remote.verifyPaymentOrder(
         EasebuzzVerifyRequest(
@@ -307,6 +333,7 @@ class PaymentCheckoutBloc
       );
 
       if (!verifyResult.verified) {
+        await secureStorage?.clearPendingPayment();
         AppLogger.error(
           '❌ [PAYMENT CHECKOUT BLOC] Easebuzz verification failed: ${verifyResult.message}',
         );
@@ -328,10 +355,6 @@ class PaymentCheckoutBloc
           sdkResult.transactionId ??
           order.transactionId;
 
-      final settledRemarks =
-          event.customRemarks ??
-          'Settled via Easebuzz (${state.paymentModeDisplay})';
-
       await remote.postReceiptEntry(
         amount: amountToPay,
         transactionRefNo: verifiedPaymentId,
@@ -343,6 +366,8 @@ class PaymentCheckoutBloc
         season: state.bill.season,
         remarks: settledRemarks,
       );
+
+      await secureStorage?.clearPendingPayment();
 
       final now = DateTime.now();
 
@@ -374,6 +399,7 @@ class PaymentCheckoutBloc
       AppLogger.info(
         '✅ [PAYMENT CHECKOUT BLOC] Easebuzz payment verified: ${settledPayment.paymentNumber}',
       );
+      paymentRefreshNotifier.value++;
       emit(
         state.copyWith(
           step: PaymentCheckoutStep.success,
@@ -420,6 +446,130 @@ class PaymentCheckoutBloc
         state.copyWith(
           step: PaymentCheckoutStep.failure,
           errorMessage: 'Easebuzz payment failed: $e',
+        ),
+      );
+    }
+  }
+
+  Future<void> _onRecoverPendingPayment(
+    RecoverPendingPaymentEvent event,
+    Emitter<PaymentCheckoutState> emit,
+  ) async {
+    final storage = secureStorage;
+    final remote = paymentRemoteDataSource;
+    if (storage == null || remote == null) return;
+
+    try {
+      final raw = await storage.getPendingPayment();
+      if (raw == null || raw.isEmpty) return;
+
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map<String, dynamic>) return;
+      if (decoded['billId']?.toString() != state.bill.id) return;
+
+      final txnId = decoded['transactionId']?.toString() ?? '';
+      final orderId = decoded['orderId']?.toString() ?? txnId;
+      final paymentId = decoded['paymentId']?.toString() ?? txnId;
+      final signature = decoded['signature']?.toString() ?? '';
+      final amount = (decoded['amount'] as num?)?.toDouble() ?? 0.0;
+      final payload = decoded['payload']?.toString() ?? '{}';
+      final remarks =
+          decoded['remarks']?.toString() ?? 'Settled via Easebuzz';
+
+      if (txnId.isEmpty || amount <= 0) {
+        await storage.clearPendingPayment();
+        return;
+      }
+
+      AppLogger.bloc(
+        '⚡ [PAYMENT CHECKOUT BLOC] Recovering pending Easebuzz txn: $txnId',
+      );
+      emit(
+        state.copyWith(
+          step: PaymentCheckoutStep.processing,
+          processingStage: 3,
+          errorMessage: null,
+        ),
+      );
+
+      final verifyResult = await remote.verifyPaymentOrder(
+        EasebuzzVerifyRequest(
+          transactionId: txnId,
+          orderId: orderId,
+          paymentId: paymentId,
+          signature: signature,
+          amount: amount,
+          payload: payload,
+        ),
+      );
+
+      if (!verifyResult.verified) {
+        await storage.clearPendingPayment();
+        emit(
+          state.copyWith(
+            step: PaymentCheckoutStep.methodSelection,
+            processingStage: 1,
+            errorMessage: verifyResult.message,
+          ),
+        );
+        return;
+      }
+
+      final verifiedPaymentId = verifyResult.paymentId ?? paymentId;
+      final verifiedTxnId = verifyResult.transactionId ?? txnId;
+
+      await remote.postReceiptEntry(
+        amount: amount,
+        transactionRefNo: verifiedPaymentId,
+        farmerMemberId:
+            state.bill.farmerMemberId ??
+            int.tryParse(state.bill.consumerId ?? ''),
+        societyId: state.bill.societyId,
+        fiscalYear: state.bill.fiscalYear,
+        season: state.bill.season,
+        remarks: remarks,
+      );
+
+      await storage.clearPendingPayment();
+      paymentRefreshNotifier.value++;
+
+      emit(
+        state.copyWith(
+          step: PaymentCheckoutStep.success,
+          completedPayment: PaymentEntity(
+            id: verifiedPaymentId,
+            paymentNumber: verifiedTxnId,
+            status: PaymentStatus.success,
+            amount: amount,
+            paymentDate: DateTime.now(),
+            billId: state.bill.id,
+            billNumber: state.bill.billNumber,
+            consumerId: state.bill.consumerId,
+            consumerName: state.bill.consumerName,
+            wuaSocietyName: state.bill.wuaSocietyName,
+            season: state.bill.season,
+            cropType: state.bill.cropType,
+            paymentMode: state.paymentModeDisplay,
+            gatewayTransactionId: verifiedPaymentId,
+            bankReference: verifiedTxnId,
+            gatewayName: 'Easebuzz Payment Gateway',
+            remarks: remarks,
+            farmerMemberId:
+                state.bill.farmerMemberId ??
+                int.tryParse(state.bill.consumerId ?? ''),
+            societyId: state.bill.societyId,
+            fiscalYear: state.bill.fiscalYear,
+          ),
+        ),
+      );
+    } catch (e) {
+      AppLogger.warning('Pending payment recovery deferred: $e');
+      emit(
+        state.copyWith(
+          step: PaymentCheckoutStep.methodSelection,
+          processingStage: 1,
+          errorMessage:
+              'A previous payment is pending settlement. Tap Pay to retry verification.',
         ),
       );
     }

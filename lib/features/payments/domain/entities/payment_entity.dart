@@ -95,6 +95,16 @@ class PaymentEntity extends Equatable {
   bool get isFailed => status.toUpperCase() == PaymentStatus.failed;
   bool get isRefunded => status.toUpperCase() == PaymentStatus.refunded;
 
+  /// Effective Indian Fiscal Year (e.g. "2026-2027").
+  /// Uses backend `fiscalYear` when available, otherwise derives it from `paymentDate`
+  /// (April-March cycle).
+  String get effectiveFiscalYear {
+    final fy = fiscalYear?.trim();
+    if (fy != null && fy.isNotEmpty) return fy;
+    final startYear = paymentDate.month >= 4 ? paymentDate.year : paymentDate.year - 1;
+    return '$startYear-${startYear + 1}';
+  }
+
   /// Formatted date string (e.g. "14 Aug 2026, 03:30 PM").
   String get formattedDateTime {
     return DateFormat('dd MMM yyyy, hh:mm a').format(paymentDate);

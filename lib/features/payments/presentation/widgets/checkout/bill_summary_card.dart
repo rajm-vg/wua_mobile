@@ -80,17 +80,17 @@ class _BillSummaryCardState extends State<BillSummaryCard> {
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.verified_user_outlined,
                           size: 14,
-                          color: AppColors.canalGreen,
+                          color: colors.canalGreen,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           'Govt WRD Portal',
                           style: context.caption
                               .withSize(11)
-                              .withColor(AppColors.canalGreen),
+                              .withColor(colors.canalGreen),
                         ),
                       ],
                     ),
@@ -228,12 +228,12 @@ class _BillSummaryCardState extends State<BillSummaryCard> {
                       children: [
                         Text(
                           l10n.amountPaid,
-                          style: context.bodySmall.withColor(AppColors.success),
+                          style: context.bodySmall.withColor(colors.success),
                         ),
                         Text(
                           '- ${_formatCurrency(bill.paidAmount)}',
                           style: context.bodySmall.bold.withColor(
-                            AppColors.success,
+                            colors.success,
                           ),
                         ),
                       ],
@@ -281,13 +281,13 @@ class _BillSummaryCardState extends State<BillSummaryCard> {
         Text(
           label,
           style: context.bodySmall.withColor(
-            isHighlight ? AppColors.error : colors.textSecondary,
+            isHighlight ? colors.error : colors.textSecondary,
           ),
         ),
         Text(
           amount,
           style: context.bodySmall.bold.withColor(
-            isHighlight ? AppColors.error : colors.textPrimary,
+            isHighlight ? colors.error : colors.textPrimary,
           ),
         ),
       ],

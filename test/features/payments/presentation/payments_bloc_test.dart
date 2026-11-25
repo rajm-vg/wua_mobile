@@ -42,7 +42,9 @@ void main() {
     status: PaymentStatus.success,
     amount: 2360,
     paymentDate: DateTime(2026, 8, 14),
-    season: 'Kharif Season (2024-25)',
+    season: 'Kharif',
+    fiscalYear: '2026-2027',
+    paymentMode: 'Online',
   );
 
   final tPayment2 = PaymentEntity(
@@ -51,17 +53,30 @@ void main() {
     status: PaymentStatus.failed,
     amount: 380,
     paymentDate: DateTime(2026, 10, 20),
-    season: 'Annual Maintenance Cess',
+    season: 'Rabi',
+    fiscalYear: '2026-2027',
+    paymentMode: 'UPI',
   );
 
-  final tPayments = [tPayment1, tPayment2];
+  final tPayment3 = PaymentEntity(
+    id: 'pay_3',
+    paymentNumber: 'REC/003',
+    status: PaymentStatus.success,
+    amount: 1200,
+    paymentDate: DateTime(2026, 2, 10),
+    season: 'Rabi',
+    fiscalYear: '2025-2026',
+    paymentMode: 'Online',
+  );
+
+  final tPayments = [tPayment1, tPayment2, tPayment3];
 
   test('initial state should be PaymentsInitial', () {
     expect(bloc.state, equals(const PaymentsInitial()));
   });
 
   blocTest<PaymentsBloc, PaymentsState>(
-    'emits [PaymentsLoading, PaymentsLoaded] on successful LoadPaymentsEvent',
+    'emits [PaymentsLoading, PaymentsLoaded] sorted newest-first on LoadPaymentsEvent',
     build: () {
       when(() => mockGetPaymentsUseCase(any())).thenAnswer(
         (_) async => Right(tPayments),
@@ -73,7 +88,7 @@ void main() {
       const PaymentsLoading(),
       PaymentsLoaded(
         allPayments: tPayments,
-        filteredPayments: tPayments,
+        filteredPayments: [tPayment2, tPayment1, tPayment3],
         selectedStatus: 'ALL',
         searchQuery: '',
       ),
@@ -100,19 +115,89 @@ void main() {
     build: () => bloc,
     seed: () => PaymentsLoaded(
       allPayments: tPayments,
-      filteredPayments: tPayments,
-      selectedStatus: 'ALL',
-      searchQuery: '',
+      filteredPayments: [tPayment2, tPayment1, tPayment3],
     ),
     act: (bloc) => bloc.add(const FilterPaymentsByStatusEvent('SUCCESS')),
     expect: () => [
       PaymentsLoaded(
         allPayments: tPayments,
-        filteredPayments: [tPayment1],
+        filteredPayments: [tPayment1, tPayment3],
         selectedStatus: 'SUCCESS',
-        searchQuery: '',
+      ),
+    ],
+  );
+
+  blocTest<PaymentsBloc, PaymentsState>(
+    'filters payments by fiscal year correctly',
+    build: () => bloc,
+    seed: () => PaymentsLoaded(
+      allPayments: tPayments,
+      filteredPayments: [tPayment2, tPayment1, tPayment3],
+    ),
+    act: (bloc) => bloc.add(const FilterPaymentsByFiscalYearEvent('2025-2026')),
+    expect: () => [
+      PaymentsLoaded(
+        allPayments: tPayments,
+        filteredPayments: [tPayment3],
+        selectedFiscalYear: '2025-2026',
+      ),
+    ],
+  );
+
+  blocTest<PaymentsBloc, PaymentsState>(
+    'sorts payments by amountHighToLow and oldestFirst',
+    build: () => bloc,
+    seed: () => PaymentsLoaded(
+      allPayments: tPayments,
+      filteredPayments: [tPayment2, tPayment1, tPayment3],
+    ),
+    act: (bloc) {
+      bloc.add(const SortPaymentsEvent(PaymentSortOption.amountHighToLow));
+      bloc.add(const SortPaymentsEvent(PaymentSortOption.oldestFirst));
+    },
+    expect: () => [
+      PaymentsLoaded(
+        allPayments: tPayments,
+        filteredPayments: [tPayment1, tPayment3, tPayment2],
+        sortOption: PaymentSortOption.amountHighToLow,
+      ),
+      PaymentsLoaded(
+        allPayments: tPayments,
+        filteredPayments: [tPayment3, tPayment1, tPayment2],
+        sortOption: PaymentSortOption.oldestFirst,
+      ),
+    ],
+  );
+
+  blocTest<PaymentsBloc, PaymentsState>(
+    'applies combined filters (season + mode) and resets cleanly',
+    build: () => bloc,
+    seed: () => PaymentsLoaded(
+      allPayments: tPayments,
+      filteredPayments: [tPayment2, tPayment1, tPayment3],
+    ),
+    act: (bloc) {
+      bloc.add(
+        const ApplyPaymentFiltersEvent(
+          season: 'Rabi',
+          paymentMode: 'Online',
+          sortOption: PaymentSortOption.amountLowToHigh,
+        ),
+      );
+      bloc.add(const ClearPaymentFiltersEvent());
+    },
+    expect: () => [
+      PaymentsLoaded(
+        allPayments: tPayments,
+        filteredPayments: [tPayment3],
+        selectedSeason: 'Rabi',
+        selectedPaymentMode: 'Online',
+        sortOption: PaymentSortOption.amountLowToHigh,
+      ),
+      PaymentsLoaded(
+        allPayments: tPayments,
+        filteredPayments: [tPayment2, tPayment1, tPayment3],
       ),
     ],
   );
 }
-

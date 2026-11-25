@@ -194,13 +194,13 @@ class _BillDetailPageView extends StatelessWidget {
     IconData badgeIcon;
 
     if (bill.isPaid) {
-      badgeBg = AppColors.success.withValues(alpha: 0.12);
-      badgeFg = AppColors.success;
+      badgeBg = colors.success.withValues(alpha: 0.14);
+      badgeFg = colors.success;
       badgeTitle = l10n.paidInFullUpper;
       badgeIcon = Icons.check_circle_rounded;
     } else if (bill.isOverdue) {
-      badgeBg = AppColors.error.withValues(alpha: 0.12);
-      badgeFg = AppColors.error;
+      badgeBg = colors.error.withValues(alpha: 0.14);
+      badgeFg = colors.error;
       badgeTitle = l10n.overdueUpper;
       badgeIcon = Icons.warning_amber_rounded;
     } else {
@@ -565,11 +565,11 @@ class _BillDetailPageView extends StatelessWidget {
               children: [
                 Text(
                   l10n.amountPaid,
-                  style: context.bodySmall.withColor(AppColors.success),
+                  style: context.bodySmall.withColor(colors.success),
                 ),
                 Text(
                   '- ${_formatCurrency(bill.paidAmount)}',
-                  style: context.bodySmall.bold.withColor(AppColors.success),
+                  style: context.bodySmall.bold.withColor(colors.success),
                 ),
               ],
             ),
@@ -595,8 +595,8 @@ class _BillDetailPageView extends StatelessWidget {
                   _formatCurrency(bill.isPaid ? 0.0 : bill.outstandingAmount),
                   style: context.titleMedium.bold.withColor(
                     bill.isPaid
-                        ? AppColors.success
-                        : (bill.isOverdue ? AppColors.error : colors.primary),
+                        ? colors.success
+                        : (bill.isOverdue ? colors.error : colors.primary),
                   ),
                 ),
               ],
@@ -626,9 +626,9 @@ class _BillDetailPageView extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.verified_rounded,
-                  color: AppColors.success,
+                  color: colors.success,
                   size: 24,
                 ),
                 const SizedBox(width: 10),
@@ -639,7 +639,7 @@ class _BillDetailPageView extends StatelessWidget {
                       Text(
                         l10n.paymentCompleted,
                         style: context.labelMedium.bold.withColor(
-                          AppColors.success,
+                          colors.success,
                         ),
                       ),
                       Text(
@@ -657,7 +657,7 @@ class _BillDetailPageView extends StatelessWidget {
                 BillReceiptSheet.show(context, bill: bill);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.headerTeal,
+                backgroundColor: colors.billCtaBg,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
@@ -698,7 +698,7 @@ class _BillDetailPageView extends StatelessWidget {
             ),
             icon: const Icon(Icons.payment_rounded, size: 18),
             label: Text(
-              'Pay ${_formatCurrency(bill.outstandingAmount)} via Easebuzz',
+              l10n.payAmountViaEasebuzz(_formatCurrency(bill.outstandingAmount)),
               style: context.buttonText.bold.white,
             ),
           ),

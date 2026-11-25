@@ -383,5 +383,42 @@
   },
   "redirectingNetBanking": "Redirecting to Net Banking / Debit Card gateway...",
   "netBankingDebitCard": "Net Banking / Debit Card",
-  "securedViaWrdGateway": "Secured via WRD Government Payment Gateway"
+  "securedViaWrdGateway": "Secured via WRD Government Payment Gateway",
+  "payNow": "Pay Now",
+  "payAmountViaEasebuzz": "Pay {amount} via Easebuzz",
+  "@payAmountViaEasebuzz": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentAmountPartialFull": "Payment Amount (Partial / Full)",
+  "paymentSuccessfulTitle": "Payment Successful!",
+  "paymentFailedTitle": "Payment Failed",
+  "tryAgain": "Try Again",
+  "viewLinkedBill": "View Linked Bill",
+  "fiscalYear": "Fiscal Year",
+  "sortAndFilter": "Sort & Filter",
+  "sortBy": "Sort By",
+  "newestFirst": "Newest First",
+  "oldestFirst": "Oldest First",
+  "amountHighToLow": "Amount: High to Low",
+  "amountLowToHigh": "Amount: Low to High",
+  "filters": "Filters",
+  "allFiscalYears": "All FY",
+  "allSeasons": "All Seasons",
+  "allPaymentModes": "All Modes",
+  "applyFilters": "Apply",
+  "showingCountOfTotal": "Showing {filtered} of {total}",
+  "@showingCountOfTotal": {
+    "placeholders": {
+      "filtered": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  }
 }

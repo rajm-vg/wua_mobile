@@ -58,6 +58,22 @@ class SecureStorageService {
     await _storage.delete(key: AppConstants.userDataKey);
   }
 
+  static const String _pendingPaymentKey = 'pending_easebuzz_payment';
+
+  // ─── Pending Payment Recovery ───────────────────────────────
+
+  Future<void> savePendingPayment(String jsonString) async {
+    await _storage.write(key: _pendingPaymentKey, value: jsonString);
+  }
+
+  Future<String?> getPendingPayment() async {
+    return _storage.read(key: _pendingPaymentKey);
+  }
+
+  Future<void> clearPendingPayment() async {
+    await _storage.delete(key: _pendingPaymentKey);
+  }
+
   // ─── Generic Secure Read/Write ──────────────────────────────
 
   Future<void> write({required String key, required String value}) async {

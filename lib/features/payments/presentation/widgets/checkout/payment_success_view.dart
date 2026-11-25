@@ -1,5 +1,7 @@
+import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:wua_mobile/core/extensions/extensions.dart';
@@ -26,7 +28,9 @@ class _PaymentSuccessViewState extends State<PaymentSuccessView>
   late final Animation<double> _circleScale;
   late final Animation<double> _rippleScale;
   late final Animation<double> _rippleOpacity;
+  late final Animation<double> _sparkleProgress;
   late final Animation<double> _checkProgress;
+  late final Animation<double> _amountProgress;
   late final Animation<double> _contentOpacity;
   late final Animation<Offset> _contentSlide;
 
@@ -35,32 +39,40 @@ class _PaymentSuccessViewState extends State<PaymentSuccessView>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 950),
+      duration: const Duration(milliseconds: 1100),
     );
 
     _circleScale = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(0.0, 0.45, curve: Curves.elasticOut),
+      curve: const Interval(0.0, 0.42, curve: Curves.elasticOut),
     );
-    _rippleScale = Tween<double>(begin: 0.7, end: 1.45).animate(
+    _rippleScale = Tween<double>(begin: 0.7, end: 1.55).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.1, 0.75, curve: Curves.easeOut),
+        curve: const Interval(0.08, 0.72, curve: Curves.easeOut),
       ),
     );
     _rippleOpacity = Tween<double>(begin: 0.45, end: 0.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.15, 0.75, curve: Curves.easeOut),
+        curve: const Interval(0.12, 0.72, curve: Curves.easeOut),
       ),
+    );
+    _sparkleProgress = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.15, 0.85, curve: Curves.easeOutCubic),
     );
     _checkProgress = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(0.28, 0.65, curve: Curves.easeOutCubic),
+      curve: const Interval(0.24, 0.62, curve: Curves.easeOutCubic),
+    );
+    _amountProgress = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.30, 0.78, curve: Curves.easeOutCubic),
     );
     _contentOpacity = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(0.45, 0.95, curve: Curves.easeOut),
+      curve: const Interval(0.40, 0.92, curve: Curves.easeOut),
     );
     _contentSlide = Tween<Offset>(
       begin: const Offset(0, 0.06),
@@ -68,11 +80,12 @@ class _PaymentSuccessViewState extends State<PaymentSuccessView>
     ).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.45, 0.95, curve: Curves.easeOutCubic),
+        curve: const Interval(0.40, 0.92, curve: Curves.easeOutCubic),
       ),
     );
 
     _controller.forward();
+    HapticFeedback.mediumImpact();
   }
 
   @override
@@ -88,6 +101,12 @@ class _PaymentSuccessViewState extends State<PaymentSuccessView>
       decimalDigits: amount.truncateToDouble() == amount ? 0 : 2,
     );
     return format.format(amount);
+  }
+
+  void _copyValue(BuildContext context, String label, String value) {
+    Clipboard.setData(ClipboardData(text: value));
+    HapticFeedback.selectionClick();
+    context.showSuccessSnackBar('$label copied');
   }
 
   @override
@@ -115,9 +134,10 @@ class _PaymentSuccessViewState extends State<PaymentSuccessView>
     final newPaidAmount = state.bill.paidAmount + payment.amount;
     final newOutstanding =
         (state.bill.totalAmount - newPaidAmount).clamp(0.0, double.infinity);
+    final isPartial = newOutstanding > 0;
 
     final updatedPaidBill = state.bill.copyWith(
-      status: newOutstanding <= 0 ? 'PAID' : 'PARTIAL',
+      status: isPartial ? 'PARTIAL' : 'PAID',
       paidAmount: newPaidAmount,
       outstandingAmount: newOutstanding,
       paymentReference: payment.gatewayTransactionId ?? payment.paymentNumber,
@@ -132,65 +152,163 @@ class _PaymentSuccessViewState extends State<PaymentSuccessView>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Animated TPAP Success Badge & Stroke Checkmark
-              Center(
-                child: AnimatedBuilder(
-                  animation: _controller,
-                  builder: (context, _) {
-                    return SizedBox(
-                      width: 112,
-                      height: 112,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Transform.scale(
-                            scale: _rippleScale.value,
-                            child: Container(
-                              width: 84,
-                              height: 84,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: AppColors.success.withValues(
-                                    alpha: _rippleOpacity.value,
-                                  ),
-                                  width: 4,
+              // Animated TPAP Hero Celebration Header
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.lg,
+                ),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(24),
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.success.withValues(alpha: 0.12),
+                      AppColors.canalGreen.withValues(alpha: 0.04),
+                    ],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    AnimatedBuilder(
+                      animation: _controller,
+                      builder: (context, _) {
+                        return SizedBox(
+                          width: 128,
+                          height: 128,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              CustomPaint(
+                                size: const Size(128, 128),
+                                painter: _SparkleBurstPainter(
+                                  progress: _sparkleProgress.value,
                                 ),
+                              ),
+                              Transform.scale(
+                                scale: _rippleScale.value,
+                                child: Container(
+                                  width: 84,
+                                  height: 84,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: AppColors.success.withValues(
+                                        alpha: _rippleOpacity.value,
+                                      ),
+                                      width: 4,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Transform.scale(
+                                scale: _circleScale.value.clamp(0.0, 1.15),
+                                child: Container(
+                                  width: 84,
+                                  height: 84,
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: [
+                                        Color(0xFF16A34A),
+                                        Color(0xFF15803D),
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.success
+                                            .withValues(alpha: 0.35),
+                                        blurRadius: 20,
+                                        offset: const Offset(0, 8),
+                                      ),
+                                    ],
+                                  ),
+                                  child: CustomPaint(
+                                    painter: _AnimatedCheckmarkPainter(
+                                      progress: _checkProgress.value,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    FadeTransition(
+                      opacity: _contentOpacity,
+                      child: Column(
+                        children: [
+                          Text(
+                            l10n.paymentSuccessfulTitle,
+                            style: context.headlineSmall.bold
+                                .withColor(colors.textPrimary),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'पाणीपट्टी भरणा यशस्वीरीत्या पूर्ण झाला',
+                            style: context.bodySmall
+                                .withColor(colors.textSecondary),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          AnimatedBuilder(
+                            animation: _amountProgress,
+                            builder: (context, _) {
+                              final animatedAmount =
+                                  payment.amount * _amountProgress.value;
+                              return Text(
+                                _formatCurrency(animatedAmount),
+                                style: context.displaySmall.bold
+                                    .withColor(colors.success),
+                              );
+                            },
+                          ),
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color: colors.cardBackground,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: colors.success.withValues(alpha: 0.35),
                               ),
                             ),
-                          ),
-                          Transform.scale(
-                            scale: _circleScale.value.clamp(0.0, 1.15),
-                            child: Container(
-                              width: 84,
-                              height: 84,
-                              decoration: BoxDecoration(
-                                color: AppColors.success,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppColors.success
-                                        .withValues(alpha: 0.3),
-                                    blurRadius: 18,
-                                    offset: const Offset(0, 6),
-                                  ),
-                                ],
-                              ),
-                              child: CustomPaint(
-                                painter: _AnimatedCheckmarkPainter(
-                                  progress: _checkProgress.value,
-                                  color: Colors.white,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.verified_user_rounded,
+                                  size: 14,
+                                  color: colors.success,
                                 ),
-                              ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  isPartial
+                                      ? 'Partial Payment Settled • Remaining ${_formatCurrency(newOutstanding)}'
+                                      : 'Paid to WRD Water User Account',
+                                  style: context.caption.bold
+                                      .withColor(colors.success),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
-                    );
-                  },
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: AppSpacing.sm),
+              const SizedBox(height: AppSpacing.md),
 
               FadeTransition(
                 opacity: _contentOpacity,
@@ -199,32 +317,7 @@ class _PaymentSuccessViewState extends State<PaymentSuccessView>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // Title
-                      Text(
-                        'Payment Successful!',
-                        style: context.headlineSmall.bold
-                            .withColor(colors.textPrimary),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'पाणीपट्टी भरणा यशस्वीरीत्या पूर्ण झाला',
-                        style: context.bodySmall.withColor(colors.textSecondary),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 12),
-
-                      // Large Amount
-                      Center(
-                        child: Text(
-                          _formatCurrency(payment.amount),
-                          style: context.headlineLarge.bold
-                              .withColor(AppColors.success),
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-
-                      // Receipt Summary Card
+                      // Receipt Card with Dashed Divider & Copyable IDs
                       Container(
                         decoration: BoxDecoration(
                           color: colors.cardBackground,
@@ -246,26 +339,40 @@ class _PaymentSuccessViewState extends State<PaymentSuccessView>
                               'Receipt / Challan No.',
                               payment.paymentNumber,
                               isBold: true,
+                              onCopy: () => _copyValue(
+                                context,
+                                'Receipt No.',
+                                payment.paymentNumber,
+                              ),
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 10),
                             _buildReceiptRow(
                               context,
                               'WRD Transaction ID',
                               payment.gatewayTransactionId ?? 'N/A',
+                              onCopy: payment.gatewayTransactionId != null
+                                  ? () => _copyValue(
+                                        context,
+                                        'Transaction ID',
+                                        payment.gatewayTransactionId!,
+                                      )
+                                  : null,
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 10),
                             _buildReceiptRow(
                               context,
                               'Payment Method',
                               payment.paymentMode,
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 10),
                             _buildReceiptRow(
                               context,
                               'Date & Time',
                               payment.formattedDateTime,
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 14),
+                            _DashedDivider(color: colors.divider),
+                            const SizedBox(height: 14),
                             if (payment.wuaSocietyName != null &&
                                 payment.wuaSocietyName!.isNotEmpty) ...[
                               _buildReceiptRow(
@@ -273,28 +380,28 @@ class _PaymentSuccessViewState extends State<PaymentSuccessView>
                                 'WUA Society',
                                 payment.wuaSocietyName!,
                               ),
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 10),
                             ],
                             _buildReceiptRow(
                               context,
                               'Bill Reference',
                               payment.billNumber ?? state.bill.billNumber,
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 10),
                             _buildReceiptRow(
                               context,
                               'Season & Crops',
                               '${payment.season} • ${payment.cropType}',
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 14),
                             Divider(color: colors.divider, height: 1),
                             const SizedBox(height: 10),
                             Row(
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.verified_rounded,
                                   size: 16,
-                                  color: AppColors.canalGreen,
+                                  color: colors.canalGreen,
                                 ),
                                 const SizedBox(width: 6),
                                 Expanded(
@@ -302,7 +409,7 @@ class _PaymentSuccessViewState extends State<PaymentSuccessView>
                                     'Recorded in Government Water Resources Dept ledger.',
                                     style: context.caption
                                         .withSize(11)
-                                        .withColor(AppColors.canalGreen),
+                                        .withColor(colors.canalGreen),
                                   ),
                                 ),
                               ],
@@ -312,18 +419,19 @@ class _PaymentSuccessViewState extends State<PaymentSuccessView>
                       ),
                       const SizedBox(height: AppSpacing.lg),
 
-                      // View Official E-Receipt Button
+                      // Primary CTA: View Official E-Receipt
                       ElevatedButton.icon(
                         onPressed: () {
                           BillReceiptSheet.show(context, bill: updatedPaidBill);
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.headerTeal,
+                          backgroundColor: colors.billCtaBg,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          padding: const EdgeInsets.symmetric(vertical: 15),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),
                           ),
+                          elevation: 2,
                         ),
                         icon: const Icon(Icons.receipt_long_rounded, size: 20),
                         label: Text(
@@ -333,22 +441,54 @@ class _PaymentSuccessViewState extends State<PaymentSuccessView>
                       ),
                       const SizedBox(height: AppSpacing.sm),
 
-                      // View in Payments History
-                      OutlinedButton.icon(
-                        onPressed: () {
-                          context.go('/payments');
-                        },
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
+                      // Secondary Row: Share & History
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () {
+                                final summary = [
+                                  'WRD Pani Patti Payment Receipt',
+                                  'Amount: ${_formatCurrency(payment.amount)}',
+                                  'Receipt No: ${payment.paymentNumber}',
+                                  if (payment.gatewayTransactionId != null)
+                                    'Transaction ID: ${payment.gatewayTransactionId}',
+                                  'Bill: ${payment.billNumber ?? state.bill.billNumber}',
+                                  'Date: ${payment.formattedDateTime}',
+                                ].join('\n');
+                                _copyValue(context, 'Receipt summary', summary);
+                              },
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                side: BorderSide(color: colors.cardBorder),
+                              ),
+                              icon: const Icon(Icons.share_rounded, size: 17),
+                              label: Text(l10n.shareReceipt),
+                            ),
                           ),
-                          side: BorderSide(color: colors.cardBorder),
-                        ),
-                        icon: const Icon(Icons.history_rounded, size: 18),
-                        label: const Text('View in Payments History'),
+                          const SizedBox(width: AppSpacing.sm),
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () {
+                                context.go('/payments');
+                              },
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                                side: BorderSide(color: colors.cardBorder),
+                              ),
+                              icon: const Icon(Icons.history_rounded, size: 17),
+                              label: const Text('History'),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: AppSpacing.sm),
+                      const SizedBox(height: AppSpacing.xs),
 
                       // Back to Dashboard
                       TextButton(
@@ -376,11 +516,12 @@ class _PaymentSuccessViewState extends State<PaymentSuccessView>
     String label,
     String value, {
     bool isBold = false,
+    VoidCallback? onCopy,
   }) {
     final colors = context.colors;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Text(
           label,
@@ -388,12 +529,32 @@ class _PaymentSuccessViewState extends State<PaymentSuccessView>
         ),
         const SizedBox(width: 8),
         Expanded(
-          child: Text(
-            value,
-            style: isBold
-                ? context.bodySmall.bold.withColor(colors.textPrimary)
-                : context.bodySmall.withColor(colors.textPrimary),
-            textAlign: TextAlign.end,
+          child: InkWell(
+            onTap: onCopy,
+            borderRadius: BorderRadius.circular(6),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Flexible(
+                  child: Text(
+                    value,
+                    style: isBold
+                        ? context.bodySmall.bold.withColor(colors.textPrimary)
+                        : context.bodySmall.withColor(colors.textPrimary),
+                    textAlign: TextAlign.end,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                if (onCopy != null) ...[
+                  const SizedBox(width: 5),
+                  Icon(
+                    Icons.copy_rounded,
+                    size: 13,
+                    color: colors.primary,
+                  ),
+                ],
+              ],
+            ),
           ),
         ),
       ],
@@ -435,4 +596,71 @@ class _AnimatedCheckmarkPainter extends CustomPainter {
   @override
   bool shouldRepaint(_AnimatedCheckmarkPainter oldDelegate) =>
       oldDelegate.progress != progress || oldDelegate.color != color;
+}
+
+class _SparkleBurstPainter extends CustomPainter {
+  const _SparkleBurstPainter({required this.progress});
+
+  final double progress;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (progress <= 0 || progress >= 1) return;
+
+    final center = Offset(size.width / 2, size.height / 2);
+    final opacity = (1.0 - progress).clamp(0.0, 1.0);
+    const sparkleColors = [
+      Color(0xFF16A34A),
+      Color(0xFFF59E0B),
+      Color(0xFF0EA5E9),
+      Color(0xFF22C55E),
+    ];
+
+    for (int i = 0; i < 8; i++) {
+      final angle = (i * math.pi / 4) - math.pi / 8;
+      final radius = 38.0 + (26.0 * progress);
+      final pos = Offset(
+        center.dx + math.cos(angle) * radius,
+        center.dy + math.sin(angle) * radius,
+      );
+      final dotPaint = Paint()
+        ..color = sparkleColors[i % sparkleColors.length].withValues(
+          alpha: opacity,
+        )
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(pos, 3.5 * (1.0 - progress * 0.5), dotPaint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_SparkleBurstPainter oldDelegate) =>
+      oldDelegate.progress != progress;
+}
+
+class _DashedDivider extends StatelessWidget {
+  const _DashedDivider({required this.color});
+
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const dashWidth = 6.0;
+        const dashSpace = 4.0;
+        final dashCount =
+            (constraints.maxWidth / (dashWidth + dashSpace)).floor();
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: List.generate(dashCount, (_) {
+            return SizedBox(
+              width: dashWidth,
+              height: 1,
+              child: DecoratedBox(decoration: BoxDecoration(color: color)),
+            );
+          }),
+        );
+      },
+    );
+  }
 }

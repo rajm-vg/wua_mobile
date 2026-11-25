@@ -125,3 +125,7 @@ class UpdatePaymentAmountEvent extends PaymentCheckoutEvent {
   @override
   List<Object?> get props => [amount];
 }
+
+class RecoverPendingPaymentEvent extends PaymentCheckoutEvent {
+  const RecoverPendingPaymentEvent();
+}

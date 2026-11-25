@@ -1515,6 +1515,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Secured via WRD Government Payment Gateway'**
   String get securedViaWrdGateway;
+
+  /// No description provided for @payAmountViaEasebuzz.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay {amount} via Easebuzz'**
+  String payAmountViaEasebuzz(String amount);
+
+  /// No description provided for @paymentAmountPartialFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Amount (Partial / Full)'**
+  String get paymentAmountPartialFull;
+
+  /// No description provided for @paymentSuccessfulTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Successful!'**
+  String get paymentSuccessfulTitle;
+
+  /// No description provided for @paymentFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Failed'**
+  String get paymentFailedTitle;
+
+  /// No description provided for @viewLinkedBill.
+  ///
+  /// In en, this message translates to:
+  /// **'View Linked Bill'**
+  String get viewLinkedBill;
+
+  /// No description provided for @fiscalYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Fiscal Year'**
+  String get fiscalYear;
+
+  /// No description provided for @sortAndFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort & Filter'**
+  String get sortAndFilter;
+
+  /// No description provided for @sortBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort By'**
+  String get sortBy;
+
+  /// No description provided for @newestFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Newest First'**
+  String get newestFirst;
+
+  /// No description provided for @oldestFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Oldest First'**
+  String get oldestFirst;
+
+  /// No description provided for @amountHighToLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount: High to Low'**
+  String get amountHighToLow;
+
+  /// No description provided for @amountLowToHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount: Low to High'**
+  String get amountLowToHigh;
+
+  /// No description provided for @filters.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters'**
+  String get filters;
+
+  /// No description provided for @allFiscalYears.
+  ///
+  /// In en, this message translates to:
+  /// **'All FY'**
+  String get allFiscalYears;
+
+  /// No description provided for @allSeasons.
+  ///
+  /// In en, this message translates to:
+  /// **'All Seasons'**
+  String get allSeasons;
+
+  /// No description provided for @allPaymentModes.
+  ///
+  /// In en, this message translates to:
+  /// **'All Modes'**
+  String get allPaymentModes;
+
+  /// No description provided for @applyFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get applyFilters;
+
+  /// No description provided for @showingCountOfTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing {filtered} of {total}'**
+  String showingCountOfTotal(int filtered, int total);
 }
 
 class _AppLocalizationsDelegate

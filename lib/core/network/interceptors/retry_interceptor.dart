@@ -50,6 +50,13 @@ class RetryInterceptor extends Interceptor {
   }
 
   bool _shouldRetry(DioException err) {
+    // Never retry non-idempotent mutations (POST/PUT/PATCH/DELETE) to avoid
+    // duplicate orders/receipts or delayed error feedback.
+    final method = err.requestOptions.method.toUpperCase();
+    if (method != 'GET' && method != 'HEAD' && method != 'OPTIONS') {
+      return false;
+    }
+
     // Retry on connection errors
     if (err.type == DioExceptionType.connectionError ||
         err.type == DioExceptionType.connectionTimeout ||

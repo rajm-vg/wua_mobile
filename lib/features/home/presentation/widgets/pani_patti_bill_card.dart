@@ -170,7 +170,24 @@ class PaniPattiBillCard extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(landInfoText, style: context.caption.withSize(11.5)),
                     if (bill!.paidAmount > 0) ...[
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 6),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: LinearProgressIndicator(
+                          value: bill!.totalAmount > 0
+                              ? (bill!.paidAmount / bill!.totalAmount).clamp(
+                                  0.0,
+                                  1.0,
+                                )
+                              : 0.0,
+                          minHeight: 5,
+                          backgroundColor: colors.surfaceVariant,
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                            Color(0xFF16A34A),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
                       Text(
                         '${l10n.amountPaid}: ₹ ${NumberFormat('#,##0.##').format(bill!.paidAmount)} • ${l10n.grossBillAmount}: ₹ ${NumberFormat('#,##0.##').format(bill!.totalAmount)}',
                         style: context.caption
@@ -207,7 +224,7 @@ class PaniPattiBillCard extends StatelessWidget {
                 label: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('Pay Now', style: context.labelMedium.bold.white),
+                    Text(l10n.payNow, style: context.labelMedium.bold.white),
                     const SizedBox(width: 4),
                     const Icon(Icons.arrow_forward_rounded, size: 14),
                   ],

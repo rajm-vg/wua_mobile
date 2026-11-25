@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:wua_mobile/core/di/injection_container.dart';
 import 'package:wua_mobile/core/extensions/extensions.dart';
+import 'package:wua_mobile/core/storage/secure_storage_service.dart';
 import 'package:wua_mobile/features/bills/domain/entities/bill_entity.dart';
 import 'package:wua_mobile/features/payments/data/datasources/easebuzz_sdk_service.dart';
 import 'package:wua_mobile/features/payments/data/datasources/payment_remote_datasource.dart';
@@ -69,11 +70,16 @@ class PaymentCheckoutPage extends StatelessWidget {
           easebuzzSdkService: sl.isRegistered<EasebuzzSdkService>()
               ? sl<EasebuzzSdkService>()
               : null,
+          secureStorage: sl.isRegistered<SecureStorageService>()
+              ? sl<SecureStorageService>()
+              : null,
           initialBill: activeBill,
           initialMethod: initialMethod,
         );
         if (autoLaunch && hasPayableAmount) {
           bloc.add(const ExecutePaymentEvent());
+        } else if (hasPayableAmount) {
+          bloc.add(const RecoverPendingPaymentEvent());
         }
         return bloc;
       },
@@ -237,7 +243,9 @@ class _PaymentCheckoutPageViewState extends State<_PaymentCheckoutPageView> {
                   icon: const Icon(Icons.payment_rounded, size: 20),
                   label: Text(
                     isValidAmount
-                        ? 'Pay ${_formatCurrency(payableAmount)} via Easebuzz'
+                        ? context.l10n.payAmountViaEasebuzz(
+                            _formatCurrency(payableAmount),
+                          )
                         : 'Enter Valid Payment Amount',
                     style: context.buttonText.bold.white,
                   ),
@@ -273,7 +281,7 @@ class _PaymentCheckoutPageViewState extends State<_PaymentCheckoutPageView> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Payment Amount (Partial / Full)',
+                context.l10n.paymentAmountPartialFull,
                 style: context.labelMedium.bold.withColor(colors.textPrimary),
               ),
               Text(
