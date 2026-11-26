@@ -34,6 +34,13 @@ abstract class AuthRemoteDataSource {
   });
 
   Future<void> verifyOtp({required String email, required String otp});
+
+  Future<UserModel> fetchCurrentUser(String accessToken);
+
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  });
 }
 
 /// Remote authentication data source implementation connecting directly to wrd_backend (Spring Boot / JHipster).
@@ -76,9 +83,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
     final authData = authResponse.data ?? {};
     final idToken =
-        (authData['id_token'] ??
-                authData['access_token'] ??
-                authData['token'])
+        (authData['id_token'] ?? authData['access_token'] ?? authData['token'])
             as String? ??
         '';
 
@@ -90,12 +95,30 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
     AppLogger.info('🔑 [AUTH REMOTE] Received id_token successfully');
 
-    // Step 2: GET /api/account with Authorization: Bearer <id_token>
+    // Step 2 & 3: Fetch /api/account, validate role/status, and enrich SocietyFarmer
+    final user = await fetchCurrentUser(idToken);
+
+    final tokens = AuthTokensModel(
+      accessToken: idToken,
+      refreshToken: '',
+      expiresIn: 86400,
+    );
+
+    AppLogger.info(
+      '👤 [AUTH REMOTE] Logged in: ${user.name} (Role: ${user.role}, SocietyId: ${user.societyId}, FarmerId: ${user.refTableId})',
+    );
+
+    return (user: user, tokens: tokens);
+  }
+
+  @override
+  Future<UserModel> fetchCurrentUser(String accessToken) async {
     final accountResponse = await apiClient.get<Map<String, dynamic>>(
       ApiEndpoints.account,
       options: Options(
         headers: {
-          ApiConstants.authorization: '${ApiConstants.bearerPrefix}$idToken',
+          ApiConstants.authorization:
+              '${ApiConstants.bearerPrefix}$accessToken',
         },
       ),
     );
@@ -103,7 +126,23 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     final accountData = accountResponse.data ?? {};
     var user = UserModel.fromJson(accountData);
 
-    // Step 3: Enrich with SocietyFarmer profile if linked to agricultural record
+    // Block ROLE_SUPER_ADMIN accounts without a societyId from mobile access.
+    final isSuperAdmin =
+        user.authorities.contains('ROLE_SUPER_ADMIN') ||
+        user.roles.contains('ROLE_SUPER_ADMIN');
+    if (isSuperAdmin && user.societyId == null) {
+      throw const UnauthorizedException(
+        message: 'Super Admin accounts are not supported on mobile. Please use the web portal.',
+      );
+    }
+
+    if (user.status != null && user.status!.isNotEmpty && user.status != 'A') {
+      throw const UnauthorizedException(
+        message: 'Your account is inactive. Please contact your WUA Secretary.',
+      );
+    }
+
+    // Enrich with SocietyFarmer profile if linked to agricultural record
     if (user.refTable == 'SocietyFarmer' && user.refTableId != null) {
       try {
         final farmerResponse = await apiClient.get<Map<String, dynamic>>(
@@ -111,7 +150,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
           options: Options(
             headers: {
               ApiConstants.authorization:
-                  '${ApiConstants.bearerPrefix}$idToken',
+                  '${ApiConstants.bearerPrefix}$accessToken',
             },
           ),
         );
@@ -140,14 +179,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
             roles: user.roles,
             surveyNo: fData['sSurveyNo'] as String? ?? user.surveyNo,
             village: fData['sVillage'] as String? ?? user.village,
-            farmArea:
-                (fData['nFarmArea'] as num?)?.toDouble() ?? user.farmArea,
+            farmArea: (fData['nFarmArea'] as num?)?.toDouble() ?? user.farmArea,
             totalBalance:
                 (fData['nTotalBalance'] as num?)?.toDouble() ??
                 user.totalBalance,
             irrigationMethod:
-                fData['sIrrigationMethod'] as String? ??
-                user.irrigationMethod,
+                fData['sIrrigationMethod'] as String? ?? user.irrigationMethod,
             typeOfCrop: fData['sTypeOfCrop'] as String? ?? user.typeOfCrop,
           );
         }
@@ -156,17 +193,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       }
     }
 
-    final tokens = AuthTokensModel(
-      accessToken: idToken,
-      refreshToken: '',
-      expiresIn: 86400,
-    );
-
-    AppLogger.info(
-      '👤 [AUTH REMOTE] Logged in: ${user.name} (Role: ${user.role}, SocietyId: ${user.societyId}, FarmerId: ${user.refTableId})',
-    );
-
-    return (user: user, tokens: tokens);
+    return user;
   }
 
   @override
@@ -200,13 +227,21 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<void> logout(String accessToken, {String? username}) async {
+    final cleanUsername = username?.trim() ?? '';
+    if (cleanUsername.isEmpty) return;
+
     await apiClient.post<void>(
       ApiEndpoints.logout,
-      data: {'username': username ?? '', 'password': '', 'rememberMe': false},
+      data: {
+        'username': cleanUsername,
+        'password': '*****',
+        'rememberMe': false,
+      },
       options: Options(
         headers: {
-          ApiConstants.authorization:
-              '${ApiConstants.bearerPrefix}$accessToken',
+          if (accessToken.isNotEmpty)
+            ApiConstants.authorization:
+                '${ApiConstants.bearerPrefix}$accessToken',
         },
       ),
     );
@@ -227,9 +262,14 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String newPassword,
   }) async {
     final cleanUsername = email.trim();
-    await apiClient.post<dynamic>(
+    final response = await apiClient.post<dynamic>(
       '${ApiEndpoints.changePassword}?username=${Uri.encodeQueryComponent(cleanUsername)}&newPassword=${Uri.encodeQueryComponent(newPassword)}',
     );
+    if (response.data == false) {
+      throw const ServerException(
+        message: 'Could not update password. Please verify your mobile number.',
+      );
+    }
   }
 
   @override
@@ -242,5 +282,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     if (response.data == false) {
       throw const ServerException(message: 'Invalid or expired OTP entered.');
     }
+  }
+
+  @override
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    await apiClient.post<void>(
+      ApiEndpoints.accountChangePassword,
+      data: {'currentPassword': currentPassword, 'newPassword': newPassword},
+    );
   }
 }

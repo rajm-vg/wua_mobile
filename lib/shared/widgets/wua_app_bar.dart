@@ -161,7 +161,7 @@ class WuaAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  Widget? _buildTitle(BuildContext context) {
+  Widget? _buildTitle(BuildContext context, bool effectiveCenterTitle) {
     if (titleWidget != null) return titleWidget;
 
     if (title == null && !showBrandBadge) return null;
@@ -170,7 +170,7 @@ class WuaAppBar extends StatelessWidget implements PreferredSizeWidget {
 
     return Column(
       mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: (centerTitle ?? false)
+      crossAxisAlignment: effectiveCenterTitle
           ? CrossAxisAlignment.center
           : CrossAxisAlignment.start,
       children: [
@@ -313,6 +313,8 @@ class WuaAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
     final resolvedBg = backgroundColor ?? colors.surface;
+    final effectiveCenterTitle = centerTitle ?? false;
+    final leadingWidget = _buildLeading(context);
 
     return Container(
       decoration: BoxDecoration(
@@ -329,10 +331,13 @@ class WuaAppBar extends StatelessWidget implements PreferredSizeWidget {
             : null,
       ),
       child: AppBar(
-        title: _buildTitle(context),
-        leading: _buildLeading(context),
+        title: _buildTitle(context, effectiveCenterTitle),
+        leading: leadingWidget,
+        automaticallyImplyLeading: showBackButton,
+        leadingWidth: leadingWidget != null && leading == null ? 52 : null,
+        titleSpacing: effectiveCenterTitle ? null : AppSpacing.xs,
         actions: _buildActions(context),
-        centerTitle: centerTitle,
+        centerTitle: effectiveCenterTitle,
         backgroundColor: Colors.transparent,
         elevation: elevation,
         scrolledUnderElevation: 0,

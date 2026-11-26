@@ -124,7 +124,13 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, void>> logout() async {
     try {
       if (await networkInfo.isConnected) {
-        await remoteDataSource.logout('');
+        String? username;
+        try {
+          final cachedUser = await localDataSource.getCachedUser();
+          username = cachedUser.username ?? cachedUser.phone;
+        } catch (_) {}
+        final token = await localDataSource.getAccessToken() ?? '';
+        await remoteDataSource.logout(token, username: username);
       }
     } catch (_) {
       // Best-effort server-side logout; always clear local state.
@@ -195,8 +201,43 @@ class AuthRepositoryImpl implements AuthRepository {
       return const Right(null);
     } on ServerException catch (e) {
       return Left(ServerFailure(message: e.message, code: e.statusCode));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message, originalException: e));
+    } on TimeoutException catch (e) {
+      return Left(TimeoutFailure(message: e.message, originalException: e));
     } catch (e, stackTrace) {
       AppLogger.error('OTP verification failed', e, stackTrace);
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    if (!await networkInfo.isConnected) {
+      return const Left(NetworkFailure());
+    }
+
+    try {
+      await remoteDataSource.changePassword(
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+      );
+      return const Right(null);
+    } on UnauthorizedException catch (e) {
+      return Left(
+        UnauthorizedFailure(message: e.message, originalException: e),
+      );
+    } on ServerException catch (e) {
+      return Left(ServerFailure(message: e.message, code: e.statusCode));
+    } on NetworkException catch (e) {
+      return Left(NetworkFailure(message: e.message, originalException: e));
+    } on TimeoutException catch (e) {
+      return Left(TimeoutFailure(message: e.message, originalException: e));
+    } catch (e, stackTrace) {
+      AppLogger.error('Change password failed', e, stackTrace);
       return Left(UnknownFailure(message: e.toString()));
     }
   }
@@ -208,6 +249,38 @@ class AuthRepositoryImpl implements AuthRepository {
       return Right(user.toEntity());
     } on CacheException catch (e) {
       return Left(CacheFailure(message: e.message, originalException: e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, UserEntity>> refreshCurrentUser() async {
+    if (!await networkInfo.isConnected) {
+      return getCachedUser();
+    }
+
+    final token = await localDataSource.getAccessToken();
+    if (token == null || token.isEmpty) {
+      return const Left(UnauthorizedFailure(message: 'Session expired.'));
+    }
+
+    try {
+      final user = await remoteDataSource.fetchCurrentUser(token);
+      await localDataSource.cacheUser(user);
+      return Right(user.toEntity());
+    } on UnauthorizedException catch (e) {
+      await localDataSource.clearCache();
+      return Left(
+        UnauthorizedFailure(message: e.message, originalException: e),
+      );
+    } on ServerException catch (_) {
+      return getCachedUser();
+    } on NetworkException catch (_) {
+      return getCachedUser();
+    } on TimeoutException catch (_) {
+      return getCachedUser();
+    } catch (e, stackTrace) {
+      AppLogger.error('Refresh current user failed', e, stackTrace);
+      return getCachedUser();
     }
   }
 

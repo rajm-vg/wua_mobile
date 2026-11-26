@@ -65,8 +65,7 @@ class AppRouter {
       GoRoute(
         path: '/forgot-password',
         name: RouteNames.forgotPassword,
-        builder: (context, state) =>
-            const _PlaceholderPage(title: 'Forgot Password'),
+        builder: (context, state) => const ForgotPasswordPage(),
       ),
 
       // ─── Easebuzz Payment Checkout ────────────────────────────────────────

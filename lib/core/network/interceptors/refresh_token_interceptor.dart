@@ -29,8 +29,19 @@ class RefreshTokenInterceptor extends QueuedInterceptor {
       return;
     }
 
+    // Don't attempt token refresh on auth endpoints (e.g. bad credentials on /api/authenticate).
+    final path = err.requestOptions.path;
+    if (path == ApiEndpoints.authenticate ||
+        path == ApiEndpoints.register ||
+        path == ApiEndpoints.generateOtp ||
+        path == ApiEndpoints.verifyOtp ||
+        path == ApiEndpoints.changePassword) {
+      handler.next(err);
+      return;
+    }
+
     // Don't retry the refresh endpoint itself.
-    if (err.requestOptions.path == ApiEndpoints.refreshToken) {
+    if (path == ApiEndpoints.refreshToken) {
       _handleTokenExpired();
       handler.next(err);
       return;

@@ -64,7 +64,10 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
     await Future<void>.delayed(const Duration(milliseconds: 500));
   }
 
-  Future<void> _openFiltersSheet(BuildContext context, PaymentsLoaded state) async {
+  Future<void> _openFiltersSheet(
+    BuildContext context,
+    PaymentsLoaded state,
+  ) async {
     final bloc = context.read<PaymentsBloc>();
     final selection = await showWuaBottomSheet<PaymentFilterSelection>(
       context: context,
@@ -98,7 +101,7 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
     return WuaScaffold(
       title: l10n.paymentHistory,
       subtitle: l10n.paymentSubtitle,
-      showBackButton: false,
+      showBackButton: true,
       scrollable: false,
       padding: EdgeInsets.zero,
       enableMaxConstraint: true,
@@ -157,7 +160,11 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
                 color: colors.error.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.error_outline_rounded, size: 36, color: colors.error),
+              child: Icon(
+                Icons.error_outline_rounded,
+                size: 36,
+                color: colors.error,
+              ),
             ),
             const SizedBox(height: AppSpacing.md),
             Text(
@@ -172,7 +179,9 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.headerTeal,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               icon: const Icon(Icons.refresh_rounded, size: 16),
               label: Text(l10n.tryAgain),
@@ -234,7 +243,9 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
                           ),
                           child: TextField(
                             controller: _searchController,
-                            style: context.bodyMedium.withColor(colors.textPrimary),
+                            style: context.bodyMedium.withColor(
+                              colors.textPrimary,
+                            ),
                             decoration: InputDecoration(
                               hintText: l10n.searchPaymentsHint,
                               hintStyle: context.caption,
@@ -245,7 +256,10 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
                               ),
                               suffixIcon: _searchController.text.isNotEmpty
                                   ? IconButton(
-                                      icon: const Icon(Icons.clear_rounded, size: 18),
+                                      icon: const Icon(
+                                        Icons.clear_rounded,
+                                        size: 18,
+                                      ),
                                       onPressed: () {
                                         _searchController.clear();
                                         context.read<PaymentsBloc>().add(
@@ -255,7 +269,9 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
                                     )
                                   : null,
                               border: InputBorder.none,
-                              contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                              ),
                             ),
                             onChanged: (query) {
                               context.read<PaymentsBloc>().add(
@@ -279,7 +295,8 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
                       children: [
                         _buildFilterChip(
                           context,
-                          label: '${l10n.filterAll} (${state.allPayments.length})',
+                          label:
+                              '${l10n.filterAll} (${state.allPayments.length})',
                           statusKey: 'ALL',
                           isSelected: state.selectedStatus == 'ALL',
                         ),
@@ -294,7 +311,8 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
                         const SizedBox(width: 8),
                         _buildFilterChip(
                           context,
-                          label: '${l10n.filterPending} (${state.pendingCount})',
+                          label:
+                              '${l10n.filterPending} (${state.pendingCount})',
                           statusKey: 'PENDING',
                           isSelected: state.selectedStatus == 'PENDING',
                           isWarning: true,
@@ -358,21 +376,20 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
               sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final payment = state.filteredPayments[index];
-                    return PaymentCard(
-                      key: ValueKey(payment.id),
-                      payment: payment,
-                    );
-                  },
-                  childCount: state.filteredPayments.length,
-                ),
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final payment = state.filteredPayments[index];
+                  return PaymentCard(
+                    key: ValueKey(payment.id),
+                    payment: payment,
+                  );
+                }, childCount: state.filteredPayments.length),
               ),
             ),
 
           const SliverToBoxAdapter(
-            child: SizedBox(height: 96), // Extra bottom padding for floating bottom nav
+            child: SizedBox(
+              height: 96,
+            ), // Extra bottom padding for floating bottom nav
           ),
         ],
       ),
@@ -414,15 +431,17 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
       fg = isDanger
           ? colors.error
           : (isSuccess
-              ? colors.success
-              : (isWarning ? colors.warning : colors.textSecondary));
+                ? colors.success
+                : (isWarning ? colors.warning : colors.textSecondary));
       border = BorderSide(color: colors.cardBorder);
     }
 
     return InkWell(
       borderRadius: BorderRadius.circular(20),
       onTap: () {
-        context.read<PaymentsBloc>().add(FilterPaymentsByStatusEvent(statusKey));
+        context.read<PaymentsBloc>().add(
+          FilterPaymentsByStatusEvent(statusKey),
+        );
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
@@ -440,11 +459,13 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
   Widget _buildSortFilterButton(BuildContext context, PaymentsLoaded state) {
     final colors = context.colors;
     final l10n = context.l10n;
-    final extraFilterCount = (state.selectedFiscalYear != 'ALL' ? 1 : 0) +
+    final extraFilterCount =
+        (state.selectedFiscalYear != 'ALL' ? 1 : 0) +
         (state.selectedSeason != 'ALL' ? 1 : 0) +
         (state.selectedPaymentMode != 'ALL' ? 1 : 0);
     final isHighlighted =
-        extraFilterCount > 0 || state.sortOption != PaymentSortOption.newestFirst;
+        extraFilterCount > 0 ||
+        state.sortOption != PaymentSortOption.newestFirst;
 
     return InkWell(
       borderRadius: BorderRadius.circular(16),
@@ -475,14 +496,19 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
               if (extraFilterCount > 0) ...[
                 const SizedBox(width: 6),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: colors.billCtaBg,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
                     '$extraFilterCount',
-                    style: context.labelSmall.bold.withColor(Colors.white).withSize(10.5),
+                    style: context.labelSmall.bold
+                        .withColor(Colors.white)
+                        .withSize(10.5),
                   ),
                 ),
               ],
@@ -546,7 +572,8 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
     final formattedFilteredTotal = NumberFormat.currency(
       locale: 'en_IN',
       symbol: '₹ ',
-      decimalDigits: state.filteredSuccessfulAmount.truncateToDouble() ==
+      decimalDigits:
+          state.filteredSuccessfulAmount.truncateToDouble() ==
               state.filteredSuccessfulAmount
           ? 0
           : 2,
@@ -590,7 +617,9 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
             borderRadius: BorderRadius.circular(8),
             onTap: () {
               _searchController.clear();
-              context.read<PaymentsBloc>().add(const ClearPaymentFiltersEvent());
+              context.read<PaymentsBloc>().add(
+                const ClearPaymentFiltersEvent(),
+              );
             },
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -623,7 +652,11 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
                 color: colors.surfaceVariant,
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.receipt_long_outlined, size: 32, color: colors.textSecondary),
+              child: Icon(
+                Icons.receipt_long_outlined,
+                size: 32,
+                color: colors.textSecondary,
+              ),
             ),
             const SizedBox(height: AppSpacing.md),
             Text(
@@ -643,10 +676,14 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
               OutlinedButton.icon(
                 onPressed: () {
                   _searchController.clear();
-                  context.read<PaymentsBloc>().add(const ClearPaymentFiltersEvent());
+                  context.read<PaymentsBloc>().add(
+                    const ClearPaymentFiltersEvent(),
+                  );
                 },
                 style: OutlinedButton.styleFrom(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 icon: const Icon(Icons.filter_alt_off_rounded, size: 16),
                 label: Text(l10n.resetFilters),
@@ -658,4 +695,3 @@ class _PaymentsPageViewState extends State<_PaymentsPageView> {
     );
   }
 }
-

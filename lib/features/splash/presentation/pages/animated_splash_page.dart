@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:wua_mobile/core/di/injection_container.dart';
+import 'package:wua_mobile/core/errors/failures.dart';
 import 'package:wua_mobile/core/extensions/extensions.dart';
 import 'package:wua_mobile/core/storage/secure_storage_service.dart';
+import 'package:wua_mobile/features/authentication/domain/repositories/auth_repository.dart';
 import 'package:wua_mobile/features/splash/presentation/widgets/water_ripple_background.dart';
 import 'package:wua_mobile/features/splash/presentation/widgets/wrd_emblem.dart';
 
@@ -131,7 +133,16 @@ class _AnimatedSplashPageState extends State<AnimatedSplashPage>
     });
 
     final secureStorage = sl<SecureStorageService>();
-    final hasToken = await secureStorage.hasToken();
+    var hasToken = await secureStorage.hasToken();
+
+    if (hasToken && sl.isRegistered<AuthRepository>()) {
+      final refreshResult = await sl<AuthRepository>().refreshCurrentUser();
+      refreshResult.fold((failure) {
+        if (failure is UnauthorizedFailure) {
+          hasToken = false;
+        }
+      }, (_) {});
+    }
 
     // Step 3: Finalize and ready
     await Future<void>.delayed(const Duration(milliseconds: 650));

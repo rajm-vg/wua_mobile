@@ -55,9 +55,10 @@ class UserModel {
     );
 
     final email = JsonParseUtils.parseString(json['email']);
-    final avatarUrl = JsonParseUtils.parseStringOrNull(
+    final rawAvatar = JsonParseUtils.parseStringOrNull(
       json['imageUrl'] ?? json['avatar_url'],
     );
+    final avatarUrl = _normalizeAvatar(rawAvatar);
 
     // Status: 'A' in JHipster backend indicates Active
     final status = JsonParseUtils.parseString(json['status']);
@@ -181,7 +182,12 @@ class UserModel {
   bool get isFarmerMember =>
       refTable == 'SocietyFarmer' ||
       (refTable == null &&
-          (roles.any((r) => r.contains('सभासद')) || role == 'farmer'));
+          (roles.any(
+                (r) =>
+                    r.contains('सभासद') ||
+                    r.toUpperCase() == 'ROLE_FARMER',
+              ) ||
+              role == 'farmer'));
 
   int? get effectiveFarmerMemberId =>
       isFarmerMember ? (refTableId ?? int.tryParse(id)) : null;
@@ -252,6 +258,19 @@ class UserModel {
     );
   }
 
+  static String? _normalizeAvatar(String? raw) {
+    if (raw == null) return null;
+    final trimmed = raw.trim();
+    if (trimmed.isEmpty) return null;
+    if (trimmed.startsWith('http://') ||
+        trimmed.startsWith('https://') ||
+        trimmed.startsWith('data:')) {
+      return trimmed;
+    }
+    // LoginUserDTO.imageUrl is a byte[] serialized as raw Base64.
+    return 'data:image/jpeg;base64,$trimmed';
+  }
+
   static String _deriveRoleString(
     List<String> roles,
     List<String> authorities,
@@ -259,7 +278,9 @@ class UserModel {
   ) {
     if (roles.any((r) =>
         r.contains('सचिव') ||
+        r.contains('संचालक') ||
         r.toLowerCase().contains('sachiv') ||
+        r.toLowerCase().contains('sanchalak') ||
         r.toLowerCase().contains('secretary'))) {
       return 'wua_official';
     }
@@ -268,6 +289,9 @@ class UserModel {
     }
     if (authorities.any((a) => a.contains('SACHIV') || a.contains('SANCHALAK'))) {
       return 'wua_official';
+    }
+    if (roles.any((r) => r.contains('सभासद') || r.toUpperCase() == 'ROLE_FARMER')) {
+      return 'farmer';
     }
     if (refTable == 'SocietyFarmer') {
       return 'farmer';

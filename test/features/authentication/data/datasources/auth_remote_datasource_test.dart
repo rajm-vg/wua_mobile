@@ -196,7 +196,7 @@ void main() {
           ApiEndpoints.logout,
           data: {
             'username': testUsername,
-            'password': '',
+            'password': '*****',
             'rememberMe': false,
           },
           options: any<Options>(named: 'options'),
@@ -237,6 +237,49 @@ void main() {
         () => dataSource.login(
           identifier: '9876543210',
           password: 'WrongPassword',
+        ),
+        throwsA(isA<UnauthorizedException>()),
+      );
+    });
+
+    test('blocks ROLE_SUPER_ADMIN without societyId on login', () async {
+      const token = 'eyJhbGciOiJIUzUxMiJ9.super-admin';
+      when(
+        () => mockApiClient.post<Map<String, dynamic>>(
+          ApiEndpoints.authenticate,
+          data: any<dynamic>(named: 'data'),
+        ),
+      ).thenAnswer(
+        (_) async => Response(
+          requestOptions: RequestOptions(path: ApiEndpoints.authenticate),
+          statusCode: 200,
+          data: {'id_token': token},
+        ),
+      );
+      when(
+        () => mockApiClient.get<Map<String, dynamic>>(
+          ApiEndpoints.account,
+          options: any<Options>(named: 'options'),
+        ),
+      ).thenAnswer(
+        (_) async => Response(
+          requestOptions: RequestOptions(path: ApiEndpoints.account),
+          statusCode: 200,
+          data: {
+            'id': 1,
+            'username': '9999999999',
+            'status': 'A',
+            'societyId': null,
+            'authorities': ['ROLE_SUPER_ADMIN'],
+            'roles': ['ROLE_SUPER_ADMIN'],
+          },
+        ),
+      );
+
+      expect(
+        () => dataSource.login(
+          identifier: '9999999999',
+          password: 'admin',
         ),
         throwsA(isA<UnauthorizedException>()),
       );

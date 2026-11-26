@@ -86,5 +86,33 @@ void main() {
       expect(model.role, 'wua_official');
       expect(model.isVerified, true);
     });
+
+    test('fromJson normalizes raw Base64 imageUrl and maps Sanchalak/Farmer roles', () {
+      final sanchalakJson = {
+        'id': 3001,
+        'firstName': 'Ramesh Patil',
+        'username': '9876543210',
+        'mobileNo': '9876543210',
+        'imageUrl': '/9j/4AAQSkZJRg==',
+        'status': 'A',
+        'roles': ['संचालक'],
+      };
+
+      final sanchalak = UserModel.fromJson(sanchalakJson);
+      expect(sanchalak.avatarUrl, 'data:image/jpeg;base64,/9j/4AAQSkZJRg==');
+      expect(sanchalak.role, 'wua_official');
+
+      final farmerJson = {
+        'id': 3002,
+        'firstName': 'Suresh Shinde',
+        'username': '9123456789',
+        'mobileNo': '9123456789',
+        'status': 'A',
+        'roles': ['ROLE_FARMER'],
+      };
+      final farmer = UserModel.fromJson(farmerJson);
+      expect(farmer.isFarmerMember, true);
+      expect(farmer.role, 'farmer');
+    });
   });
 }
