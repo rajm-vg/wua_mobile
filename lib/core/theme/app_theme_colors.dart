@@ -240,8 +240,8 @@ class AppThemeColors extends ThemeExtension<AppThemeColors> {
 
     textPrimary: AppColors.textPrimaryDark,
     textSecondary: AppColors.textSecondaryDark,
-    textHint: Color(0xFF64748B),
-    textDisabled: Color(0xFF475569),
+    textHint: Color(0xFF94A3B8),
+    textDisabled: Color(0xFF64748B),
 
     headerBackground: AppColors.darkCanal, // Rich peacock teal
     headerText: Colors.white,

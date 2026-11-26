@@ -1,3 +1,4 @@
+import 'package:wua_mobile/core/utils/json_parse_utils.dart';
 import 'package:wua_mobile/features/authentication/domain/entities/auth_tokens.dart';
 
 /// Data Transfer Object for authentication tokens.
@@ -9,15 +10,21 @@ class AuthTokensModel {
   });
 
   factory AuthTokensModel.fromJson(Map<String, dynamic> json) {
-    final token = (json['id_token'] ??
-            json['access_token'] ??
-            json['token'] ??
-            json['accessToken']) as String? ??
-        '';
+    final token = JsonParseUtils.parseString(
+      json['id_token'] ??
+          json['access_token'] ??
+          json['token'] ??
+          json['accessToken'],
+    );
     return AuthTokensModel(
       accessToken: token,
-      refreshToken: (json['refresh_token'] ?? json['refreshToken']) as String? ?? '',
-      expiresIn: (json['expires_in'] ?? json['expiresIn']) as int? ?? 86400,
+      refreshToken: JsonParseUtils.parseString(
+        json['refresh_token'] ?? json['refreshToken'],
+      ),
+      expiresIn: JsonParseUtils.parseInt(
+        json['expires_in'] ?? json['expiresIn'],
+        defaultValue: 86400,
+      ),
     );
   }
   final String accessToken;

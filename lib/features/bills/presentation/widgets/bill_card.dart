@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:wua_mobile/core/l10n/l10n.dart';
+import 'package:wua_mobile/core/router/route_names.dart';
 import 'package:wua_mobile/core/theme/colors.dart';
 import 'package:wua_mobile/core/theme/radius.dart';
 import 'package:wua_mobile/core/theme/spacing.dart';
 import 'package:wua_mobile/core/theme/theme_extensions.dart';
 import 'package:wua_mobile/features/bills/domain/entities/bill_entity.dart';
 import 'package:wua_mobile/features/bills/presentation/widgets/bill_receipt_sheet.dart';
-import 'package:wua_mobile/features/payments/payments.dart';
 
 /// Interactive, theme-aware card representing an individual WUA Pani Patti Bill.
 class BillCard extends StatelessWidget {
@@ -44,13 +44,13 @@ class BillCard extends StatelessWidget {
     IconData badgeIcon;
 
     if (bill.isPaid) {
-      badgeBg = AppColors.success.withValues(alpha: 0.12);
-      badgeText = AppColors.success;
+      badgeBg = colors.success.withValues(alpha: 0.14);
+      badgeText = colors.success;
       badgeLabel = l10n.paid;
       badgeIcon = Icons.check_circle_rounded;
     } else if (bill.isOverdue) {
-      badgeBg = AppColors.error.withValues(alpha: 0.12);
-      badgeText = AppColors.error;
+      badgeBg = colors.error.withValues(alpha: 0.14);
+      badgeText = colors.error;
       badgeLabel = l10n.filterOverdue;
       badgeIcon = Icons.warning_amber_rounded;
     } else {
@@ -198,6 +198,29 @@ class BillCard extends StatelessWidget {
                                 : l10n.commandAreaCessForAcres('${bill.landAreaAcres}'),
                             style: context.caption.withSize(11.5),
                           ),
+                          if (bill.paidAmount > 0 && bill.outstandingAmount > 0) ...[
+                            const SizedBox(height: 6),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: LinearProgressIndicator(
+                                value: bill.totalAmount > 0
+                                    ? (bill.paidAmount / bill.totalAmount).clamp(0.0, 1.0)
+                                    : 0.0,
+                                minHeight: 5,
+                                backgroundColor: colors.surfaceVariant,
+                                valueColor: const AlwaysStoppedAnimation<Color>(
+                                  Color(0xFF16A34A),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              '${l10n.amountPaid}: ${_formatCurrency(bill.paidAmount)} / ${_formatCurrency(bill.totalAmount)}',
+                              style: context.caption
+                                  .withSize(10.5)
+                                  .withColor(colors.textSecondary),
+                            ),
+                          ],
                         ],
                       ),
                     ),
@@ -209,7 +232,10 @@ class BillCard extends StatelessWidget {
                         onPressed:
                             onPayPressed ??
                             () {
-                              UpiAppChooserSheet.show(context, bill: bill);
+                              context.pushNamed(
+                                RouteNames.paymentCheckout,
+                                extra: bill,
+                              );
                             },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: colors.billCtaBg,
@@ -228,7 +254,7 @@ class BillCard extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              l10n.payViaUpi,
+                              l10n.payNow,
                               style: context.labelMedium.bold.white,
                             ),
                             const SizedBox(width: 4),
@@ -242,9 +268,9 @@ class BillCard extends StatelessWidget {
                           BillReceiptSheet.show(context, bill: bill);
                         },
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.success,
+                          foregroundColor: colors.success,
                           side: BorderSide(
-                            color: AppColors.success.withValues(alpha: 0.5),
+                            color: colors.success.withValues(alpha: 0.5),
                           ),
                           padding: const EdgeInsets.symmetric(
                             horizontal: AppSpacing.md,

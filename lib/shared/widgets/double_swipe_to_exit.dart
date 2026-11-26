@@ -47,9 +47,13 @@ class _DoubleSwipeToExitState extends State<DoubleSwipeToExit> {
     if (didPop) return;
 
     // 1. If inner navigation can pop, pop back to previous view
-    if (context.canPop()) {
-      context.pop();
-      return;
+    try {
+      if (context.canPop()) {
+        context.pop();
+        return;
+      }
+    } catch (_) {
+      // GoRouter not present in current context (e.g. isolated test environments)
     }
 
     // 2. If on a non-home bottom navigation tab, navigate back to Dashboard first

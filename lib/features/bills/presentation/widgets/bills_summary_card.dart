@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:wua_mobile/core/l10n/l10n.dart';
-import 'package:wua_mobile/core/theme/colors.dart';
 import 'package:wua_mobile/core/theme/spacing.dart';
 import 'package:wua_mobile/core/theme/theme_extensions.dart';
 
@@ -63,7 +62,7 @@ class BillsSummaryCard extends StatelessWidget {
                     Text(
                       l10n.totalWaterDuesUpper,
                       style: context.badgeText.bold.withColor(
-                        hasDues ? AppColors.warning : AppColors.success,
+                        hasDues ? colors.warning : colors.success,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -82,7 +81,7 @@ class BillsSummaryCard extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
                     color: overdueCount > 0
-                        ? AppColors.error.withValues(alpha: 0.12)
+                        ? colors.error.withValues(alpha: 0.14)
                         : colors.billBadgeBg,
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -92,7 +91,7 @@ class BillsSummaryCard extends StatelessWidget {
                       Icon(
                         overdueCount > 0 ? Icons.error_outline_rounded : Icons.schedule_rounded,
                         size: 14,
-                        color: overdueCount > 0 ? AppColors.error : colors.billBadgeText,
+                        color: overdueCount > 0 ? colors.error : colors.billBadgeText,
                       ),
                       const SizedBox(width: 4),
                       Text(
@@ -100,7 +99,7 @@ class BillsSummaryCard extends StatelessWidget {
                             ? l10n.overdueCountLabel(overdueCount)
                             : l10n.dueCountLabel(pendingCount),
                         style: context.labelSmall.bold.withColor(
-                          overdueCount > 0 ? AppColors.error : colors.billBadgeText,
+                          overdueCount > 0 ? colors.error : colors.billBadgeText,
                         ),
                       ),
                     ],
@@ -110,17 +109,17 @@ class BillsSummaryCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: AppColors.success.withValues(alpha: 0.12),
+                    color: colors.success.withValues(alpha: 0.14),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.check_circle_rounded, size: 14, color: AppColors.success),
+                      Icon(Icons.check_circle_rounded, size: 14, color: colors.success),
                       const SizedBox(width: 4),
                       Text(
                         l10n.allDuesCleared,
-                        style: context.labelSmall.bold.withColor(AppColors.success),
+                        style: context.labelSmall.bold.withColor(colors.success),
                       ),
                     ],
                   ),
@@ -147,14 +146,14 @@ class BillsSummaryCard extends StatelessWidget {
                 context,
                 title: l10n.filterOverdue,
                 value: '$overdueCount',
-                color: overdueCount > 0 ? AppColors.error : colors.textSecondary,
+                color: overdueCount > 0 ? colors.error : colors.textSecondary,
               ),
               Container(width: 1, height: 26, color: colors.billDivider),
               _buildMetric(
                 context,
                 title: l10n.paidBills,
                 value: '$paidCount',
-                color: AppColors.success,
+                color: colors.success,
               ),
             ],
           ),

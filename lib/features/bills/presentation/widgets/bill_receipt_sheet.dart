@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:wua_mobile/core/extensions/extensions.dart';
 import 'package:wua_mobile/features/bills/domain/entities/bill_entity.dart';
@@ -69,12 +70,12 @@ class BillReceiptSheet extends StatelessWidget {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: AppColors.headerTeal.withValues(alpha: 0.12),
+                    color: colors.canalGreen.withValues(alpha: 0.14),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.water_drop_rounded,
-                    color: AppColors.headerTeal,
+                    color: colors.canalGreen,
                     size: 24,
                   ),
                 ),
@@ -86,7 +87,7 @@ class BillReceiptSheet extends StatelessWidget {
                       Text(
                         l10n.waterResourcesDepartmentUpper,
                         style: context.badgeText.bold.withColor(
-                          AppColors.headerTeal,
+                          colors.canalGreen,
                         ),
                       ),
                       Text(
@@ -127,31 +128,31 @@ class BillReceiptSheet extends StatelessWidget {
                   const SizedBox(height: 8),
                   _buildRow(
                     l10n.kisanConsumerLabel,
-                    bill.consumerName ?? 'Ramesh Patil',
+                    bill.consumerName ?? 'N/A',
                     context,
                   ),
                   const SizedBox(height: 8),
                   _buildRow(
                     l10n.societyLabel,
-                    bill.wuaSocietyName ?? 'Ganga-Godavari WUA #12',
+                    bill.wuaSocietyName ?? 'N/A',
                     context,
                   ),
                   const SizedBox(height: 8),
                   _buildRow(
                     l10n.paymentDateLabel,
-                    bill.formattedPaymentDate ?? '14 Aug 2026',
+                    bill.formattedPaymentDate ?? 'N/A',
                     context,
                   ),
                   const SizedBox(height: 8),
                   _buildRow(
                     l10n.paymentModeLabel,
-                    bill.paymentMethod ?? 'BHIM UPI',
+                    bill.paymentMethod ?? 'N/A',
                     context,
                   ),
                   const SizedBox(height: 8),
                   _buildRow(
                     l10n.refIdTxnLabel,
-                    bill.paymentReference ?? 'UPI/WRD/894123',
+                    bill.paymentReference ?? 'N/A',
                     context,
                   ),
                   const SizedBox(height: 12),
@@ -173,7 +174,7 @@ class BillReceiptSheet extends StatelessWidget {
                               : bill.totalAmount,
                         ),
                         style: context.titleLarge.bold.withColor(
-                          AppColors.success,
+                          colors.success,
                         ),
                       ),
                     ],
@@ -188,17 +189,17 @@ class BillReceiptSheet extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: AppColors.success.withValues(alpha: 0.1),
+                color: colors.success.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: AppColors.success.withValues(alpha: 0.3),
+                  color: colors.success.withValues(alpha: 0.35),
                 ),
               ),
               child: Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.verified_rounded,
-                    color: AppColors.success,
+                    color: colors.success,
                     size: 28,
                   ),
                   const SizedBox(width: 12),
@@ -209,7 +210,7 @@ class BillReceiptSheet extends StatelessWidget {
                         Text(
                           l10n.paymentVerifiedByWrd,
                           style: context.labelMedium.bold.withColor(
-                            AppColors.success,
+                            colors.success,
                           ),
                         ),
                         Text(
@@ -249,11 +250,22 @@ class BillReceiptSheet extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {
+                      final receiptSummary = [
+                        l10n.paniPattiEReceiptTitle,
+                        '${l10n.officialReceiptNo}: $receiptNo',
+                        '${l10n.billNumber}: ${bill.billNumber}',
+                        '${l10n.amountPaid}: ${currencyFormatter.format(bill.paidAmount > 0 ? bill.paidAmount : bill.totalAmount)}',
+                        '${l10n.season}: ${bill.season}',
+                        if (bill.paymentReference != null)
+                          'Ref: ${bill.paymentReference}',
+                      ].join('\n');
+                      Clipboard.setData(ClipboardData(text: receiptSummary));
+                      HapticFeedback.selectionClick();
                       Navigator.of(context).pop();
                       context.showSuccessSnackBar(l10n.receiptSharedSuccess);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.headerTeal,
+                      backgroundColor: colors.billCtaBg,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       elevation: 0,

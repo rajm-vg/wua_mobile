@@ -139,7 +139,31 @@ class HomeHeader extends StatelessWidget {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    l10n.gatNoMulshi,
+                    () {
+                      final currentUser = user;
+                      final surveyNo = currentUser?.surveyNo;
+                      final village = currentUser?.village;
+                      final societyId = currentUser?.societyId;
+                      final hasSurvey = surveyNo != null && surveyNo.isNotEmpty;
+                      final hasVillage = village != null && village.isNotEmpty;
+                      if (hasSurvey && hasVillage) {
+                        return 'Gat No. $surveyNo • $village';
+                      }
+                      if (hasSurvey) {
+                        return societyId != null
+                            ? 'Gat No. $surveyNo • WUA #$societyId'
+                            : 'Gat No. $surveyNo';
+                      }
+                      if (hasVillage) {
+                        return societyId != null
+                            ? '$village • WUA #$societyId'
+                            : village;
+                      }
+                      if (societyId != null) {
+                        return 'WUA Society #$societyId';
+                      }
+                      return 'N/A';
+                    }(),
                     style: context.caption
                         .withColor(colors.headerSubtitle)
                         .withSize(12)

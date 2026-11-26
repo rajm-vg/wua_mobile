@@ -29,7 +29,7 @@ class TurnStatus {
   }
 }
 
-/// Breakdown of water usage per crop.
+/// Breakdown of water usage per crop aligned with `crop_details` table.
 class CropWaterUsage extends Equatable {
   const CropWaterUsage({
     required this.cropName,
@@ -38,6 +38,27 @@ class CropWaterUsage extends Equatable {
     required this.usedHaCm,
     required this.areaAcres,
     required this.percentage,
+    this.id,
+    this.memberId,
+    this.farmerMemberId,
+    this.societyId,
+    this.waterUsageId,
+    this.fiscalYear,
+    this.season,
+    this.rotation,
+    this.village,
+    this.surveyNo,
+    this.source,
+    this.waterValue,
+    this.rateType,
+    this.rateValue,
+    this.perType,
+    this.seasonalWaterUsage,
+    this.amount,
+    this.approvalStatus,
+    this.billGenerated,
+    this.isPaymentDone,
+    this.transactionDate,
   });
 
   final String cropName;
@@ -47,15 +68,74 @@ class CropWaterUsage extends Equatable {
   final double areaAcres;
   final double percentage;
 
+  // ─── Database Fields from `crop_details` ───────────────────
+  final int? id;
+  final int? memberId;
+  final int? farmerMemberId;
+  final int? societyId;
+  final int? waterUsageId;
+  final String? fiscalYear;
+  final String? season;
+  final String? rotation;
+  final String? village;
+  final String? surveyNo;
+  final String? source;
+  final double? waterValue;
+  final String? rateType;
+  final double? rateValue;
+  final String? perType;
+  final String? seasonalWaterUsage;
+  final double? amount;
+  final String? approvalStatus;
+  final bool? billGenerated;
+  final bool? isPaymentDone;
+  final DateTime? transactionDate;
+
+  String get displayCropName =>
+      cropNameMarathi.isNotEmpty ? cropNameMarathi : cropName;
+
+  String? get formattedUnitValue {
+    final val = waterValue;
+    if (val == null || val <= 0) return null;
+    final valText = val % 1 == 0
+        ? val.toInt().toString()
+        : val.toStringAsFixed(2);
+    final unit = rateType?.isNotEmpty == true
+        ? rateType!
+        : (perType?.isNotEmpty == true ? perType! : '');
+    return unit.isNotEmpty ? '$valText $unit' : valText;
+  }
+
   @override
   List<Object?> get props => [
-        cropName,
-        cropNameMarathi,
-        allocatedHaCm,
-        usedHaCm,
-        areaAcres,
-        percentage,
-      ];
+    cropName,
+    cropNameMarathi,
+    allocatedHaCm,
+    usedHaCm,
+    areaAcres,
+    percentage,
+    id,
+    memberId,
+    farmerMemberId,
+    societyId,
+    waterUsageId,
+    fiscalYear,
+    season,
+    rotation,
+    village,
+    surveyNo,
+    source,
+    waterValue,
+    rateType,
+    rateValue,
+    perType,
+    seasonalWaterUsage,
+    amount,
+    approvalStatus,
+    billGenerated,
+    isPaymentDone,
+    transactionDate,
+  ];
 }
 
 /// Quota and live canal status for the farmer's water share.
@@ -75,8 +155,10 @@ class WaterQuotaEntity extends Equatable {
     required this.totalTurnsCount,
     required this.completedTurnsCount,
     required this.cropBreakdown,
-    this.soilMoistureStatus = 'Optimal (68%)',
+    this.soilMoistureStatus = 'N/A',
     this.nextCanalRotationDate,
+    this.societyId,
+    this.fiscalYear,
   });
 
   final String season;
@@ -95,32 +177,40 @@ class WaterQuotaEntity extends Equatable {
   final List<CropWaterUsage> cropBreakdown;
   final String soilMoistureStatus;
   final DateTime? nextCanalRotationDate;
+  final int? societyId;
+  final String? fiscalYear;
 
   bool get isNearLimit => percentageUsed >= 85.0;
   bool get isLimitExceeded => percentageUsed >= 100.0;
+  double get totalIrrigatedArea =>
+      cropBreakdown.fold<double>(0.0, (sum, c) => sum + c.areaAcres);
+  double get totalCropAmount =>
+      cropBreakdown.fold<double>(0.0, (sum, c) => sum + (c.amount ?? 0.0));
 
   @override
   List<Object?> get props => [
-        season,
-        totalQuotaHaCm,
-        usedQuotaHaCm,
-        remainingQuotaHaCm,
-        percentageUsed,
-        canalName,
-        canalStatus,
-        currentFlowCusecs,
-        outletNumber,
-        wuaSocietyName,
-        farmerName,
-        totalTurnsCount,
-        completedTurnsCount,
-        cropBreakdown,
-        soilMoistureStatus,
-        nextCanalRotationDate,
-      ];
+    season,
+    totalQuotaHaCm,
+    usedQuotaHaCm,
+    remainingQuotaHaCm,
+    percentageUsed,
+    canalName,
+    canalStatus,
+    currentFlowCusecs,
+    outletNumber,
+    wuaSocietyName,
+    farmerName,
+    totalTurnsCount,
+    completedTurnsCount,
+    cropBreakdown,
+    soilMoistureStatus,
+    nextCanalRotationDate,
+    societyId,
+    fiscalYear,
+  ];
 }
 
-/// Rotational irrigation turn / Wari entity for scheduled canal delivery.
+/// Rotational irrigation turn / Wari entity aligned with `wua_water_usage` table.
 class IrrigationTurnEntity extends Equatable {
   const IrrigationTurnEntity({
     required this.id,
@@ -138,10 +228,18 @@ class IrrigationTurnEntity extends Equatable {
     required this.waterDeliveredHaCm,
     required this.crop,
     required this.fieldParcel,
-    this.inspectorName = 'S. K. Deshmukh (Patkari)',
+    this.inspectorName = 'N/A',
     this.isVerified = false,
     this.notes,
     this.canRequestSwap = true,
+    this.societyId,
+    this.fiscalYear,
+    this.rotation,
+    this.cumecs,
+    this.totalHours,
+    this.waterStartTime,
+    this.waterEndTime,
+    this.rawStatus,
   });
 
   final String id;
@@ -164,6 +262,16 @@ class IrrigationTurnEntity extends Equatable {
   final String? notes;
   final bool canRequestSwap;
 
+  // ─── Database Fields from `wua_water_usage` (vgwaterresource) ───
+  final int? societyId;
+  final String? fiscalYear;
+  final String? rotation;
+  final double? cumecs;
+  final double? totalHours;
+  final String? waterStartTime;
+  final String? waterEndTime;
+  final String? rawStatus;
+
   bool get isActive => status.toUpperCase() == TurnStatus.active;
   bool get isUpcoming => status.toUpperCase() == TurnStatus.upcoming;
   bool get isCompleted => status.toUpperCase() == TurnStatus.completed;
@@ -180,26 +288,34 @@ class IrrigationTurnEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        turnNumber,
-        season,
-        status,
-        scheduledStartTime,
-        scheduledEndTime,
-        actualStartTime,
-        actualEndTime,
-        durationHours,
-        outletNo,
-        gateNo,
-        dischargeCusecs,
-        waterDeliveredHaCm,
-        crop,
-        fieldParcel,
-        inspectorName,
-        isVerified,
-        notes,
-        canRequestSwap,
-      ];
+    id,
+    turnNumber,
+    season,
+    status,
+    scheduledStartTime,
+    scheduledEndTime,
+    actualStartTime,
+    actualEndTime,
+    durationHours,
+    outletNo,
+    gateNo,
+    dischargeCusecs,
+    waterDeliveredHaCm,
+    crop,
+    fieldParcel,
+    inspectorName,
+    isVerified,
+    notes,
+    canRequestSwap,
+    societyId,
+    fiscalYear,
+    rotation,
+    cumecs,
+    totalHours,
+    waterStartTime,
+    waterEndTime,
+    rawStatus,
+  ];
 }
 
 /// Aggregated entity containing quota, upcoming turn, and turn history.
@@ -223,4 +339,3 @@ class WaterUsageSummaryEntity extends Equatable {
   @override
   List<Object?> get props => [quota, nextTurn, allTurns];
 }
-

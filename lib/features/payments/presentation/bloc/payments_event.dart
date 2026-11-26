@@ -1,6 +1,14 @@
 import 'package:equatable/equatable.dart';
 import 'package:wua_mobile/features/payments/domain/entities/payment_entity.dart';
 
+/// Sort orders supported on the Payments History screen.
+enum PaymentSortOption {
+  newestFirst,
+  oldestFirst,
+  amountHighToLow,
+  amountLowToHigh,
+}
+
 abstract class PaymentsEvent extends Equatable {
   const PaymentsEvent();
 
@@ -25,6 +33,67 @@ class FilterPaymentsByStatusEvent extends PaymentsEvent {
 
   @override
   List<Object?> get props => [status];
+}
+
+class FilterPaymentsByFiscalYearEvent extends PaymentsEvent {
+  const FilterPaymentsByFiscalYearEvent(this.fiscalYear);
+
+  final String fiscalYear;
+
+  @override
+  List<Object?> get props => [fiscalYear];
+}
+
+class FilterPaymentsBySeasonEvent extends PaymentsEvent {
+  const FilterPaymentsBySeasonEvent(this.season);
+
+  final String season;
+
+  @override
+  List<Object?> get props => [season];
+}
+
+class FilterPaymentsByModeEvent extends PaymentsEvent {
+  const FilterPaymentsByModeEvent(this.paymentMode);
+
+  final String paymentMode;
+
+  @override
+  List<Object?> get props => [paymentMode];
+}
+
+class SortPaymentsEvent extends PaymentsEvent {
+  const SortPaymentsEvent(this.sortOption);
+
+  final PaymentSortOption sortOption;
+
+  @override
+  List<Object?> get props => [sortOption];
+}
+
+class ApplyPaymentFiltersEvent extends PaymentsEvent {
+  const ApplyPaymentFiltersEvent({
+    this.status,
+    this.fiscalYear,
+    this.season,
+    this.paymentMode,
+    this.sortOption,
+  });
+
+  final String? status;
+  final String? fiscalYear;
+  final String? season;
+  final String? paymentMode;
+  final PaymentSortOption? sortOption;
+
+  @override
+  List<Object?> get props => [
+    status,
+    fiscalYear,
+    season,
+    paymentMode,
+    sortOption,
+  ];
 }
 
 class SearchPaymentsEvent extends PaymentsEvent {
@@ -57,4 +126,3 @@ class RecordPaymentEvent extends PaymentsEvent {
   @override
   List<Object?> get props => [payment];
 }
-

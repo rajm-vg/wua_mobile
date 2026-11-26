@@ -181,7 +181,16 @@ class UpcomingCanalTurnCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      'In 2 Days',
+                      () {
+                        final days = turn.scheduledStartTime
+                            .difference(DateTime.now())
+                            .inDays;
+                        if (days > 0) {
+                          return 'In $days ${days == 1 ? 'Day' : 'Days'}';
+                        }
+                        if (days == 0) return 'Today';
+                        return TurnStatus.toLabel(turn.status);
+                      }(),
                       style: context.labelSmall.bold
                           .withColor(colors.turnCardBadgeText)
                           .withSize(11),

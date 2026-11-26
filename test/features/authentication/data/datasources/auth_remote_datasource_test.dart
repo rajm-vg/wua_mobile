@@ -194,7 +194,7 @@ void main() {
             ApiEndpoints.logout,
             data: {
               'username': testUsername,
-              'password': '',
+              'password': '*****',
               'rememberMe': false,
             },
             options: any<Options>(named: 'options'),
@@ -204,18 +204,10 @@ void main() {
     );
   });
 
-  group('AuthRemoteDataSourceImpl (Dev Demo Fallback Enabled)', () {
-    late AuthRemoteDataSourceImpl fallbackDataSource;
+  group('AuthRemoteDataSourceImpl Error Handling (No Fallback)', () {
     const testUsername = '9922322710';
 
-    setUp(() {
-      fallbackDataSource = AuthRemoteDataSourceImpl(
-        apiClient: mockApiClient,
-        enableDemoFallback: true,
-      );
-    });
-
-    test('smoothly falls back to Subhash Zinjad mock profile when backend connection fails', () async {
+    test('rethrows ServerException when backend connection fails', () async {
       when(
         () => mockApiClient.post<Map<String, dynamic>>(
           ApiEndpoints.authenticate,
@@ -223,57 +215,72 @@ void main() {
         ),
       ).thenThrow(const ServerException(message: 'Connection refused'));
 
-      final result = await fallbackDataSource.login(
-        identifier: testUsername,
-        password: 'admin',
+      expect(
+        () => dataSource.login(identifier: testUsername, password: 'admin'),
+        throwsA(isA<ServerException>()),
       );
-
-      expect(result.user.username, testUsername);
-      expect(result.user.name, 'सुभाष रंगनाथ झिंजाड');
-      expect(result.user.role, 'wua_official');
-      expect(result.user.societyId, 1503);
-      expect(result.tokens.accessToken, startsWith('mock_jwt_id_token_2100_'));
-    });
-
-    test('smoothly falls back to Farmer mock profile when backend fails for farmer credentials', () async {
-      when(
-        () => mockApiClient.post<Map<String, dynamic>>(
-          ApiEndpoints.authenticate,
-          data: any<dynamic>(named: 'data'),
-        ),
-      ).thenThrow(const ServerException(message: 'Connection refused'));
-
-      final result = await fallbackDataSource.login(
-        identifier: '9876543210',
-        password: 'Farmer@123',
-      );
-
-      expect(result.user.phone, '9876543210');
-      expect(result.user.name, 'Ramesh Patel');
-      expect(result.user.role, 'farmer');
     });
 
     test(
-      'smoothly falls back to Sabhasad 2 (Anand Deshmukh) mock profile',
+      'rethrows UnauthorizedException when invalid credentials are provided',
       () async {
         when(
           () => mockApiClient.post<Map<String, dynamic>>(
             ApiEndpoints.authenticate,
             data: any<dynamic>(named: 'data'),
           ),
-        ).thenThrow(const ServerException(message: 'Connection refused'));
-
-        final result = await fallbackDataSource.login(
-          identifier: '9822334455',
-          password: 'Farmer@123',
+        ).thenThrow(
+          const UnauthorizedException(message: 'Invalid credentials'),
         );
 
-        expect(result.user.phone, '9822334455');
-        expect(result.user.name, 'आनंद देशमुख');
-        expect(result.user.role, 'farmer');
-        expect(result.user.refTable, 'SocietyFarmer');
-        expect(result.user.refTableId, 502);
+        expect(
+          () => dataSource.login(
+            identifier: '9876543210',
+            password: 'WrongPassword',
+          ),
+          throwsA(isA<UnauthorizedException>()),
+        );
       },
     );
+
+    test('blocks ROLE_SUPER_ADMIN without societyId on login', () async {
+      const token = 'eyJhbGciOiJIUzUxMiJ9.super-admin';
+      when(
+        () => mockApiClient.post<Map<String, dynamic>>(
+          ApiEndpoints.authenticate,
+          data: any<dynamic>(named: 'data'),
+        ),
+      ).thenAnswer(
+        (_) async => Response(
+          requestOptions: RequestOptions(path: ApiEndpoints.authenticate),
+          statusCode: 200,
+          data: {'id_token': token},
+        ),
+      );
+      when(
+        () => mockApiClient.get<Map<String, dynamic>>(
+          ApiEndpoints.account,
+          options: any<Options>(named: 'options'),
+        ),
+      ).thenAnswer(
+        (_) async => Response(
+          requestOptions: RequestOptions(path: ApiEndpoints.account),
+          statusCode: 200,
+          data: {
+            'id': 1,
+            'username': '9999999999',
+            'status': 'A',
+            'societyId': null,
+            'authorities': ['ROLE_SUPER_ADMIN'],
+            'roles': ['ROLE_SUPER_ADMIN'],
+          },
+        ),
+      );
+
+      expect(
+        () => dataSource.login(identifier: '9999999999', password: 'admin'),
+        throwsA(isA<UnauthorizedException>()),
+      );
+    });
   });
 }

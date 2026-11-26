@@ -94,9 +94,30 @@ class DioErrorMapper {
   }
 
   /// Attempts to extract a human-readable error message from the response body.
+  /// Handles Spring Boot / JHipster ProblemDetails (`detail`, `title`) as well as
+  /// standard (`message`, `error`) payloads.
   static String _extractMessage(dynamic data) {
     if (data is Map<String, dynamic>) {
-      return (data['message'] as String?) ?? (data['error'] as String?) ?? '';
+      final detail = data['detail'] as String?;
+      if (detail != null && detail.trim().isNotEmpty) {
+        if (detail.trim() == 'Bad credentials') {
+          return 'Invalid username or password.';
+        }
+        return detail.trim();
+      }
+      final message = data['message'] as String?;
+      if (message != null && message.trim().isNotEmpty) {
+        return message.trim();
+      }
+      final error = data['error'] as String?;
+      if (error != null && error.trim().isNotEmpty) {
+        return error.trim();
+      }
+      final title = data['title'] as String?;
+      if (title != null && title.trim().isNotEmpty) {
+        return title.trim();
+      }
+      return '';
     }
     if (data is String) return data;
     return '';

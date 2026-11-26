@@ -66,10 +66,6 @@ void main() {
         findsOneWidget,
       );
 
-      // Farmer / Sabhasad Portal Header
-      expect(find.text('Farmer / Sabhasad Login'), findsOneWidget);
-      expect(find.text('WUA Farmer Member Portal'), findsOneWidget);
-
       // Form Fields
       expect(find.byKey(const Key('login_identifier_field')), findsOneWidget);
       expect(find.byKey(const Key('login_password_field')), findsOneWidget);
@@ -77,13 +73,15 @@ void main() {
       expect(find.byKey(const Key('forgot_password_button')), findsOneWidget);
       expect(find.byKey(const Key('login_submit_button')), findsOneWidget);
 
-      // Support & Demo UI (Exclusively Sabhasad / Farmer)
-      expect(find.text('सभासद / शेतकरी लॉगिन (SABHASAD DEMO)'), findsOneWidget);
-      expect(find.text('सभासद १ (9876543210)'), findsOneWidget);
-      expect(find.text('सभासद २ (9822334455)'), findsOneWidget);
-      expect(find.text('सभासद ३ (9922322710)'), findsOneWidget);
-      expect(find.text("Don't have an account?"), findsOneWidget);
-      expect(find.text('Register'), findsOneWidget);
+      // Support UI (Demo chips hidden when EnvConfig.enableDemoFallback is false)
+      expect(find.text('QUICK ROLE DEMO'), findsNothing);
+      expect(
+        find.text(
+          'New member? Contact your WUA Secretary to register your mobile number.',
+        ),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('register_nav_button')), findsNothing);
       expect(
         find.text('Kisan Helpline (Toll Free): 1800-180-1551'),
         findsOneWidget,
@@ -106,7 +104,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.text('Please enter your mobile number or email.'),
+        find.text('Please enter your 10-digit mobile number.'),
         findsOneWidget,
       );
       expect(find.text('Password is required.'), findsOneWidget);
@@ -136,7 +134,7 @@ void main() {
       await tester.pumpAndSettle();
     });
 
-    testWidgets('populates fields when tapping quick role demo chip', (
+    testWidgets('hides quick role demo chips when demo fallback is disabled', (
       tester,
     ) async {
       tester.view.physicalSize = const Size(1080, 1920);
@@ -147,26 +145,8 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pumpAndSettle();
 
-      // Tap Sabhasad 1 demo chip
-      await tester.tap(find.text('सभासद १ (9876543210)'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('9876543210'), findsOneWidget);
-      expect(find.text('Farmer@123'), findsOneWidget);
-
-      // Tap Sabhasad 2 demo chip
-      await tester.tap(find.text('सभासद २ (9822334455)'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('9822334455'), findsOneWidget);
-      expect(find.text('Farmer@123'), findsOneWidget);
-
-      // Tap Sabhasad 3 demo chip
-      await tester.tap(find.text('सभासद ३ (9922322710)'));
-      await tester.pumpAndSettle();
-
-      expect(find.text('9922322710'), findsOneWidget);
-      expect(find.text('admin'), findsOneWidget);
+      expect(find.byKey(const Key('quick_demo_sabhasad_chip_1')), findsNothing);
+      expect(find.byKey(const Key('quick_demo_sabhasad_chip_2')), findsNothing);
     });
 
     testWidgets('dispatches AuthLoginRequested with valid credentials', (

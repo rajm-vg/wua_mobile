@@ -1,5 +1,4 @@
 import 'package:dartz/dartz.dart';
-import 'package:wua_mobile/core/errors/exceptions.dart';
 import 'package:wua_mobile/core/errors/failures.dart';
 import 'package:wua_mobile/core/network/network_info.dart';
 import 'package:wua_mobile/features/water_usage/data/datasources/water_usage_remote_datasource.dart';
@@ -22,23 +21,22 @@ class WaterUsageRepositoryImpl implements WaterUsageRepository {
     try {
       final isConnected = await networkInfo.isConnected;
       if (!isConnected) {
-        // Fall back to cached / offline mock summary
-        final cached = await remoteDataSource.getWaterUsageSummary(
-          forceRefresh: false,
+        return const Left(
+          NetworkFailure(
+            message: 'No active network connection. Please check your internet.',
+          ),
         );
-        return Right(cached);
       }
 
       final summary = await remoteDataSource.getWaterUsageSummary(
         forceRefresh: forceRefresh,
       );
       return Right(summary);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, code: e.statusCode));
     } catch (e) {
       return Left(
-        ServerFailure(
-          message: 'Failed to retrieve water usage summary: ${e.toString()}',
+        mapExceptionToFailure(
+          e,
+          fallbackPrefix: 'Failed to retrieve water usage summary',
         ),
       );
     }
@@ -51,19 +49,18 @@ class WaterUsageRepositoryImpl implements WaterUsageRepository {
     try {
       final isConnected = await networkInfo.isConnected;
       if (!isConnected) {
-        final turn = await remoteDataSource.getTurnById(turnId);
-        return Right(turn);
+        return const Left(
+          NetworkFailure(
+            message: 'No active network connection. Please check your internet.',
+          ),
+        );
       }
 
       final turn = await remoteDataSource.getTurnById(turnId);
       return Right(turn);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, code: e.statusCode));
     } catch (e) {
       return Left(
-        ServerFailure(
-          message: 'Failed to retrieve turn detail: ${e.toString()}',
-        ),
+        mapExceptionToFailure(e, fallbackPrefix: 'Failed to retrieve turn detail'),
       );
     }
   }
@@ -76,6 +73,15 @@ class WaterUsageRepositoryImpl implements WaterUsageRepository {
     String? swappedWithFarmer,
   }) async {
     try {
+      final isConnected = await networkInfo.isConnected;
+      if (!isConnected) {
+        return const Left(
+          NetworkFailure(
+            message: 'No active network connection. Please check your internet.',
+          ),
+        );
+      }
+
       final result = await remoteDataSource.requestTurnSwap(
         turnId: turnId,
         preferredDate: preferredDate,
@@ -83,12 +89,11 @@ class WaterUsageRepositoryImpl implements WaterUsageRepository {
         swappedWithFarmer: swappedWithFarmer,
       );
       return Right(result);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, code: e.statusCode));
     } catch (e) {
       return Left(
-        ServerFailure(
-          message: 'Failed to submit turn swap request: ${e.toString()}',
+        mapExceptionToFailure(
+          e,
+          fallbackPrefix: 'Failed to submit turn swap request',
         ),
       );
     }

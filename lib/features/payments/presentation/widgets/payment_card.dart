@@ -30,18 +30,18 @@ class PaymentCard extends StatelessWidget {
     IconData badgeIcon;
 
     if (payment.isSuccess) {
-      badgeBg = AppColors.success.withValues(alpha: 0.12);
-      badgeFg = AppColors.success;
+      badgeBg = colors.success.withValues(alpha: 0.14);
+      badgeFg = colors.success;
       badgeLabel = l10n.successful;
       badgeIcon = Icons.check_circle_rounded;
     } else if (payment.isFailed) {
-      badgeBg = AppColors.error.withValues(alpha: 0.12);
-      badgeFg = AppColors.error;
+      badgeBg = colors.error.withValues(alpha: 0.14);
+      badgeFg = colors.error;
       badgeLabel = l10n.failed;
       badgeIcon = Icons.cancel_rounded;
     } else {
-      badgeBg = AppColors.warning.withValues(alpha: 0.12);
-      badgeFg = AppColors.warning;
+      badgeBg = colors.warning.withValues(alpha: 0.14);
+      badgeFg = colors.warning;
       badgeLabel = l10n.filterPending;
       badgeIcon = Icons.timelapse_rounded;
     }
@@ -111,7 +111,11 @@ class PaymentCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 3),
                           Text(
-                            payment.season,
+                            payment.season != 'N/A'
+                                ? payment.season
+                                : (payment.fiscalYear != null
+                                    ? 'FY ${payment.fiscalYear}'
+                                    : payment.paymentMode),
                             style: context.titleSmall.bold.withColor(colors.textPrimary),
                           ),
                         ],
@@ -154,8 +158,8 @@ class PaymentCard extends StatelessWidget {
                             payment.formattedAmount,
                             style: context.headlineLarge.bold.withColor(
                               payment.isSuccess
-                                  ? AppColors.success
-                                  : (payment.isFailed ? AppColors.error : colors.textPrimary),
+                                  ? colors.success
+                                  : (payment.isFailed ? colors.error : colors.textPrimary),
                             ).withSize(26),
                           ),
                           const SizedBox(height: 2),
@@ -189,8 +193,8 @@ class PaymentCard extends StatelessWidget {
                           BillReceiptSheet.show(context, bill: bill);
                         },
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.success,
-                          side: BorderSide(color: AppColors.success.withValues(alpha: 0.5)),
+                          foregroundColor: colors.success,
+                          side: BorderSide(color: colors.success.withValues(alpha: 0.5)),
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                         ),

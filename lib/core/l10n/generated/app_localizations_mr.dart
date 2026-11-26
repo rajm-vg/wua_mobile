@@ -761,4 +761,62 @@ class AppLocalizationsMr extends AppLocalizations {
   @override
   String get securedViaWrdGateway =>
       'जलसंपदा शासकीय पेमेंट गेटवेद्वारे सुरक्षित';
+
+  @override
+  String payAmountViaEasebuzz(String amount) {
+    return 'Easebuzz द्वारे $amount भरा';
+  }
+
+  @override
+  String get paymentAmountPartialFull => 'भरणा रक्कम (अंशतः / पूर्ण)';
+
+  @override
+  String get paymentSuccessfulTitle => 'भरणा यशस्वी!';
+
+  @override
+  String get paymentFailedTitle => 'भरणा अयशस्वी';
+
+  @override
+  String get viewLinkedBill => 'संबंधित बिल पहा';
+
+  @override
+  String get fiscalYear => 'आर्थिक वर्ष';
+
+  @override
+  String get sortAndFilter => 'क्रमवारी आणि फिल्टर';
+
+  @override
+  String get sortBy => 'क्रमवारी';
+
+  @override
+  String get newestFirst => 'नवीनतम प्रथम';
+
+  @override
+  String get oldestFirst => 'जुने प्रथम';
+
+  @override
+  String get amountHighToLow => 'रक्कम: जास्त ते कमी';
+
+  @override
+  String get amountLowToHigh => 'रक्कम: कमी ते जास्त';
+
+  @override
+  String get filters => 'फिल्टर्स';
+
+  @override
+  String get allFiscalYears => 'सर्व आर्थिक वर्षे';
+
+  @override
+  String get allSeasons => 'सर्व हंगाम';
+
+  @override
+  String get allPaymentModes => 'सर्व माध्यमे';
+
+  @override
+  String get applyFilters => 'लागू करा';
+
+  @override
+  String showingCountOfTotal(int filtered, int total) {
+    return '$total पैकी $filtered दाखवत आहे';
+  }
 }

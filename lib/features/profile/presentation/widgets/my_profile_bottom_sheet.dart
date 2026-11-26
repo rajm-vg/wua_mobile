@@ -20,9 +20,30 @@ class MyProfileBottomSheet extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = context.colors;
 
-    final userName = user?.name.isNotEmpty == true ? user!.name : 'Ramesh Patil';
-    final userPhone = user?.phone.isNotEmpty == true ? user!.phone : '9876543210';
-    final memberId = user?.id.isNotEmpty == true ? 'WUA-${user!.id.substring(0, user!.id.length > 5 ? 5 : user!.id.length)}' : 'WUA-10245';
+    final currentUser = user;
+    final userName = currentUser?.name.isNotEmpty == true ? currentUser!.name : 'N/A';
+    final userPhone = currentUser?.phone.isNotEmpty == true ? currentUser!.phone : 'N/A';
+    final memberId = currentUser?.id.isNotEmpty == true
+        ? 'WUA-${currentUser!.id.substring(0, currentUser.id.length > 5 ? 5 : currentUser.id.length)}'
+        : 'N/A';
+    final designation = currentUser != null
+        ? (currentUser.roles.isNotEmpty
+              ? currentUser.roles.first
+              : currentUser.role.name.toUpperCase())
+        : 'N/A';
+    final surveyText =
+        currentUser?.surveyNo != null && currentUser!.surveyNo!.isNotEmpty
+        ? currentUser.surveyNo!
+        : null;
+    final landHolding = currentUser?.farmArea != null
+        ? '${currentUser!.farmArea} Acres${surveyText != null ? ' ($surveyText)' : ''}'
+        : (surveyText != null ? 'Survey $surveyText' : 'N/A');
+    final organization =
+        currentUser?.village != null && currentUser!.village!.isNotEmpty
+        ? '${currentUser.village!} WUA${currentUser.societyId != null ? ' (#${currentUser.societyId})' : ''}'
+        : (currentUser?.societyId != null
+              ? 'WUA Society #${currentUser!.societyId}'
+              : 'N/A');
 
     return Container(
       decoration: BoxDecoration(
@@ -110,19 +131,33 @@ class MyProfileBottomSheet extends StatelessWidget {
                   value: memberId,
                 ),
                 const _RowDivider(),
-                const _ProfileDetailRow(
+                _ProfileDetailRow(
                   label: 'Designation',
-                  value: 'FARMER_IRRIGATOR',
+                  value: designation,
                 ),
                 const _RowDivider(),
-                const _ProfileDetailRow(
+                _ProfileDetailRow(
                   label: 'Land Holding',
-                  value: '4.5 Acres (Survey 142/2A & 142/2B)',
+                  value: landHolding,
                 ),
+                if (user?.village != null && user!.village!.isNotEmpty) ...[
+                  const _RowDivider(),
+                  _ProfileDetailRow(
+                    label: 'Village',
+                    value: user!.village!,
+                  ),
+                ],
+                if (user?.typeOfCrop != null && user!.typeOfCrop!.isNotEmpty) ...[
+                  const _RowDivider(),
+                  _ProfileDetailRow(
+                    label: 'Primary Crop',
+                    value: user!.typeOfCrop!,
+                  ),
+                ],
                 const _RowDivider(),
-                const _ProfileDetailRow(
+                _ProfileDetailRow(
                   label: 'Organization',
-                  value: 'Mulshi Water User Association',
+                  value: organization,
                 ),
               ],
             ),

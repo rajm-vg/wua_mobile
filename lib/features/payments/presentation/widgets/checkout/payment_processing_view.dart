@@ -84,7 +84,7 @@ class PaymentProcessingView extends StatelessWidget {
                   stageNumber: 2,
                   currentStage: state.processingStage,
                   title: 'Authorizing with NPCI & Banking Network',
-                  subtitle: 'Consumer ID: ${state.bill.consumerId ?? "KISAN-MH-41201"}',
+                  subtitle: 'Consumer ID: ${state.bill.consumerId ?? "N/A"}',
                 ),
                 const SizedBox(height: 12),
                 _buildStageRow(
@@ -92,7 +92,7 @@ class PaymentProcessingView extends StatelessWidget {
                   stageNumber: 3,
                   currentStage: state.processingStage,
                   title: 'Generating Water User E-Receipt',
-                  subtitle: state.bill.wuaSocietyName ?? 'WUA Society #12',
+                  subtitle: state.bill.wuaSocietyName ?? 'N/A',
                 ),
                 const SizedBox(height: AppSpacing.lg),
 

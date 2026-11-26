@@ -34,6 +34,13 @@ abstract class AuthRemoteDataSource {
   });
 
   Future<void> verifyOtp({required String email, required String otp});
+
+  Future<UserModel> fetchCurrentUser(String accessToken);
+
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  });
 }
 
 /// Remote authentication data source implementation connecting directly to wrd_backend (Spring Boot / JHipster).
@@ -55,9 +62,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final ApiClient apiClient;
   final bool? enableDemoFallback;
 
-  bool get _isDemoFallbackEnabled =>
-      enableDemoFallback ?? EnvConfig.enableDemoFallback;
-
   @override
   Future<({UserModel user, AuthTokensModel tokens})> login({
     required String identifier,
@@ -67,215 +71,129 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     final cleanUsername = identifier.trim();
     AppLogger.network('🌐 [AUTH REMOTE] Initiating login for: $cleanUsername');
 
-    try {
-      // Step 1: POST /api/authenticate
-      final authResponse = await apiClient.post<Map<String, dynamic>>(
-        ApiEndpoints.authenticate,
-        data: {
-          'username': cleanUsername,
-          'password': password,
-          'rememberMe': rememberMe,
-        },
-      );
+    // Step 1: POST /api/authenticate
+    final authResponse = await apiClient.post<Map<String, dynamic>>(
+      ApiEndpoints.authenticate,
+      data: {
+        'username': cleanUsername,
+        'password': password,
+        'rememberMe': rememberMe,
+      },
+    );
 
-      final authData = authResponse.data ?? {};
-      final idToken = (authData['id_token'] ??
-              authData['access_token'] ??
-              authData['token']) as String? ??
-          '';
+    final authData = authResponse.data ?? {};
+    final idToken =
+        (authData['id_token'] ?? authData['access_token'] ?? authData['token'])
+            as String? ??
+        '';
 
-      if (idToken.isEmpty) {
-        throw const ServerException(
-          message: 'Authentication failed: Empty token received from server.',
-        );
-      }
-
-      AppLogger.info('🔑 [AUTH REMOTE] Received id_token successfully');
-
-      // Step 2: GET /api/account with Authorization: Bearer <id_token>
-      final accountResponse = await apiClient.get<Map<String, dynamic>>(
-        ApiEndpoints.account,
-        options: Options(
-          headers: {
-            ApiConstants.authorization: '${ApiConstants.bearerPrefix}$idToken',
-          },
-        ),
-      );
-
-      final accountData = accountResponse.data ?? {};
-      final user = UserModel.fromJson(accountData);
-      final tokens = AuthTokensModel(
-        accessToken: idToken,
-        refreshToken: '',
-        expiresIn: 86400,
-      );
-
-      AppLogger.info(
-        '👤 [AUTH REMOTE] Logged in: ${user.name} (Role: ${user.role}, SocietyId: ${user.societyId})',
-      );
-
-      return (user: user, tokens: tokens);
-    } on UnauthorizedException {
-      // If 401 Unauthorized occurs, check if it's a demo account that can fall back
-      if (_isDemoFallbackEnabled && _canFallbackToDemo(cleanUsername)) {
-        AppLogger.warning(
-          '⚠️ [AUTH REMOTE] Unauthorized on live server. Using Demo Fallback for: $cleanUsername',
-        );
-        return _mockFallbackLogin(cleanUsername);
-      }
-      rethrow;
-    } on ServerException catch (e) {
-      if (_isDemoFallbackEnabled && _canFallbackToDemo(cleanUsername)) {
-        AppLogger.warning(
-          '⚠️ [AUTH REMOTE] ServerException ($e). Using Demo Fallback for: $cleanUsername',
-        );
-        return _mockFallbackLogin(cleanUsername);
-      }
-      rethrow;
-    } catch (e) {
-      if (_isDemoFallbackEnabled && _canFallbackToDemo(cleanUsername)) {
-        AppLogger.warning(
-          '⚠️ [AUTH REMOTE] Backend connection failed ($e). Using Demo Fallback for: $cleanUsername',
-        );
-        await Future<void>.delayed(const Duration(milliseconds: 300));
-        return _mockFallbackLogin(cleanUsername);
-      }
-      rethrow;
-    }
-  }
-
-  bool _canFallbackToDemo(String username) {
-    final lower = username.toLowerCase();
-    return lower == '9922322710' ||
-        lower == '9876543210' ||
-        lower == '9822334455' ||
-        lower == 'official@wua.gov.in' ||
-        lower == 'admin@wrd.gov.in' ||
-        lower.contains('farmer') ||
-        lower.contains('sabhasad') ||
-        lower.contains('official') ||
-        lower.contains('admin');
-  }
-
-  ({UserModel user, AuthTokensModel tokens}) _mockFallbackLogin(String username) {
-    final cleanId = username.toLowerCase();
-    final UserModel user;
-
-    if (cleanId == '9922322710') {
-      // Matches wrd_backend AuthenticateController / AccountResource response for Subhash Zinjad (SocietyFarmer #696)
-      user = const UserModel(
-        id: '2100',
-        name: 'सुभाष रंगनाथ झिंजाड',
-        firstName: 'सुभाष रंगनाथ झिंजाड',
-        email: '',
-        phone: '9922322710',
-        role: 'wua_official',
-        isVerified: true,
-        createdAt: '2024-09-13T07:27:45.175044Z',
-        societyId: 1503,
-        username: '9922322710',
-        refTable: 'SocietyFarmer',
-        refTableId: 696,
-        status: 'A',
-        roles: ['सचिव', 'सभासद'],
-        authorities: [
-          'SUPER_ADMIN_AND_SACHIV_AND_SANCHALAK_ONLY',
-          'MASTER_LIST_FULL_ACCESS',
-          'MEMBER_PAYMENT_FULL_ACCESS',
-          'MEMBER_PROFILE_EDIT',
-          'SOCIETY_PAYMENT_LIST_VIEW',
-          'SOCIETY_PAYMENT_FULL_ACCESS',
-          'MEMBER_FULL_ACCESS',
-          'SOCIETY_DASHBOARD_VIEW',
-          'VOUCHER_LIST_VIEW',
-          'SHOW_ONLY',
-          'MEMBER_LIST_VIEW',
-          'MASTER_LIST_VIEW',
-          'ACCOUNT_MASTER',
-          'SUPER_ADMIN_AND_SACHIV_ONLY',
-          'VOUCHER_FULL_ACCESS',
-          'REPORT_VIEW',
-          'WATER_USED_LIST_VIEW',
-          'MEMBER_PAYMENT_LIST_VIEW',
-          'WATER_RECEIVED_LIST_VIEW',
-          'WATER_RECEIVED_FULL_ACCESS',
-          'WATER_USED_FULL_ACCESS',
-          'SOCIETY_EDIT',
-        ],
-      );
-    } else if (cleanId == '9822334455') {
-      // Sabhasad 2 (आनंद देशमुख - सभासद)
-      user = const UserModel(
-        id: 'usr_farmer_002',
-        name: 'आनंद देशमुख',
-        firstName: 'आनंद',
-        lastName: 'देशमुख',
-        email: 'anand.deshmukh@wua.gov.in',
-        phone: '9822334455',
-        role: 'farmer',
-        isVerified: true,
-        createdAt: '2023-04-10T10:00:00.000Z',
-        societyId: 1503,
-        username: '9822334455',
-        refTable: 'SocietyFarmer',
-        refTableId: 502,
-        roles: ['सभासद (शेतकरी)'],
-      );
-    } else if (cleanId == '9876543210' || cleanId.contains('farmer') || cleanId.contains('sabhasad')) {
-      // Sabhasad 1 (Ramesh Patel / रमेश पाटील - सभासद)
-      user = const UserModel(
-        id: 'usr_farmer_001',
-        name: 'Ramesh Patel',
-        firstName: 'Ramesh',
-        lastName: 'Patel',
-        email: 'farmer@wua.gov.in',
-        phone: '9876543210',
-        role: 'farmer',
-        isVerified: true,
-        createdAt: '2023-01-15T08:30:00.000Z',
-        societyId: 1503,
-        username: '9876543210',
-        refTable: 'SocietyFarmer',
-        refTableId: 501,
-        roles: ['सभासद (शेतकरी)'],
-      );
-    } else if (cleanId == 'official@wua.gov.in' || cleanId.contains('official')) {
-      user = const UserModel(
-        id: 'usr_official_002',
-        name: 'Sunita Sharma (Executive Engineer)',
-        firstName: 'Sunita',
-        lastName: 'Sharma',
-        email: 'official@wua.gov.in',
-        phone: '9876543211',
-        role: 'wua_official',
-        isVerified: true,
-        createdAt: '2022-06-10T10:15:00.000Z',
-        societyId: 1503,
-        roles: ['कार्यकारी अभियंता'],
-      );
-    } else {
-      user = const UserModel(
-        id: 'usr_admin_003',
-        name: 'Rajesh Varma (WRD Administrator)',
-        firstName: 'Rajesh',
-        lastName: 'Varma',
-        email: 'admin@wrd.gov.in',
-        phone: '9876543212',
-        role: 'admin',
-        isVerified: true,
-        createdAt: '2021-03-22T11:45:00.000Z',
-        roles: ['प्रशासक'],
+    if (idToken.isEmpty) {
+      throw const ServerException(
+        message: 'Authentication failed: Empty token received from server.',
       );
     }
 
-    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    AppLogger.info('🔑 [AUTH REMOTE] Received id_token successfully');
+
+    // Step 2 & 3: Fetch /api/account, validate role/status, and enrich SocietyFarmer
+    final user = await fetchCurrentUser(idToken);
+
     final tokens = AuthTokensModel(
-      accessToken: 'mock_jwt_id_token_${user.id}_$timestamp',
+      accessToken: idToken,
       refreshToken: '',
       expiresIn: 86400,
     );
 
+    AppLogger.info(
+      '👤 [AUTH REMOTE] Logged in: ${user.name} (Role: ${user.role}, SocietyId: ${user.societyId}, FarmerId: ${user.refTableId})',
+    );
+
     return (user: user, tokens: tokens);
+  }
+
+  @override
+  Future<UserModel> fetchCurrentUser(String accessToken) async {
+    final accountResponse = await apiClient.get<Map<String, dynamic>>(
+      ApiEndpoints.account,
+      options: Options(
+        headers: {
+          ApiConstants.authorization:
+              '${ApiConstants.bearerPrefix}$accessToken',
+        },
+      ),
+    );
+
+    final accountData = accountResponse.data ?? {};
+    var user = UserModel.fromJson(accountData);
+
+    // Block ROLE_SUPER_ADMIN accounts without a societyId from mobile access.
+    final isSuperAdmin =
+        user.authorities.contains('ROLE_SUPER_ADMIN') ||
+        user.roles.contains('ROLE_SUPER_ADMIN');
+    if (isSuperAdmin && user.societyId == null) {
+      throw const UnauthorizedException(
+        message: 'Super Admin accounts are not supported on mobile. Please use the web portal.',
+      );
+    }
+
+    if (user.status != null && user.status!.isNotEmpty && user.status != 'A') {
+      throw const UnauthorizedException(
+        message: 'Your account is inactive. Please contact your WUA Secretary.',
+      );
+    }
+
+    // Enrich with SocietyFarmer profile if linked to agricultural record
+    if (user.refTable == 'SocietyFarmer' && user.refTableId != null) {
+      try {
+        final farmerResponse = await apiClient.get<Map<String, dynamic>>(
+          ApiEndpoints.societyFarmer(user.refTableId!),
+          options: Options(
+            headers: {
+              ApiConstants.authorization:
+                  '${ApiConstants.bearerPrefix}$accessToken',
+            },
+          ),
+        );
+        if (farmerResponse.statusCode == 200 && farmerResponse.data != null) {
+          final fData = farmerResponse.data!;
+          user = UserModel(
+            id: user.id,
+            name: (fData['sName'] as String?)?.trim().isNotEmpty == true
+                ? (fData['sName'] as String).trim()
+                : user.name,
+            email: user.email,
+            phone: user.phone,
+            avatarUrl: user.avatarUrl,
+            role: user.role,
+            isVerified: user.isVerified,
+            createdAt: user.createdAt,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            societyId: (fData['iSocietyId'] as int?) ?? user.societyId,
+            username: user.username,
+            refTable: user.refTable,
+            refTableId: user.refTableId,
+            langKey: user.langKey,
+            status: user.status,
+            authorities: user.authorities,
+            roles: user.roles,
+            surveyNo: fData['sSurveyNo'] as String? ?? user.surveyNo,
+            village: fData['sVillage'] as String? ?? user.village,
+            farmArea: (fData['nFarmArea'] as num?)?.toDouble() ?? user.farmArea,
+            totalBalance:
+                (fData['nTotalBalance'] as num?)?.toDouble() ??
+                user.totalBalance,
+            irrigationMethod:
+                fData['sIrrigationMethod'] as String? ?? user.irrigationMethod,
+            typeOfCrop: fData['sTypeOfCrop'] as String? ?? user.typeOfCrop,
+          );
+        }
+      } catch (e) {
+        AppLogger.warning('SocietyFarmer profile enrichment skipped ($e)');
+      }
+    }
+
+    return user;
   }
 
   @override
@@ -285,83 +203,56 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String phone,
     required String password,
   }) async {
-    try {
-      final response = await apiClient.post<Map<String, dynamic>>(
-        ApiEndpoints.register,
-        data: {
-          'login': phone,
-          'email': email,
-          'firstName': name,
-          'password': password,
-        },
-      );
+    final response = await apiClient.post<Map<String, dynamic>>(
+      ApiEndpoints.register,
+      data: {
+        'login': phone,
+        'email': email,
+        'firstName': name,
+        'password': password,
+      },
+    );
 
-      final data = response.data ?? {};
-      final user = UserModel.fromJson(data);
-      final idToken = (data['id_token'] ?? data['token'] ?? '') as String;
-      final tokens = AuthTokensModel(
-        accessToken: idToken,
-        refreshToken: '',
-        expiresIn: 86400,
-      );
+    final data = response.data ?? {};
+    final user = UserModel.fromJson(data);
+    final idToken = (data['id_token'] ?? data['token'] ?? '') as String;
+    final tokens = AuthTokensModel(
+      accessToken: idToken,
+      refreshToken: '',
+      expiresIn: 86400,
+    );
 
-      return (user: user, tokens: tokens);
-    } catch (_) {
-      if (_isDemoFallbackEnabled) {
-        final user = UserModel(
-          id: 'usr_reg_${DateTime.now().millisecondsSinceEpoch}',
-          name: name,
-          email: email,
-          phone: phone,
-          role: 'farmer',
-          isVerified: true,
-          createdAt: DateTime.now().toIso8601String(),
-        );
-        final tokens = AuthTokensModel(
-          accessToken: 'mock_jwt_access_farmer_${DateTime.now().millisecondsSinceEpoch}',
-          refreshToken: '',
-          expiresIn: 86400,
-        );
-        return (user: user, tokens: tokens);
-      }
-      rethrow;
-    }
+    return (user: user, tokens: tokens);
   }
 
   @override
   Future<void> logout(String accessToken, {String? username}) async {
-    try {
-      await apiClient.post<void>(
-        ApiEndpoints.logout,
-        data: {
-          'username': username ?? '',
-          'password': '',
-          'rememberMe': false,
+    final cleanUsername = username?.trim() ?? '';
+    if (cleanUsername.isEmpty) return;
+
+    await apiClient.post<void>(
+      ApiEndpoints.logout,
+      data: {
+        'username': cleanUsername,
+        'password': '*****',
+        'rememberMe': false,
+      },
+      options: Options(
+        headers: {
+          if (accessToken.isNotEmpty)
+            ApiConstants.authorization:
+                '${ApiConstants.bearerPrefix}$accessToken',
         },
-        options: Options(
-          headers: {
-            ApiConstants.authorization: '${ApiConstants.bearerPrefix}$accessToken',
-          },
-        ),
-      );
-    } catch (_) {
-      // In demo mode or offline, logout gracefully clears local state
-      if (!_isDemoFallbackEnabled) {
-        rethrow;
-      }
-    }
+      ),
+    );
   }
 
   @override
   Future<void> forgotPassword({required String email}) async {
-    try {
-      await apiClient.post<void>(
-        ApiEndpoints.forgotPassword,
-        data: email,
-      );
-    } catch (_) {
-      if (!_isDemoFallbackEnabled) rethrow;
-    }
+    final cleanUsername = email.trim();
+    await apiClient.post<void>(
+      '${ApiEndpoints.generateOtp}?username=${Uri.encodeQueryComponent(cleanUsername)}',
+    );
   }
 
   @override
@@ -370,25 +261,37 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String otp,
     required String newPassword,
   }) async {
-    try {
-      await apiClient.post<void>(
-        ApiEndpoints.resetPassword,
-        data: {'key': otp, 'newPassword': newPassword},
+    final cleanUsername = email.trim();
+    final response = await apiClient.post<dynamic>(
+      '${ApiEndpoints.changePassword}?username=${Uri.encodeQueryComponent(cleanUsername)}&newPassword=${Uri.encodeQueryComponent(newPassword)}',
+    );
+    if (response.data == false) {
+      throw const ServerException(
+        message: 'Could not update password. Please verify your mobile number.',
       );
-    } catch (_) {
-      if (!_isDemoFallbackEnabled) rethrow;
     }
   }
 
   @override
   Future<void> verifyOtp({required String email, required String otp}) async {
-    try {
-      await apiClient.post<void>(
-        ApiEndpoints.verifyOtp,
-        data: {'email': email, 'otp': otp},
-      );
-    } catch (_) {
-      if (!_isDemoFallbackEnabled) rethrow;
+    final cleanUsername = email.trim();
+    final cleanOtp = otp.trim();
+    final response = await apiClient.post<dynamic>(
+      '${ApiEndpoints.verifyOtp}?username=${Uri.encodeQueryComponent(cleanUsername)}&otp=${Uri.encodeQueryComponent(cleanOtp)}',
+    );
+    if (response.data == false) {
+      throw const ServerException(message: 'Invalid or expired OTP entered.');
     }
+  }
+
+  @override
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    await apiClient.post<void>(
+      ApiEndpoints.accountChangePassword,
+      data: {'currentPassword': currentPassword, 'newPassword': newPassword},
+    );
   }
 }

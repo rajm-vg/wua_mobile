@@ -35,14 +35,23 @@ abstract class AuthRepository {
     required String newPassword,
   });
 
-  /// Verifies the OTP sent during registration.
+  /// Verifies the OTP sent for password reset.
   Future<Either<Failure, void>> verifyOtp({
     required String email,
     required String otp,
   });
 
+  /// Changes password for the currently authenticated user.
+  Future<Either<Failure, void>> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  });
+
   /// Returns the currently cached user, if any.
   Future<Either<Failure, UserEntity>> getCachedUser();
+
+  /// Refreshes the authenticated user's profile from `/api/account`.
+  Future<Either<Failure, UserEntity>> refreshCurrentUser();
 
   /// Returns true if the user has a valid session.
   Future<bool> isAuthenticated();

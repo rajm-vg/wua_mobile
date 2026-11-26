@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-
 import 'package:wua_mobile/core/network/api_constants.dart';
 import 'package:wua_mobile/core/network/dio_error_mapper.dart';
 
@@ -12,6 +11,23 @@ import 'package:wua_mobile/core/network/dio_error_mapper.dart';
 class ApiClient {
   ApiClient({required this.dio});
   final Dio dio;
+
+  /// Extracts a typed list of JSON objects from either a raw JSON array or a Spring Page `{content: [...]}`.
+  static List<Map<String, dynamic>> extractListData(dynamic data) {
+    if (data is List<dynamic>) {
+      return data
+          .whereType<Map<dynamic, dynamic>>()
+          .map(Map<String, dynamic>.from)
+          .toList();
+    }
+    if (data is Map<dynamic, dynamic> && data['content'] is List<dynamic>) {
+      return (data['content'] as List<dynamic>)
+          .whereType<Map<dynamic, dynamic>>()
+          .map(Map<String, dynamic>.from)
+          .toList();
+    }
+    return const <Map<String, dynamic>>[];
+  }
 
   /// Performs a GET request and returns the response data.
   Future<Response<T>> get<T>(

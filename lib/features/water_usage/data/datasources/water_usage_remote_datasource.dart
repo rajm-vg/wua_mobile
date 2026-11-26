@@ -1,8 +1,9 @@
+import 'package:wua_mobile/core/errors/exceptions.dart';
 import 'package:wua_mobile/core/logger/app_logger.dart';
 import 'package:wua_mobile/core/network/api_client.dart';
 import 'package:wua_mobile/core/network/api_endpoints.dart';
+import 'package:wua_mobile/features/authentication/data/datasources/auth_local_datasource.dart';
 import 'package:wua_mobile/features/water_usage/data/models/water_usage_model.dart';
-import 'package:wua_mobile/features/water_usage/domain/entities/water_usage_entity.dart';
 
 abstract class WaterUsageRemoteDataSource {
   Future<WaterUsageSummaryModel> getWaterUsageSummary({
@@ -17,195 +18,238 @@ abstract class WaterUsageRemoteDataSource {
   });
 }
 
+/// Remote Water Usage data source connecting directly to `wrd_backend`:
+/// - `/api/crop-details` & `/api/water-usages` (farmer outward usage, matching Web `Water Used`)
+/// - `/api/wua-water-usages` (society canal rotational turns when permitted)
 class WaterUsageRemoteDataSourceImpl implements WaterUsageRemoteDataSource {
-  WaterUsageRemoteDataSourceImpl({required this.apiClient});
+  WaterUsageRemoteDataSourceImpl({
+    required this.apiClient,
+    this.authLocalDataSource,
+  });
 
   final ApiClient apiClient;
+  final AuthLocalDataSource? authLocalDataSource;
 
-  // In-memory simulated stateful store matching home page widgets
-  late final WaterQuotaModel _mockQuota = WaterQuotaModel(
-    season: 'Rabi Season (2024-25)',
-    totalQuotaHaCm: 20.0,
-    usedQuotaHaCm: 14.2,
-    remainingQuotaHaCm: 5.8,
-    percentageUsed: 71.0,
-    canalName: 'Minor-3 (Outlet 4B), Distributary 7',
-    canalStatus: '125 Cusecs • Active',
-    currentFlowCusecs: 125.0,
-    outletNumber: 'Outlet No. 12 (Gate #4)',
-    wuaSocietyName: 'Ganga-Godavari WUA Society #12',
-    farmerName: 'Ramesh Patil',
-    totalTurnsCount: 5,
-    completedTurnsCount: 3,
-    soilMoistureStatus: 'Adequate (68%)',
-    nextCanalRotationDate: DateTime(2026, 10, 31, 8, 0),
-    cropBreakdown: const [
-      CropWaterUsageModel(
-        cropName: 'Wheat',
-        cropNameMarathi: 'गहू (HD-2967)',
-        allocatedHaCm: 12.0,
-        usedHaCm: 8.5,
-        areaAcres: 3.5,
-        percentage: 60.0,
-      ),
-      CropWaterUsageModel(
-        cropName: 'Gram / Chickpea',
-        cropNameMarathi: 'हरभरा (Digvijay)',
-        allocatedHaCm: 5.0,
-        usedHaCm: 3.2,
-        areaAcres: 1.5,
-        percentage: 23.0,
-      ),
-      CropWaterUsageModel(
-        cropName: 'Fodder / Mustard',
-        cropNameMarathi: 'चारा / मोहरी',
-        allocatedHaCm: 3.0,
-        usedHaCm: 2.5,
-        areaAcres: 1.0,
-        percentage: 17.0,
-      ),
-    ],
-  );
-
-  late final List<IrrigationTurnModel> _mockTurns = [
-    // Turn 4: Upcoming / Next active wari (matches NextCanalTurnCard on home)
-    IrrigationTurnModel(
-      id: 'turn_rabi_04',
-      turnNumber: 4,
-      season: 'Rabi Season (2024-25)',
-      status: TurnStatus.upcoming,
-      scheduledStartTime: DateTime(2026, 10, 31, 8, 0),
-      scheduledEndTime: DateTime(2026, 10, 31, 20, 0),
-      durationHours: 12.0,
-      outletNo: 'Outlet No. 12',
-      gateNo: 'Gate #4',
-      dischargeCusecs: 50.0,
-      waterDeliveredHaCm: 3.8,
-      crop: 'Wheat (गहू)',
-      fieldParcel: 'Survey No. 42/1A (3.5 Acres)',
-      inspectorName: 'S. K. Deshmukh (Patkari)',
-      isVerified: false,
-      notes: 'Sluice gate will open at 08:00 AM sharp. Please verify sub-minor field channels (चार्या) are desilted and clear of weeds.',
-      canRequestSwap: true,
-    ),
-
-    // Turn 5: Final Upcoming Turn in season
-    IrrigationTurnModel(
-      id: 'turn_rabi_05',
-      turnNumber: 5,
-      season: 'Rabi Season (2024-25)',
-      status: TurnStatus.upcoming,
-      scheduledStartTime: DateTime(2026, 11, 15, 6, 0),
-      scheduledEndTime: DateTime(2026, 11, 15, 16, 0),
-      durationHours: 10.0,
-      outletNo: 'Outlet No. 12',
-      gateNo: 'Gate #4',
-      dischargeCusecs: 45.0,
-      waterDeliveredHaCm: 3.2,
-      crop: 'Gram (हरभरा)',
-      fieldParcel: 'Survey No. 42/1B (1.5 Acres)',
-      inspectorName: 'S. K. Deshmukh (Patkari)',
-      isVerified: false,
-      notes: 'Final grain-filling irrigation rotation before harvesting.',
-      canRequestSwap: true,
-    ),
-
-    // Turn 3: Completed Turn
-    IrrigationTurnModel(
-      id: 'turn_rabi_03',
-      turnNumber: 3,
-      season: 'Rabi Season (2024-25)',
-      status: TurnStatus.completed,
-      scheduledStartTime: DateTime(2026, 10, 16, 7, 0),
-      scheduledEndTime: DateTime(2026, 10, 16, 17, 0),
-      actualStartTime: DateTime(2026, 10, 16, 7, 10),
-      actualEndTime: DateTime(2026, 10, 16, 17, 0),
-      durationHours: 10.0,
-      outletNo: 'Outlet No. 12',
-      gateNo: 'Gate #4',
-      dischargeCusecs: 50.0,
-      waterDeliveredHaCm: 3.6,
-      crop: 'Wheat (गहू)',
-      fieldParcel: 'Survey No. 42/1A (3.5 Acres)',
-      inspectorName: 'S. K. Deshmukh (Patkari)',
-      isVerified: true,
-      notes:
-          'Flow maintained consistently at 50 Cusecs. Water delivery verified.',
-      canRequestSwap: false,
-    ),
-
-    // Turn 2: Completed Turn
-    IrrigationTurnModel(
-      id: 'turn_rabi_02',
-      turnNumber: 2,
-      season: 'Rabi Season (2024-25)',
-      status: TurnStatus.completed,
-      scheduledStartTime: DateTime(2026, 10, 2, 8, 0),
-      scheduledEndTime: DateTime(2026, 10, 2, 18, 0),
-      actualStartTime: DateTime(2026, 10, 2, 8, 0),
-      actualEndTime: DateTime(2026, 10, 2, 17, 50),
-      durationHours: 10.0,
-      outletNo: 'Outlet No. 12',
-      gateNo: 'Gate #4',
-      dischargeCusecs: 50.0,
-      waterDeliveredHaCm: 3.5,
-      crop: 'Wheat & Gram',
-      fieldParcel: 'Survey No. 42/1A & 42/1B',
-      inspectorName: 'S. K. Deshmukh (Patkari)',
-      isVerified: true,
-      notes: 'Crown root initiation irrigation successfully applied.',
-      canRequestSwap: false,
-    ),
-
-    // Turn 1: Completed Turn
-    IrrigationTurnModel(
-      id: 'turn_rabi_01',
-      turnNumber: 1,
-      season: 'Rabi Season (2024-25)',
-      status: TurnStatus.completed,
-      scheduledStartTime: DateTime(2026, 9, 18, 8, 0),
-      scheduledEndTime: DateTime(2026, 9, 18, 18, 0),
-      actualStartTime: DateTime(2026, 9, 18, 8, 0),
-      actualEndTime: DateTime(2026, 9, 18, 18, 0),
-      durationHours: 10.0,
-      outletNo: 'Outlet No. 12',
-      gateNo: 'Gate #4',
-      dischargeCusecs: 50.0,
-      waterDeliveredHaCm: 3.5,
-      crop: 'Pre-sowing / Palva (पालवा)',
-      fieldParcel: 'Survey No. 42/1A (3.5 Acres)',
-      inspectorName: 'S. K. Deshmukh (Patkari)',
-      isVerified: true,
-      notes: 'Pre-sowing seedbed preparation soaking.',
-      canRequestSwap: false,
-    ),
-  ];
+  Future<List<Map<String, dynamic>>> _fetchListOrIgnoreForbidden(
+    String endpoint, {
+    required String label,
+  }) async {
+    try {
+      final response = await apiClient.get<dynamic>(endpoint);
+      if (response.statusCode == 200 && response.data != null) {
+        return ApiClient.extractListData(response.data);
+      }
+      return const <Map<String, dynamic>>[];
+    } on ServerException catch (e) {
+      if (e.statusCode == 403 || e.statusCode == 404) {
+        AppLogger.warning('$label API skipped (${e.statusCode}): ${e.message}');
+        return const <Map<String, dynamic>>[];
+      }
+      rethrow;
+    }
+  }
 
   @override
   Future<WaterUsageSummaryModel> getWaterUsageSummary({
     bool forceRefresh = false,
   }) async {
-    try {
-      final response = await apiClient.get<Map<String, dynamic>>(
-        ApiEndpoints.waterUsageSummary,
-      );
-      if (response.statusCode == 200 && response.data != null) {
-        return WaterUsageSummaryModel.fromJson(response.data!);
-      }
-    } catch (e) {
-      AppLogger.warning(
-        'WaterUsage API unavailable ($e), serving simulated WUA canal dataset.',
-      );
+    int? societyId;
+    int? farmerMemberId;
+    String? farmerName;
+
+    if (authLocalDataSource != null) {
+      try {
+        final cachedUser = await authLocalDataSource!.getCachedUser();
+        societyId = cachedUser.societyId;
+        farmerMemberId = cachedUser.effectiveFarmerMemberId;
+        farmerName = cachedUser.name;
+      } catch (_) {}
     }
 
-    final next = _mockTurns
-        .where((t) => t.isUpcoming || t.isActive)
-        .firstOrNull;
+    // 1. Fetch outward water headers (/api/water-usages) & crop details (/api/crop-details)
+    final cropEndpoint = farmerMemberId != null
+        ? ApiEndpoints.farmerCropUsage(farmerMemberId: farmerMemberId)
+        : (societyId != null
+              ? ApiEndpoints.societyCropUsage(societyId: societyId)
+              : ApiEndpoints.cropDetails);
+
+    final outwardEndpoint = farmerMemberId != null
+        ? ApiEndpoints.outwardWaterUsages(farmerMemberId: farmerMemberId)
+        : (societyId != null
+              ? ApiEndpoints.societyOutwardWaterUsages(societyId: societyId)
+              : ApiEndpoints.waterUsagesOutward);
+
+    final rawCrops = await _fetchListOrIgnoreForbidden(
+      cropEndpoint,
+      label: 'CropDetails',
+    );
+    final rawOutward = await _fetchListOrIgnoreForbidden(
+      outwardEndpoint,
+      label: 'OutwardWaterUsage',
+    );
+
+    final outwardById = <int, Map<String, dynamic>>{};
+    for (final header in rawOutward) {
+      if (header['status']?.toString().toUpperCase() == 'D') continue;
+      final idVal = header['id'];
+      final parsedId = idVal is int
+          ? idVal
+          : int.tryParse(idVal?.toString() ?? '');
+      if (parsedId != null) {
+        outwardById[parsedId] = header;
+      }
+    }
+
+    final farmerCrops = <CropWaterUsageModel>[];
+    for (final item in rawCrops) {
+      if (item['status']?.toString().toUpperCase() == 'D') continue;
+      final merged = Map<String, dynamic>.from(item);
+      final wuId = item['waterUsageId'] is int
+          ? item['waterUsageId'] as int
+          : int.tryParse(item['waterUsageId']?.toString() ?? '');
+      final parent = wuId != null ? outwardById[wuId] : null;
+      if (parent != null) {
+        merged['fiscalYear'] ??= parent['fiscalYear'];
+        merged['season'] ??= parent['season'];
+        merged['approvalStatus'] ??= parent['approvalStatus'];
+        merged['billGenerated'] ??= parent['billGenerated'];
+      }
+      farmerCrops.add(CropWaterUsageModel.fromJson(merged));
+    }
+
+    // 2. Fetch society canal rotations (/api/wua-water-usages), tolerating 403 for farmers
+    final rotationsEndpoint = societyId != null
+        ? ApiEndpoints.canalRotations(societyId: societyId)
+        : ApiEndpoints.waterUsage;
+
+    List<IrrigationTurnModel> turns = <IrrigationTurnModel>[];
+    try {
+      final response = await apiClient.get<dynamic>(rotationsEndpoint);
+      if (response.statusCode == 200 && response.data != null) {
+        if (response.data is Map<String, dynamic>) {
+          final summary = WaterUsageSummaryModel.fromJson(
+            response.data as Map<String, dynamic>,
+          );
+          if (farmerCrops.isNotEmpty) {
+            final updatedQuota = WaterQuotaModel(
+              season: summary.quota.season,
+              totalQuotaHaCm: summary.quota.totalQuotaHaCm,
+              usedQuotaHaCm: summary.quota.usedQuotaHaCm,
+              remainingQuotaHaCm: summary.quota.remainingQuotaHaCm,
+              percentageUsed: summary.quota.percentageUsed,
+              canalName: summary.quota.canalName,
+              canalStatus: summary.quota.canalStatus,
+              currentFlowCusecs: summary.quota.currentFlowCusecs,
+              outletNumber: summary.quota.outletNumber,
+              wuaSocietyName: summary.quota.wuaSocietyName,
+              farmerName: farmerName ?? summary.quota.farmerName,
+              totalTurnsCount: summary.quota.totalTurnsCount,
+              completedTurnsCount: summary.quota.completedTurnsCount,
+              cropBreakdown: farmerCrops,
+              soilMoistureStatus: summary.quota.soilMoistureStatus,
+              nextCanalRotationDate: summary.quota.nextCanalRotationDate,
+              societyId: summary.quota.societyId ?? societyId,
+              fiscalYear: summary.quota.fiscalYear,
+            );
+            return WaterUsageSummaryModel(
+              quota: updatedQuota,
+              nextTurn: summary.nextTurn,
+              allTurns: summary.allTurns,
+            );
+          }
+          return summary;
+        }
+
+        final turnItems = ApiClient.extractListData(response.data);
+        turns = turnItems.map(IrrigationTurnModel.fromJson).toList()
+          ..sort(
+            (a, b) => a.scheduledStartTime.compareTo(b.scheduledStartTime),
+          );
+      }
+    } on UnauthorizedException {
+      rethrow;
+    } on ServerException catch (e) {
+      if (e.statusCode == 403 || e.statusCode == 404) {
+        AppLogger.warning(
+          'Canal rotations (/api/wua-water-usages) unavailable (${e.statusCode}); continuing with outward crop usage.',
+        );
+      } else if (farmerCrops.isEmpty && outwardById.isEmpty) {
+        rethrow;
+      } else {
+        AppLogger.warning('Canal rotations error ignored ($e)');
+      }
+    } on NetworkException {
+      if (farmerCrops.isEmpty && outwardById.isEmpty) rethrow;
+    } on TimeoutException {
+      if (farmerCrops.isEmpty && outwardById.isEmpty) rethrow;
+    }
+
+    final next = turns.where((t) => t.isUpcoming || t.isActive).firstOrNull;
+    double totalAllocated = 0.0;
+    double totalUsed = 0.0;
+    for (final c in farmerCrops) {
+      totalAllocated += c.allocatedHaCm;
+      totalUsed += c.usedHaCm;
+    }
+
+    final activeOutwardHeaders = outwardById.values.toList();
+    final firstHeaderSeason = activeOutwardHeaders.isNotEmpty
+        ? activeOutwardHeaders.first['season']?.toString()
+        : null;
+    final firstHeaderFiscalYear = activeOutwardHeaders.isNotEmpty
+        ? activeOutwardHeaders.first['fiscalYear']?.toString()
+        : null;
+
+    final resolvedSeason = turns.isNotEmpty
+        ? turns.first.season
+        : (farmerCrops.firstOrNull?.season ??
+              firstHeaderSeason ??
+              'N/A');
+    final resolvedFiscalYear =
+        turns.firstOrNull?.fiscalYear ??
+        farmerCrops.firstOrNull?.fiscalYear ??
+        firstHeaderFiscalYear;
+
+    final firstSurvey = farmerCrops.firstOrNull?.surveyNo;
+    final quota = WaterQuotaModel(
+      season: resolvedSeason,
+      totalQuotaHaCm: totalAllocated,
+      usedQuotaHaCm: totalUsed,
+      remainingQuotaHaCm: totalAllocated > totalUsed
+          ? totalAllocated - totalUsed
+          : 0.0,
+      percentageUsed: totalAllocated > 0
+          ? (totalUsed / totalAllocated) * 100
+          : 0.0,
+      canalName: turns.isNotEmpty
+          ? turns.first.fieldParcel
+          : (farmerCrops.firstOrNull?.source ?? 'N/A'),
+      canalStatus: turns.any((t) => t.isActive)
+          ? 'Active Rotational Flow'
+          : (turns.isNotEmpty
+                ? 'Scheduled'
+                : (farmerCrops.isNotEmpty || activeOutwardHeaders.isNotEmpty
+                      ? 'Recorded Usage'
+                      : 'N/A')),
+      currentFlowCusecs: turns.isNotEmpty ? turns.first.dischargeCusecs : 0.0,
+      outletNumber: turns.isNotEmpty
+          ? turns.first.outletNo
+          : (firstSurvey != null && firstSurvey.isNotEmpty
+                ? 'Survey $firstSurvey'
+                : 'N/A'),
+      wuaSocietyName: '',
+      farmerName: farmerName ?? '',
+      totalTurnsCount: turns.length,
+      completedTurnsCount: turns.where((t) => t.isCompleted).length,
+      cropBreakdown: farmerCrops,
+      societyId: societyId,
+      fiscalYear: resolvedFiscalYear,
+    );
 
     return WaterUsageSummaryModel(
-      quota: _mockQuota,
-      nextTurn: next,
-      allTurns: List.unmodifiable(_mockTurns),
+      quota: quota,
+      nextTurn: next ?? turns.firstOrNull,
+      allTurns: turns,
     );
   }
 
@@ -219,13 +263,10 @@ class WaterUsageRemoteDataSourceImpl implements WaterUsageRemoteDataSource {
         return IrrigationTurnModel.fromJson(response.data!);
       }
     } catch (e) {
-      AppLogger.warning('Turn detail API fallback: $e');
+      AppLogger.warning('Turn detail API error: $e');
     }
 
-    return _mockTurns.firstWhere(
-      (t) => t.id == turnId,
-      orElse: () => _mockTurns.first,
-    );
+    throw ServerException(message: 'Turn with ID "$turnId" not found');
   }
 
   @override
@@ -249,37 +290,9 @@ class WaterUsageRemoteDataSourceImpl implements WaterUsageRemoteDataSource {
         return true;
       }
     } catch (e) {
-      AppLogger.warning(
-        'Turn swap API failed ($e), executing local mock swap.',
-      );
+      AppLogger.warning('Turn swap API error: $e');
     }
 
-    // Local simulated update
-    final index = _mockTurns.indexWhere((t) => t.id == turnId);
-    if (index != -1) {
-      final old = _mockTurns[index];
-      _mockTurns[index] = IrrigationTurnModel(
-        id: old.id,
-        turnNumber: old.turnNumber,
-        season: old.season,
-        status: TurnStatus.swapped,
-        scheduledStartTime: preferredDate,
-        scheduledEndTime: preferredDate.add(
-          Duration(hours: old.durationHours.toInt()),
-        ),
-        durationHours: old.durationHours,
-        outletNo: old.outletNo,
-        gateNo: old.gateNo,
-        dischargeCusecs: old.dischargeCusecs,
-        waterDeliveredHaCm: old.waterDeliveredHaCm,
-        crop: old.crop,
-        fieldParcel: old.fieldParcel,
-        inspectorName: old.inspectorName,
-        isVerified: false,
-        notes: 'Rescheduled: $reason (${swappedWithFarmer ?? "Neighbor Swap"})',
-        canRequestSwap: false,
-      );
-    }
-    return true;
+    return false;
   }
 }

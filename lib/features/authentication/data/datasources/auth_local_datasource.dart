@@ -14,6 +14,7 @@ abstract class AuthLocalDataSource {
   });
   Future<void> clearCache();
   Future<bool> hasToken();
+  Future<String?> getAccessToken();
 }
 
 /// Concrete implementation using [SecureStorageService].
@@ -56,4 +57,7 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
 
   @override
   Future<bool> hasToken() => secureStorage.hasToken();
+
+  @override
+  Future<String?> getAccessToken() => secureStorage.getAccessToken();
 }

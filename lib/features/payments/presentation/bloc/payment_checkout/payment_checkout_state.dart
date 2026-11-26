@@ -2,24 +2,11 @@ import 'package:equatable/equatable.dart';
 import 'package:wua_mobile/features/bills/domain/entities/bill_entity.dart';
 import 'package:wua_mobile/features/payments/domain/entities/payment_entity.dart';
 
-enum PaymentMethodType {
-  upi,
-  netBanking,
-  card,
-}
+enum PaymentMethodType { upi, netBanking, card }
 
-enum UpiSubMode {
-  apps,
-  vpa,
-  qr,
-}
+enum UpiSubMode { apps, vpa, qr }
 
-enum PaymentCheckoutStep {
-  methodSelection,
-  processing,
-  success,
-  failure,
-}
+enum PaymentCheckoutStep { methodSelection, processing, success, failure }
 
 class PaymentCheckoutState extends Equatable {
   const PaymentCheckoutState({
@@ -33,14 +20,14 @@ class PaymentCheckoutState extends Equatable {
     this.vpaVerifiedName,
     this.selectedBank = 'State Bank of India',
     this.cardNumber = '',
-    this.cardHolder = 'Ramesh Patil',
+    this.cardHolder = '',
     this.cardExpiry = '',
     this.cardCvv = '',
     this.saveCard = true,
     this.processingStage = 1,
     this.completedPayment,
     this.errorMessage,
-    this.simulateFailure = false,
+    this.customAmount,
   });
 
   final BillEntity bill;
@@ -60,16 +47,29 @@ class PaymentCheckoutState extends Equatable {
   final int processingStage;
   final PaymentEntity? completedPayment;
   final String? errorMessage;
-  final bool simulateFailure;
+  final double? customAmount;
+
+  double get maxPayableAmount =>
+      bill.outstandingAmount > 0 ? bill.outstandingAmount : bill.totalAmount;
+
+  double get effectivePaymentAmount => customAmount ?? maxPayableAmount;
 
   /// Detect card brand from card number
   String get detectedCardBrand {
     final clean = cardNumber.replaceAll(' ', '');
-    if (clean.startsWith('508') || clean.startsWith('60') || clean.startsWith('65') || clean.startsWith('81') || clean.startsWith('82')) {
+    if (clean.startsWith('508') ||
+        clean.startsWith('60') ||
+        clean.startsWith('65') ||
+        clean.startsWith('81') ||
+        clean.startsWith('82')) {
       return 'RuPay (KCC)';
     } else if (clean.startsWith('4')) {
       return 'Visa';
-    } else if (clean.startsWith('51') || clean.startsWith('52') || clean.startsWith('53') || clean.startsWith('54') || clean.startsWith('55')) {
+    } else if (clean.startsWith('51') ||
+        clean.startsWith('52') ||
+        clean.startsWith('53') ||
+        clean.startsWith('54') ||
+        clean.startsWith('55')) {
       return 'MasterCard';
     }
     return 'RuPay';
@@ -77,24 +77,7 @@ class PaymentCheckoutState extends Equatable {
 
   /// Display string for payment mode
   String get paymentModeDisplay {
-    switch (selectedMethod) {
-      case PaymentMethodType.upi:
-        switch (upiSubMode) {
-          case UpiSubMode.apps:
-            return '$selectedUpiApp (UPI)';
-          case UpiSubMode.vpa:
-            return 'UPI VPA ($upiVpa)';
-          case UpiSubMode.qr:
-            return 'BharatQR / UPI Scan';
-        }
-      case PaymentMethodType.netBanking:
-        return 'Net Banking ($selectedBank)';
-      case PaymentMethodType.card:
-        final last4 = cardNumber.replaceAll(' ', '').length >= 4
-            ? cardNumber.replaceAll(' ', '').substring(cardNumber.replaceAll(' ', '').length - 4)
-            : '4120';
-        return '$detectedCardBrand (•••• $last4)';
-    }
+    return 'Easebuzz Gateway';
   }
 
   PaymentCheckoutState copyWith({
@@ -116,7 +99,8 @@ class PaymentCheckoutState extends Equatable {
     int? processingStage,
     PaymentEntity? completedPayment,
     String? errorMessage,
-    bool? simulateFailure,
+    double? customAmount,
+    bool clearCustomAmount = false,
   }) {
     return PaymentCheckoutState(
       bill: bill ?? this.bill,
@@ -138,29 +122,31 @@ class PaymentCheckoutState extends Equatable {
       processingStage: processingStage ?? this.processingStage,
       completedPayment: completedPayment ?? this.completedPayment,
       errorMessage: errorMessage,
-      simulateFailure: simulateFailure ?? this.simulateFailure,
+      customAmount: clearCustomAmount
+          ? null
+          : (customAmount ?? this.customAmount),
     );
   }
 
   @override
   List<Object?> get props => [
-        bill,
-        step,
-        selectedMethod,
-        upiSubMode,
-        selectedUpiApp,
-        upiVpa,
-        isVpaVerified,
-        vpaVerifiedName,
-        selectedBank,
-        cardNumber,
-        cardHolder,
-        cardExpiry,
-        cardCvv,
-        saveCard,
-        processingStage,
-        completedPayment,
-        errorMessage,
-        simulateFailure,
-      ];
+    bill,
+    step,
+    selectedMethod,
+    upiSubMode,
+    selectedUpiApp,
+    upiVpa,
+    isVpaVerified,
+    vpaVerifiedName,
+    selectedBank,
+    cardNumber,
+    cardHolder,
+    cardExpiry,
+    cardCvv,
+    saveCard,
+    processingStage,
+    completedPayment,
+    errorMessage,
+    customAmount,
+  ];
 }

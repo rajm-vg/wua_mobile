@@ -1,6 +1,7 @@
+import 'package:wua_mobile/core/utils/json_parse_utils.dart';
 import 'package:wua_mobile/features/bills/domain/entities/bill_entity.dart';
 
-/// Data transfer model for WUA Pani Patti Bill entity.
+/// Data transfer model for WUA Pani Patti Bill entity aligned with `bill_header` table.
 class BillModel extends BillEntity {
   const BillModel({
     required super.id,
@@ -32,83 +33,192 @@ class BillModel extends BillEntity {
     super.paymentMethod,
     super.notes,
     super.metadata,
+    super.farmerMemberId,
+    super.societyId,
+    super.fiscalYear,
+    super.valueDate,
+    super.glTranId,
+    super.rawStatus,
+    super.details,
   });
 
   factory BillModel.fromJson(Map<String, dynamic> json) {
+    final isPaid = JsonParseUtils.parseBool(
+          json['isPaymentDone'] ?? json['is_payment_done'],
+        ) ||
+        (JsonParseUtils.parseString(json['status']).toUpperCase() ==
+            BillStatus.paid.toUpperCase());
+
+    final dueDateParsed = JsonParseUtils.parseDateTime(
+      json['due_date'] ?? json['dueDate'] ?? json['dDueDate'],
+    );
+
+    String resolvedStatus;
+    if (isPaid) {
+      resolvedStatus = BillStatus.paid;
+    } else if (JsonParseUtils.parseStringOrNull(json['status']) != null) {
+      resolvedStatus = JsonParseUtils.parseString(json['status']);
+    } else if (dueDateParsed != null && dueDateParsed.isBefore(DateTime.now())) {
+      resolvedStatus = BillStatus.overdue;
+    } else {
+      resolvedStatus = BillStatus.pending;
+    }
+
+    final total = JsonParseUtils.parseDouble(
+      json['total_amount'] ??
+          json['totalAmount'] ??
+          json['amount'] ??
+          json['nBillAmount'] ??
+          ((json['nAmount'] != null)
+              ? (JsonParseUtils.parseDouble(json['nAmount']) +
+                  JsonParseUtils.parseDouble(json['nLocalTax']) +
+                  JsonParseUtils.parseDouble(json['nPenalty']))
+              : null),
+    );
+    final paid = JsonParseUtils.parseDouble(
+      json['paid_amount'] ?? json['paidAmount'] ?? json['nPaidAmount'],
+    );
+    final taxesAmount = JsonParseUtils.parseDouble(
+      json['taxes'] ?? json['govt_cess'] ?? json['nLocalTax'],
+    );
+    final penaltyAmount = JsonParseUtils.parseDouble(
+      json['penalties'] ?? json['nPenalty'],
+    );
+    final subtotalAmount = JsonParseUtils.parseDouble(
+      json['subtotal'] ??
+          json['base_water_charges'] ??
+          json['nAmount'] ??
+          (total > 0 ? (total - taxesAmount - penaltyAmount) : 0.0),
+    );
+    final outstanding = JsonParseUtils.parseDouble(
+      json['balanceAmount'] ??
+          json['balance_amount'] ??
+          json['outstanding_amount'] ??
+          json['outstandingAmount'] ??
+          json['nPreviousBalance'] ??
+          (isPaid ? 0.0 : (total - paid)),
+    );
+
+    final rawDetails = json['details'] ?? json['bill_details'] ?? json['billDetails'];
+    final detailsList = JsonParseUtils.parseMapList(rawDetails)
+        .map(BillDetailModel.fromJson)
+        .toList();
+
+    final farmerObj = JsonParseUtils.parseMapOrNull(json['farmerObj']);
+    final societyObj = JsonParseUtils.parseMapOrNull(farmerObj?['societyObj']);
+
     return BillModel(
-      id: _parseString(json['id']),
-      billNumber: _parseString(
-        json['bill_number'] ?? json['billNumber'] ?? json['bill_no'],
+      id: JsonParseUtils.parseString(json['id']),
+      billNumber: JsonParseUtils.parseString(
+        json['bill_number'] ??
+            json['billNumber'] ??
+            (json['iBillNo'] != null ? 'BILL-${json['iBillNo']}' : null) ??
+            json['bill_no'] ??
+            json['sKhateNumber'] ??
+            (json['id'] != null ? 'BILL-${json['id']}' : 'BILL-000'),
       ),
-      status: _parseString(json['status'], defaultValue: BillStatus.pending),
-      consumerId: _parseStringOrNull(json['consumer_id'] ?? json['consumerId']),
-      consumerName: _parseStringOrNull(
-        json['consumer_name'] ?? json['consumerName'] ?? json['customer'],
+      status: resolvedStatus,
+      consumerId: JsonParseUtils.parseStringOrNull(
+        json['consumer_id'] ?? json['consumerId'] ?? json['iFarmerMemberId'],
       ),
-      wuaSocietyName: _parseStringOrNull(
+      consumerName: JsonParseUtils.parseStringOrNull(
+        json['consumer_name'] ??
+            json['consumerName'] ??
+            farmerObj?['sName'] ??
+            json['customer'] ??
+            json['sFarmerName'],
+      ),
+      wuaSocietyName: JsonParseUtils.parseStringOrNull(
         json['wua_society_name'] ??
             json['society_name'] ??
             json['societyName'] ??
-            json['wuaSocietyName'],
+            societyObj?['sSocietyName'] ??
+            json['wuaSocietyName'] ??
+            json['sWuaName'],
       ),
-      canalSection: _parseStringOrNull(
-        json['canal_section'] ?? json['canalSection'],
+      canalSection: JsonParseUtils.parseStringOrNull(
+        json['canal_section'] ??
+            json['canalSection'] ??
+            json['sSection'] ??
+            json['sSubDivision'],
       ),
-      season: _parseString(
-        json['season'],
-        defaultValue: 'Rabi Season (2024-25)',
+      season: JsonParseUtils.parseString(
+        json['season'] ?? json['sSeason'],
+        defaultValue: 'N/A',
       ),
-      cropType: _parseString(
-        json['crop_type'] ?? json['cropType'],
-        defaultValue: 'Wheat',
+      cropType: JsonParseUtils.parseString(
+        json['crop_type'] ?? json['cropType'] ?? json['sCrop'],
+        defaultValue: 'N/A',
       ),
-      landAreaAcres: _parseDouble(
-        json['land_area_acres'] ?? json['landAreaAcres'],
+      landAreaAcres: JsonParseUtils.parseDouble(
+        json['land_area_acres'] ??
+            json['landAreaAcres'] ??
+            json['nIrrigatedArea'] ??
+            json['area'],
       ),
-      waterQuantityLiters: _parseDouble(
-        json['water_quantity_liters'] ?? json['waterQuantityLiters'],
+      waterQuantityLiters: JsonParseUtils.parseDouble(
+        json['water_quantity_liters'] ??
+            json['waterQuantityLiters'] ??
+            json['nWaterUsage'] ??
+            json['nWaterAllocation'] ??
+            json['cumecs'],
       ),
-      rotationsCount: _parseInt(
+      rotationsCount: JsonParseUtils.parseInt(
         json['rotations_count'] ?? json['rotationsCount'],
-        defaultValue: 1,
+        defaultValue: 0,
       ),
-      billDate: _parseDateTime(
+      billDate: JsonParseUtils.parseDateTime(
         json['bill_date'] ?? json['billDate'] ?? json['dBillDate'],
       ),
-      dueDate: _parseDateTime(
-        json['due_date'] ?? json['dueDate'] ?? json['dDueDate'],
-      ),
-      subtotal: _parseDouble(json['subtotal'] ?? json['base_water_charges']),
-      taxes: _parseDouble(json['taxes'] ?? json['govt_cess']),
-      maintenanceCess: _parseDouble(
+      dueDate: dueDateParsed,
+      subtotal: subtotalAmount,
+      taxes: taxesAmount,
+      maintenanceCess: JsonParseUtils.parseDouble(
         json['maintenance_cess'] ??
             json['maintenanceCess'] ??
             json['wua_maintenance'],
       ),
-      penalties: _parseDouble(json['penalties']),
-      interestAmount: _parseDouble(
+      penalties: penaltyAmount,
+      interestAmount: JsonParseUtils.parseDouble(
         json['interest_amount'] ?? json['interestAmount'],
       ),
-      discounts: _parseDouble(json['discounts']),
-      adjustmentAmount: _parseDouble(
+      discounts: JsonParseUtils.parseDouble(json['discounts']),
+      adjustmentAmount: JsonParseUtils.parseDouble(
         json['adjustment_amount'] ?? json['adjustmentAmount'],
       ),
-      totalAmount: _parseDouble(
-        json['total_amount'] ?? json['totalAmount'] ?? json['amount'],
-      ),
-      paidAmount: _parseDouble(json['paid_amount'] ?? json['paidAmount']),
-      outstandingAmount: _parseDouble(
-        json['outstanding_amount'] ?? json['outstandingAmount'],
-      ),
-      paymentReference: _parseStringOrNull(
+      totalAmount: total,
+      paidAmount: paid,
+      outstandingAmount: outstanding,
+      paymentReference: JsonParseUtils.parseStringOrNull(
         json['payment_reference'] ?? json['paymentReference'] ?? json['txnid'],
       ),
-      paymentDate: _parseDateTime(json['payment_date'] ?? json['paymentDate']),
-      paymentMethod: _parseStringOrNull(
+      paymentDate: JsonParseUtils.parseDateTime(
+        json['payment_date'] ?? json['paymentDate'] ?? json['dPaymentDate'],
+      ),
+      paymentMethod: JsonParseUtils.parseStringOrNull(
         json['payment_method'] ?? json['paymentMethod'],
       ),
-      notes: _parseStringOrNull(json['notes']),
-      metadata: json['metadata'] as Map<String, dynamic>?,
+      notes: JsonParseUtils.parseStringOrNull(json['notes']),
+      metadata: JsonParseUtils.parseMapOrNull(json['metadata']),
+      farmerMemberId: JsonParseUtils.parseIntOrNull(
+        json['iFarmerMemberId'] ?? json['farmerMemberId'] ?? json['farmer_member_id'],
+      ),
+      societyId: JsonParseUtils.parseIntOrNull(
+        json['iSocietyId'] ?? json['societyId'] ?? json['society_id'],
+      ),
+      fiscalYear: JsonParseUtils.parseStringOrNull(
+        json['sFiscalYear'] ?? json['fiscalYear'] ?? json['fiscal_year'],
+      ),
+      valueDate: JsonParseUtils.parseDateTime(
+        json['dValueDate'] ?? json['valueDate'] ?? json['value_date'],
+      ),
+      glTranId: JsonParseUtils.parseIntOrNull(
+        json['iGlTranId'] ?? json['glTranId'] ?? json['gl_tran_id'],
+      ),
+      rawStatus: JsonParseUtils.parseStringOrNull(
+        json['sStatus'] ?? json['rawStatus'] ?? json['raw_status'],
+      ),
+      details: detailsList,
     );
   }
 
@@ -143,41 +253,87 @@ class BillModel extends BillEntity {
       'payment_method': paymentMethod,
       'notes': notes,
       'metadata': metadata,
+      'iFarmerMemberId': farmerMemberId,
+      'iSocietyId': societyId,
+      'sFiscalYear': fiscalYear,
+      'dValueDate': valueDate?.toIso8601String(),
+      'iGlTranId': glTranId,
+      'sStatus': rawStatus ?? status,
+      'details': details.map((d) {
+        if (d is BillDetailModel) return d.toJson();
+        return BillDetailModel(
+          id: d.id,
+          billNo: d.billNo,
+          crop: d.crop,
+          irrigatedArea: d.irrigatedArea,
+          rate: d.rate,
+          amount: d.amount,
+          localTax: d.localTax,
+          penalty: d.penalty,
+          isPaymentDone: d.isPaymentDone,
+          paidAmount: d.paidAmount,
+        ).toJson();
+      }).toList(),
     };
   }
 
-  // ─── Safe Deserialization Utilities ─────────────────────────
+}
 
-  static String _parseString(dynamic value, {String defaultValue = ''}) {
-    if (value == null) return defaultValue;
-    return value.toString().trim();
+/// Data model for `bill_details` line item.
+class BillDetailModel extends BillDetailEntity {
+  const BillDetailModel({
+    super.id,
+    super.billNo,
+    required super.crop,
+    super.irrigatedArea,
+    super.rate,
+    super.amount,
+    super.localTax,
+    super.penalty,
+    super.isPaymentDone,
+    super.paidAmount,
+  });
+
+  factory BillDetailModel.fromJson(Map<String, dynamic> json) {
+    return BillDetailModel(
+      id: JsonParseUtils.parseIntOrNull(json['id']),
+      billNo: JsonParseUtils.parseIntOrNull(
+        json['iBillNo'] ?? json['billNo'] ?? json['bill_no'],
+      ),
+      crop: JsonParseUtils.parseString(
+        json['sCrop'] ?? json['crop'] ?? json['cropType'],
+        defaultValue: 'General Crop',
+      ),
+      irrigatedArea: JsonParseUtils.parseDouble(
+        json['nIrrigatedArea'] ?? json['irrigatedArea'] ?? json['area'],
+      ),
+      rate: JsonParseUtils.parseDouble(json['nRate'] ?? json['rate']),
+      amount: JsonParseUtils.parseDouble(json['nAmount'] ?? json['amount']),
+      localTax: JsonParseUtils.parseDouble(
+        json['nLocalTax'] ?? json['localTax'],
+      ),
+      penalty: JsonParseUtils.parseDouble(json['nPenalty'] ?? json['penalty']),
+      isPaymentDone: JsonParseUtils.parseBool(
+        json['isPaymentDone'] ?? json['is_payment_done'],
+      ),
+      paidAmount: JsonParseUtils.parseDouble(
+        json['paidAmount'] ?? json['paid_amount'],
+      ),
+    );
   }
 
-  static String? _parseStringOrNull(dynamic value) {
-    if (value == null) return null;
-    final str = value.toString().trim();
-    return str.isEmpty ? null : str;
-  }
-
-  static double _parseDouble(dynamic value, {double defaultValue = 0.0}) {
-    if (value == null) return defaultValue;
-    if (value is num) return value.toDouble();
-    if (value is String) return double.tryParse(value) ?? defaultValue;
-    return defaultValue;
-  }
-
-  static int _parseInt(dynamic value, {int defaultValue = 0}) {
-    if (value == null) return defaultValue;
-    if (value is int) return value;
-    if (value is num) return value.toInt();
-    if (value is String) return int.tryParse(value) ?? defaultValue;
-    return defaultValue;
-  }
-
-  static DateTime? _parseDateTime(dynamic value) {
-    if (value == null) return null;
-    if (value is DateTime) return value;
-    if (value is String) return DateTime.tryParse(value);
-    return null;
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'iBillNo': billNo,
+      'sCrop': crop,
+      'nIrrigatedArea': irrigatedArea,
+      'nRate': rate,
+      'nAmount': amount,
+      'nLocalTax': localTax,
+      'nPenalty': penalty,
+      'isPaymentDone': isPaymentDone,
+      'paidAmount': paidAmount,
+    };
   }
 }

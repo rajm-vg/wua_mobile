@@ -5,10 +5,7 @@ import 'package:wua_mobile/features/bills/domain/entities/bill_entity.dart';
 
 /// Interactive summary card displaying the bill to be paid with expandable tariff details.
 class BillSummaryCard extends StatefulWidget {
-  const BillSummaryCard({
-    super.key,
-    required this.bill,
-  });
+  const BillSummaryCard({super.key, required this.bill});
 
   final BillEntity bill;
 
@@ -36,7 +33,7 @@ class _BillSummaryCardState extends State<BillSummaryCard> {
 
     final payableAmount = bill.outstandingAmount > 0
         ? bill.outstandingAmount
-        : (bill.totalAmount > 0 ? bill.totalAmount : 1240.0);
+        : bill.totalAmount;
 
     return Container(
       decoration: BoxDecoration(
@@ -83,17 +80,17 @@ class _BillSummaryCardState extends State<BillSummaryCard> {
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.verified_user_outlined,
                           size: 14,
-                          color: AppColors.canalGreen,
+                          color: colors.canalGreen,
                         ),
                         const SizedBox(width: 4),
                         Text(
                           'Govt WRD Portal',
-                          style: context.caption.withSize(11).withColor(
-                                AppColors.canalGreen,
-                              ),
+                          style: context.caption
+                              .withSize(11)
+                              .withColor(colors.canalGreen),
                         ),
                       ],
                     ),
@@ -125,13 +122,16 @@ class _BillSummaryCardState extends State<BillSummaryCard> {
                       children: [
                         Text(
                           l10n.totalPayable,
-                          style: context.caption.withColor(colors.textSecondary),
+                          style: context.caption.withColor(
+                            colors.textSecondary,
+                          ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           _formatCurrency(payableAmount),
-                          style: context.headlineMedium.bold
-                              .withColor(colors.primary),
+                          style: context.headlineMedium.bold.withColor(
+                            colors.primary,
+                          ),
                         ),
                       ],
                     ),
@@ -150,7 +150,9 @@ class _BillSummaryCardState extends State<BillSummaryCard> {
                       ),
                       label: Text(
                         _isExpanded ? 'Hide Breakdown' : 'View Breakdown',
-                        style: context.labelMedium.bold.withColor(colors.primary),
+                        style: context.labelMedium.bold.withColor(
+                          colors.primary,
+                        ),
                       ),
                     ),
                   ],
@@ -176,21 +178,19 @@ class _BillSummaryCardState extends State<BillSummaryCard> {
                   _buildCostRow(
                     context,
                     l10n.baseWaterTariff,
-                    _formatCurrency(bill.subtotal > 0 ? bill.subtotal : 1110.0),
+                    _formatCurrency(bill.subtotal),
                   ),
                   const SizedBox(height: 6),
                   _buildCostRow(
                     context,
                     l10n.govtWaterCessTaxes,
-                    _formatCurrency(bill.taxes > 0 ? bill.taxes : 90.0),
+                    _formatCurrency(bill.taxes),
                   ),
                   const SizedBox(height: 6),
                   _buildCostRow(
                     context,
                     l10n.wuaInfrastructureMaint,
-                    _formatCurrency(
-                      bill.maintenanceCess > 0 ? bill.maintenanceCess : 40.0,
-                    ),
+                    _formatCurrency(bill.maintenanceCess),
                   ),
                   if (bill.penalties > 0) ...[
                     const SizedBox(height: 6),
@@ -208,17 +208,57 @@ class _BillSummaryCardState extends State<BillSummaryCard> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Total Cess Calculation',
-                        style: context.bodySmall.bold
-                            .withColor(colors.textPrimary),
+                        l10n.grossBillAmount,
+                        style: context.bodySmall.bold.withColor(
+                          colors.textPrimary,
+                        ),
                       ),
                       Text(
-                        _formatCurrency(payableAmount),
-                        style: context.bodySmall.bold
-                            .withColor(colors.textPrimary),
+                        _formatCurrency(bill.totalAmount),
+                        style: context.bodySmall.bold.withColor(
+                          colors.textPrimary,
+                        ),
                       ),
                     ],
                   ),
+                  if (bill.paidAmount > 0) ...[
+                    const SizedBox(height: 6),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          l10n.amountPaid,
+                          style: context.bodySmall.withColor(colors.success),
+                        ),
+                        Text(
+                          '- ${_formatCurrency(bill.paidAmount)}',
+                          style: context.bodySmall.bold.withColor(
+                            colors.success,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Divider(color: colors.divider, height: 1),
+                    const SizedBox(height: 6),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          l10n.netOutstandingBalance,
+                          style: context.bodySmall.bold.withColor(
+                            colors.primary,
+                          ),
+                        ),
+                        Text(
+                          _formatCurrency(payableAmount),
+                          style: context.bodySmall.bold.withColor(
+                            colors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -241,13 +281,13 @@ class _BillSummaryCardState extends State<BillSummaryCard> {
         Text(
           label,
           style: context.bodySmall.withColor(
-            isHighlight ? AppColors.error : colors.textSecondary,
+            isHighlight ? colors.error : colors.textSecondary,
           ),
         ),
         Text(
           amount,
           style: context.bodySmall.bold.withColor(
-            isHighlight ? AppColors.error : colors.textPrimary,
+            isHighlight ? colors.error : colors.textPrimary,
           ),
         ),
       ],

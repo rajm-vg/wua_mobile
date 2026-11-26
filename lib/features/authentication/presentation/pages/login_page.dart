@@ -59,9 +59,14 @@ class _LoginPageViewState extends State<_LoginPageView> {
   void _onLoginSubmitted() {
     FocusScope.of(context).unfocus();
     if (_formKey.currentState?.validate() ?? false) {
+      var identifier = _identifierController.text.trim();
+      // Normalize 11-digit Indian mobile numbers starting with 0 (e.g. 09923638738 -> 9923638738).
+      if (RegExp(r'^0\d{10}$').hasMatch(identifier)) {
+        identifier = identifier.substring(1);
+      }
       context.read<AuthBloc>().add(
         AuthLoginRequested(
-          identifier: _identifierController.text.trim(),
+          identifier: identifier,
           password: _passwordController.text,
           rememberMe: _rememberMe,
         ),
@@ -79,22 +84,18 @@ class _LoginPageViewState extends State<_LoginPageView> {
   String? _validateIdentifier(String? value) {
     final trimmed = value?.trim() ?? '';
     if (trimmed.isEmpty) {
-      return 'Please enter your mobile number or email.';
+      return context.isMarathi
+          ? 'कृपया आपला १० अंकी मोबाईल नंबर प्रविष्ट करा.'
+          : 'Please enter your 10-digit mobile number.';
     }
 
-    final isNumeric = RegExp(r'^\d+$').hasMatch(trimmed);
-    if (isNumeric) {
-      if (trimmed.length != 10) {
-        return 'Please enter a valid 10-digit mobile number.';
-      }
-      return null;
+    if (!RegExp(r'^0?[6-9]\d{9}$').hasMatch(trimmed)) {
+      return context.isMarathi
+          ? 'कृपया वैध १० अंकी मोबाईल नंबर प्रविष्ट करा.'
+          : 'Please enter a valid 10-digit mobile number.';
     }
 
-    if (trimmed.contains('@')) {
-      return Validators.email(trimmed);
-    }
-
-    return 'Please enter a valid 10-digit mobile number or email.';
+    return null;
   }
 
   @override
@@ -184,11 +185,17 @@ class _LoginPageViewState extends State<_LoginPageView> {
                               ),
                               decoration: BoxDecoration(
                                 color: isDark
-                                    ? AppColors.sproutGreen.withValues(alpha: 0.15)
-                                    : AppColors.sproutGreen.withValues(alpha: 0.10),
+                                    ? AppColors.sproutGreen.withValues(
+                                        alpha: 0.15,
+                                      )
+                                    : AppColors.sproutGreen.withValues(
+                                        alpha: 0.10,
+                                      ),
                                 borderRadius: AppRadius.borderRadiusFull,
                                 border: Border.all(
-                                  color: AppColors.sproutGreen.withValues(alpha: 0.4),
+                                  color: AppColors.sproutGreen.withValues(
+                                    alpha: 0.4,
+                                  ),
                                 ),
                               ),
                               child: Row(
@@ -245,67 +252,18 @@ class _LoginPageViewState extends State<_LoginPageView> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              // Portal Role Header (Farmer / Sabhasad specific)
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(AppSpacing.xs),
-                                    decoration: BoxDecoration(
-                                      color: isDark
-                                          ? AppColors.sproutGreen.withValues(alpha: 0.15)
-                                          : AppColors.sproutGreen.withValues(alpha: 0.12),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(
-                                      Icons.agriculture_rounded,
-                                      size: 20,
-                                      color: AppColors.sproutGreen,
-                                    ),
-                                  ),
-                                  const SizedBox(width: AppSpacing.xs),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          context.isMarathi
-                                              ? 'शेतकरी / सभासद लॉगिन'
-                                              : 'Farmer / Sabhasad Login',
-                                          style: context.titleSmall.bold.withColor(
-                                            isDark
-                                                ? AppColors.textPrimaryDark
-                                                : AppColors.textPrimary,
-                                          ),
-                                        ),
-                                        Text(
-                                          context.isMarathi
-                                              ? 'पाणी वापर संस्था सभासद पोर्टल'
-                                              : 'WUA Farmer Member Portal',
-                                          style: context.caption.withColor(
-                                            isDark
-                                                ? AppColors.textSecondaryDark
-                                                : AppColors.textSecondary,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: AppSpacing.md),
-
-                              // Identifier input
+                              // Identifier input (10-digit mobile number)
                               AuthTextField(
                                 key: const Key('login_identifier_field'),
                                 controller: _identifierController,
                                 focusNode: _identifierFocusNode,
                                 label: l10n.identifierLabel,
-                                hintText: l10n.identifierHint,
-                                keyboardType: TextInputType.emailAddress,
+                                hintText: '9876543210',
+                                keyboardType: TextInputType.phone,
                                 textInputAction: TextInputAction.next,
                                 enabled: !isLoading,
                                 prefixIcon: const Icon(
-                                  Icons.account_circle_outlined,
+                                  Icons.phone_android_rounded,
                                 ),
                                 suffixIcon:
                                     _identifierController.text.isNotEmpty
@@ -493,110 +451,91 @@ class _LoginPageViewState extends State<_LoginPageView> {
                         ),
                         const SizedBox(height: AppSpacing.md),
 
-                        // Quick Sabhasad / Farmer Demo Chips
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.md,
-                            vertical: AppSpacing.xs,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                'सभासद / शेतकरी लॉगिन (SABHASAD DEMO)',
-                                style: context.badgeText.withColor(
-                                  isDark
-                                      ? AppColors.textSecondaryDark
-                                      : AppColors.textSecondary,
+                        // Quick Role Test Chips (Only in demo fallback mode)
+                        if (EnvConfig.enableDemoFallback)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.md,
+                              vertical: AppSpacing.xs,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'QUICK ROLE DEMO',
+                                  style: context.badgeText.withColor(
+                                    isDark
+                                        ? AppColors.textSecondaryDark
+                                        : AppColors.textSecondary,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(height: AppSpacing.xs),
-                              Wrap(
-                                spacing: AppSpacing.xs,
-                                runSpacing: AppSpacing.xs,
-                                alignment: WrapAlignment.center,
-                                children: [
-                                  ActionChip(
-                                    label: const Text('सभासद १ (9876543210)'),
-                                    avatar: const Icon(
-                                      Icons.agriculture_rounded,
-                                      size: 16,
-                                      color: AppColors.sproutGreen,
+                                const SizedBox(height: AppSpacing.xs),
+                                Wrap(
+                                  spacing: AppSpacing.xs,
+                                  runSpacing: AppSpacing.xs,
+                                  alignment: WrapAlignment.center,
+                                  children: [
+                                    ActionChip(
+                                      key: const Key(
+                                        'quick_demo_sabhasad_chip_1',
+                                      ),
+                                      label: const Text(
+                                        'सभासद / Farmer (9923638738)',
+                                      ),
+                                      avatar: const Icon(
+                                        Icons.agriculture_rounded,
+                                        size: 16,
+                                        color: AppColors.sproutGreen,
+                                      ),
+                                      onPressed: isLoading
+                                          ? null
+                                          : () => _quickFill(
+                                              '9923638738',
+                                              'admin',
+                                            ),
                                     ),
-                                    onPressed: isLoading
-                                        ? null
-                                        : () => _quickFill(
-                                            '9876543210',
-                                            'Farmer@123',
-                                          ),
-                                  ),
-                                  ActionChip(
-                                    label: const Text('सभासद २ (9822334455)'),
-                                    avatar: const Icon(
-                                      Icons.grass_rounded,
-                                      size: 16,
-                                      color: AppColors.canalGreen,
+                                    ActionChip(
+                                      key: const Key(
+                                        'quick_demo_sabhasad_chip_2',
+                                      ),
+                                      label: const Text(
+                                        'सभासद / Farmer (9156915656)',
+                                      ),
+                                      avatar: const Icon(
+                                        Icons.agriculture_rounded,
+                                        size: 16,
+                                        color: AppColors.sproutGreen,
+                                      ),
+                                      onPressed: isLoading
+                                          ? null
+                                          : () => _quickFill(
+                                              '9156915656',
+                                              'admin',
+                                            ),
                                     ),
-                                    onPressed: isLoading
-                                        ? null
-                                        : () => _quickFill(
-                                            '9822334455',
-                                            'Farmer@123',
-                                          ),
-                                  ),
-                                  ActionChip(
-                                    label: const Text('सभासद ३ (9922322710)'),
-                                    avatar: const Icon(
-                                      Icons.person_pin_rounded,
-                                      size: 16,
-                                      color: AppColors.harvestAmber,
-                                    ),
-                                    onPressed: isLoading
-                                        ? null
-                                        : () => _quickFill(
-                                            '9922322710',
-                                            'admin',
-                                          ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
                         const SizedBox(height: AppSpacing.md),
 
-                        // Register Link
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              l10n.dontHaveAccount,
-                              style: context.bodySmall.withColor(
-                                isDark
-                                    ? AppColors.textSecondaryDark
-                                    : AppColors.textSecondary,
-                              ),
+                        // Onboarding Note (Farmers/Sabhasads are registered by WUA Secretary)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.sm,
+                          ),
+                          child: Text(
+                            context.isMarathi
+                                ? 'नवीन सभासद? मोबाईल नंबर नोंदणीसाठी आपल्या WUA सचिवांशी संपर्क साधा.'
+                                : 'New member? Contact your WUA Secretary to register your mobile number.',
+                            textAlign: TextAlign.center,
+                            style: context.bodySmall.withColor(
+                              isDark
+                                  ? AppColors.textSecondaryDark
+                                  : AppColors.textSecondary,
                             ),
-                            TextButton(
-                              key: const Key('register_nav_button'),
-                              onPressed: isLoading
-                                  ? null
-                                  : () => context.push(RouteNames.register),
-                              style: TextButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: AppSpacing.xs,
-                                ),
-                              ),
-                              child: Text(
-                                l10n.register,
-                                style: context.bodySmall.semiBold.withColor(
-                                  isDark
-                                      ? AppColors.waterCyan
-                                      : AppColors.primary,
-                                ),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                         const SizedBox(height: AppSpacing.md),
 

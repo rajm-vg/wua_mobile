@@ -1,5 +1,4 @@
 import 'package:dartz/dartz.dart';
-import 'package:wua_mobile/core/errors/exceptions.dart';
 import 'package:wua_mobile/core/errors/failures.dart';
 import 'package:wua_mobile/core/network/network_info.dart';
 import 'package:wua_mobile/features/payments/data/datasources/payment_remote_datasource.dart';
@@ -39,11 +38,9 @@ class PaymentRepositoryImpl implements PaymentRepository {
       );
 
       return Right(payments);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, code: e.statusCode));
     } catch (e) {
       return Left(
-        ServerFailure(message: 'Failed to retrieve payments: ${e.toString()}'),
+        mapExceptionToFailure(e, fallbackPrefix: 'Failed to retrieve payments'),
       );
     }
   }
@@ -62,11 +59,9 @@ class PaymentRepositoryImpl implements PaymentRepository {
 
       final payment = await remoteDataSource.getPaymentById(id);
       return Right(payment);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, code: e.statusCode));
     } catch (e) {
       return Left(
-        ServerFailure(message: 'Failed to retrieve payment: ${e.toString()}'),
+        mapExceptionToFailure(e, fallbackPrefix: 'Failed to retrieve payment'),
       );
     }
   }
@@ -110,11 +105,9 @@ class PaymentRepositoryImpl implements PaymentRepository {
 
       final result = await remoteDataSource.processPayment(model);
       return Right(result);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, code: e.statusCode));
     } catch (e) {
       return Left(
-        ServerFailure(message: 'Failed to process payment: ${e.toString()}'),
+        mapExceptionToFailure(e, fallbackPrefix: 'Failed to process payment'),
       );
     }
   }

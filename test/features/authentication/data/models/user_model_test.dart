@@ -57,35 +57,38 @@ void main() {
       expect(model.email, entity.email);
     });
 
-    test('fromJson should parse wrd_backend LoginUserDTO response correctly', () {
-      final backendJson = {
-        'id': 2100,
-        'firstName': 'सुभाष रंगनाथ झिंजाड',
-        'lastName': null,
-        'societyId': 1503,
-        'username': '9922322710',
-        'mobileNo': '9922322710',
-        'email': '',
-        'imageUrl': null,
-        'langKey': 'en',
-        'status': 'A',
-        'createdOn': '2024-09-13T07:27:45.175044Z',
-        'refTable': 'SocietyFarmer',
-        'refTableId': 696,
-        'authorities': ['SUPER_ADMIN_AND_SACHIV_AND_SANCHALAK_ONLY'],
-        'roles': ['सचिव'],
-      };
+    test(
+      'fromJson should parse wrd_backend LoginUserDTO response correctly',
+      () {
+        final backendJson = {
+          'id': 2100,
+          'firstName': 'सुभाष रंगनाथ झिंजाड',
+          'lastName': null,
+          'societyId': 1503,
+          'username': '9922322710',
+          'mobileNo': '9922322710',
+          'email': '',
+          'imageUrl': null,
+          'langKey': 'en',
+          'status': 'A',
+          'createdOn': '2024-09-13T07:27:45.175044Z',
+          'refTable': 'SocietyFarmer',
+          'refTableId': 696,
+          'authorities': ['SUPER_ADMIN_AND_SACHIV_AND_SANCHALAK_ONLY'],
+          'roles': ['सचिव'],
+        };
 
-      final model = UserModel.fromJson(backendJson);
-      expect(model.id, '2100');
-      expect(model.name, 'सुभाष रंगनाथ झिंजाड');
-      expect(model.phone, '9922322710');
-      expect(model.societyId, 1503);
-      expect(model.username, '9922322710');
-      expect(model.roles, ['सचिव']);
-      expect(model.role, 'wua_official');
-      expect(model.isVerified, true);
-    });
+        final model = UserModel.fromJson(backendJson);
+        expect(model.id, '2100');
+        expect(model.name, 'सुभाष रंगनाथ झिंजाड');
+        expect(model.phone, '9922322710');
+        expect(model.societyId, 1503);
+        expect(model.username, '9922322710');
+        expect(model.roles, ['सचिव']);
+        expect(model.role, 'wua_official');
+        expect(model.isVerified, true);
+      },
+    );
 
     test('fromJson correctly identifies Sabhasad (सभासद) as farmer role', () {
       final sabhasadJson = {
@@ -110,5 +113,36 @@ void main() {
       expect(model.refTable, 'SocietyFarmer');
       expect(model.refTableId, 501);
     });
+
+    test(
+      'fromJson normalizes raw Base64 imageUrl and maps Sanchalak/Farmer roles',
+      () {
+        final sanchalakJson = {
+          'id': 3001,
+          'firstName': 'Ramesh Patil',
+          'username': '9876543210',
+          'mobileNo': '9876543210',
+          'imageUrl': '/9j/4AAQSkZJRg==',
+          'status': 'A',
+          'roles': ['संचालक'],
+        };
+
+        final sanchalak = UserModel.fromJson(sanchalakJson);
+        expect(sanchalak.avatarUrl, 'data:image/jpeg;base64,/9j/4AAQSkZJRg==');
+        expect(sanchalak.role, 'wua_official');
+
+        final farmerJson = {
+          'id': 3002,
+          'firstName': 'Suresh Shinde',
+          'username': '9123456789',
+          'mobileNo': '9123456789',
+          'status': 'A',
+          'roles': ['ROLE_FARMER'],
+        };
+        final farmer = UserModel.fromJson(farmerJson);
+        expect(farmer.isFarmerMember, true);
+        expect(farmer.role, 'farmer');
+      },
+    );
   });
 }

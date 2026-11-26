@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:wua_mobile/core/di/injection_container.dart';
 import 'package:wua_mobile/core/extensions/extensions.dart';
 import 'package:wua_mobile/features/bills/domain/entities/bill_entity.dart';
@@ -86,8 +88,21 @@ class _PaymentDetailPageView extends StatelessWidget {
                     tooltip: l10n.shareReceipt,
                     icon: const Icon(Icons.share_rounded),
                     onPressed: () {
-                      context.showInfoSnackBar(
-                        l10n.sharingPaymentConfirmation(payment.paymentNumber),
+                      final summary = [
+                        'WRD Pani Patti Receipt',
+                        'Receipt No: ${payment.paymentNumber}',
+                        'Amount: ${payment.formattedAmount}',
+                        'Status: ${payment.status}',
+                        'Date: ${payment.formattedDateTime}',
+                        if (payment.gatewayTransactionId != null)
+                          'Ref ID: ${payment.gatewayTransactionId}',
+                        if (payment.billNumber != null)
+                          'Bill: ${payment.billNumber}',
+                      ].join('\n');
+                      Clipboard.setData(ClipboardData(text: summary));
+                      HapticFeedback.selectionClick();
+                      context.showSuccessSnackBar(
+                        'Receipt summary copied to clipboard',
                       );
                     },
                   ),
@@ -182,18 +197,18 @@ class _PaymentDetailPageView extends StatelessWidget {
     IconData statusIcon;
 
     if (payment.isSuccess) {
-      badgeBg = AppColors.success.withValues(alpha: 0.12);
-      badgeFg = AppColors.success;
+      badgeBg = colors.success.withValues(alpha: 0.14);
+      badgeFg = colors.success;
       statusTitle = l10n.paymentSuccessfulUpper;
       statusIcon = Icons.check_circle_rounded;
     } else if (payment.isFailed) {
-      badgeBg = AppColors.error.withValues(alpha: 0.12);
-      badgeFg = AppColors.error;
+      badgeBg = colors.error.withValues(alpha: 0.14);
+      badgeFg = colors.error;
       statusTitle = l10n.paymentFailedUpper;
       statusIcon = Icons.cancel_rounded;
     } else {
-      badgeBg = AppColors.warning.withValues(alpha: 0.12);
-      badgeFg = AppColors.warning;
+      badgeBg = colors.warning.withValues(alpha: 0.14);
+      badgeFg = colors.warning;
       statusTitle = l10n.processingUpper;
       statusIcon = Icons.timelapse_rounded;
     }
@@ -224,7 +239,11 @@ class _PaymentDetailPageView extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  payment.season,
+                  _hasValue(payment.season)
+                      ? payment.season
+                      : (payment.fiscalYear != null
+                          ? 'FY ${payment.fiscalYear}'
+                          : l10n.paymentReceipt),
                   style: context.titleMedium.bold.withColor(colors.textPrimary),
                 ),
               ),
@@ -258,9 +277,9 @@ class _PaymentDetailPageView extends StatelessWidget {
             style: context.displaySmall.bold
                 .withColor(
                   payment.isSuccess
-                      ? AppColors.success
+                      ? colors.success
                       : (payment.isFailed
-                            ? AppColors.error
+                            ? colors.error
                             : colors.textPrimary),
                 )
                 .withSize(36),
@@ -310,6 +329,12 @@ class _PaymentDetailPageView extends StatelessWidget {
     );
   }
 
+  bool _hasValue(String? value) {
+    return value != null &&
+        value.trim().isNotEmpty &&
+        value.trim().toUpperCase() != 'N/A';
+  }
+
   // ─── 2. Transaction Details Card ─────────────────────────────
 
   Widget _buildTransactionDetailsCard(
@@ -331,10 +356,10 @@ class _PaymentDetailPageView extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.receipt_rounded,
                 size: 20,
-                color: AppColors.headerTeal,
+                color: colors.canalGreen,
               ),
               const SizedBox(width: 8),
               Text(l10n.transactionParticulars, style: context.sectionTitle.bold),
@@ -344,18 +369,24 @@ class _PaymentDetailPageView extends StatelessWidget {
           Divider(color: colors.billDivider, height: 1),
           const SizedBox(height: AppSpacing.sm),
           _buildInfoRow(l10n.officialReceiptNo, payment.paymentNumber, context),
-          _buildInfoRow(l10n.paymentMode, payment.paymentMode, context),
-          _buildInfoRow(l10n.paymentGateway, payment.gatewayName, context),
-          _buildInfoRow(
-            l10n.gatewayRefId,
-            payment.gatewayTransactionId ?? l10n.notAvailable,
-            context,
-          ),
-          _buildInfoRow(
-            l10n.bankReferenceNo,
-            payment.bankReference ?? l10n.notAvailable,
-            context,
-          ),
+          if (_hasValue(payment.paymentMode))
+            _buildInfoRow(l10n.paymentMode, payment.paymentMode, context),
+          if (_hasValue(payment.gatewayName))
+            _buildInfoRow(l10n.paymentGateway, payment.gatewayName, context),
+          if (_hasValue(payment.gatewayTransactionId))
+            _buildInfoRow(
+              l10n.gatewayRefId,
+              payment.gatewayTransactionId!,
+              context,
+            ),
+          if (_hasValue(payment.bankReference))
+            _buildInfoRow(
+              l10n.bankReferenceNo,
+              payment.bankReference!,
+              context,
+            ),
+          if (_hasValue(payment.fiscalYear))
+            _buildInfoRow(l10n.fiscalYear, payment.fiscalYear!, context),
           _buildInfoRow(
             l10n.paymentDateTime,
             payment.formattedDateTime,
@@ -374,6 +405,25 @@ class _PaymentDetailPageView extends StatelessWidget {
   ) {
     final colors = context.colors;
     final l10n = context.l10n;
+
+    final rows = <Widget>[
+      if (_hasValue(payment.consumerName))
+        _buildInfoRow(l10n.farmerName, payment.consumerName!, context),
+      if (_hasValue(payment.consumerId))
+        _buildInfoRow(l10n.kisanConsumerId, payment.consumerId!, context),
+      if (_hasValue(payment.wuaSocietyName))
+        _buildInfoRow(l10n.wuaSociety, payment.wuaSocietyName!, context),
+      if (_hasValue(payment.billNumber))
+        _buildInfoRow(l10n.billNumber, payment.billNumber!, context),
+      if (_hasValue(payment.season))
+        _buildInfoRow(l10n.season, payment.season, context),
+      if (_hasValue(payment.cropType))
+        _buildInfoRow(l10n.cropCultivated, payment.cropType, context),
+    ];
+
+    if (rows.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return Container(
       decoration: BoxDecoration(
@@ -402,28 +452,7 @@ class _PaymentDetailPageView extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
           Divider(color: colors.billDivider, height: 1),
           const SizedBox(height: AppSpacing.sm),
-          _buildInfoRow(
-            l10n.farmerName,
-            payment.consumerName ?? 'Ramesh Patil',
-            context,
-          ),
-          _buildInfoRow(
-            l10n.kisanConsumerId,
-            payment.consumerId ?? 'KISAN-MH-41201',
-            context,
-          ),
-          _buildInfoRow(
-            l10n.wuaSociety,
-            payment.wuaSocietyName ?? 'Ganga-Godavari WUA #12',
-            context,
-          ),
-          _buildInfoRow(
-            l10n.billNumber,
-            payment.billNumber ?? 'WUA-PANI-BILL',
-            context,
-          ),
-          _buildInfoRow(l10n.season, payment.season, context),
-          _buildInfoRow(l10n.cropCultivated, payment.cropType, context),
+          ...rows,
         ],
       ),
     );
@@ -449,7 +478,7 @@ class _PaymentDetailPageView extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: () => _openOfficialReceipt(context, payment),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.headerTeal,
+                backgroundColor: colors.billCtaBg,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
@@ -476,6 +505,16 @@ class _PaymentDetailPageView extends StatelessWidget {
               icon: const Icon(Icons.download_rounded, size: 16),
               label: Text(l10n.downloadPdfCertificate),
             ),
+            if (payment.billId != null && payment.billId!.trim().isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.sm),
+              TextButton.icon(
+                onPressed: () {
+                  context.push('/bills/${payment.billId}');
+                },
+                icon: const Icon(Icons.description_outlined, size: 16),
+                label: Text(l10n.viewLinkedBill),
+              ),
+            ],
           ],
         ),
       );

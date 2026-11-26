@@ -103,7 +103,7 @@ void main() {
       expect(find.text('एकूण भरलेली रक्कम'), findsOneWidget);
       expect(find.text('१ पूर्ण'), findsNothing);
       expect(find.text('1 पूर्ण'), findsOneWidget);
-      expect(find.text('UPI द्वारे भरा'), findsOneWidget);
+      expect(find.text('आता भरा'), findsOneWidget);
       expect(find.text('पावती'), findsNWidgets(2));
       expect(find.text('पुन्हा प्रयत्न करा'), findsOneWidget);
       expect(find.text('तपशील'), findsOneWidget);
@@ -136,7 +136,7 @@ void main() {
 
       expect(find.text('कुल निपटाए गए भुगतान'), findsOneWidget);
       expect(find.text('2 पूर्ण'), findsOneWidget);
-      expect(find.text('UPI द्वारा भुगतान करें'), findsOneWidget);
+      expect(find.text('अभी भुगतान करें'), findsOneWidget);
       expect(find.text('रसीद'), findsOneWidget);
       expect(find.text('जल संसाधन विभाग'), findsOneWidget);
       expect(find.text('पानी पट्टी ई-रसीद'), findsOneWidget);

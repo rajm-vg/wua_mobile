@@ -4,12 +4,12 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:wua_mobile/core/di/injection_container.dart';
 import 'package:wua_mobile/core/extensions/extensions.dart';
+import 'package:wua_mobile/core/router/route_names.dart';
 import 'package:wua_mobile/features/bills/domain/entities/bill_entity.dart';
 import 'package:wua_mobile/features/bills/presentation/bloc/bills_bloc.dart';
 import 'package:wua_mobile/features/bills/presentation/bloc/bills_event.dart';
 import 'package:wua_mobile/features/bills/presentation/bloc/bills_state.dart';
 import 'package:wua_mobile/features/bills/presentation/widgets/bill_receipt_sheet.dart';
-import 'package:wua_mobile/features/payments/payments.dart';
 import 'package:wua_mobile/shared/widgets/wua_scaffold.dart';
 
 /// Detailed view for a specific WUA Pani Patti Bill.
@@ -194,13 +194,13 @@ class _BillDetailPageView extends StatelessWidget {
     IconData badgeIcon;
 
     if (bill.isPaid) {
-      badgeBg = AppColors.success.withValues(alpha: 0.12);
-      badgeFg = AppColors.success;
+      badgeBg = colors.success.withValues(alpha: 0.14);
+      badgeFg = colors.success;
       badgeTitle = l10n.paidInFullUpper;
       badgeIcon = Icons.check_circle_rounded;
     } else if (bill.isOverdue) {
-      badgeBg = AppColors.error.withValues(alpha: 0.12);
-      badgeFg = AppColors.error;
+      badgeBg = colors.error.withValues(alpha: 0.14);
+      badgeFg = colors.error;
       badgeTitle = l10n.overdueUpper;
       badgeIcon = Icons.warning_amber_rounded;
     } else {
@@ -371,26 +371,14 @@ class _BillDetailPageView extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
           Divider(color: colors.billDivider, height: 1),
           const SizedBox(height: AppSpacing.sm),
-          _buildInfoRow(
-            l10n.farmerName,
-            bill.consumerName ?? 'Ramesh Patil',
-            context,
-          ),
+          _buildInfoRow(l10n.farmerName, bill.consumerName ?? 'N/A', context),
           _buildInfoRow(
             l10n.kisanConsumerId,
-            bill.consumerId ?? 'KISAN-MH-41201',
+            bill.consumerId ?? 'N/A',
             context,
           ),
-          _buildInfoRow(
-            l10n.wuaSociety,
-            bill.wuaSocietyName ?? 'Ganga-Godavari WUA #12',
-            context,
-          ),
-          _buildInfoRow(
-            l10n.canalSection,
-            bill.canalSection ?? 'Minor-3 (Outlet 4B)',
-            context,
-          ),
+          _buildInfoRow(l10n.wuaSociety, bill.wuaSocietyName ?? 'N/A', context),
+          _buildInfoRow(l10n.canalSection, bill.canalSection ?? 'N/A', context),
           _buildInfoRow(l10n.cropCultivated, bill.cropType, context),
           _buildInfoRow(
             l10n.commandLandArea,
@@ -460,7 +448,8 @@ class _BillDetailPageView extends StatelessWidget {
                 context,
                 title: l10n.waterRate,
                 value: l10n.ratePerAcre(
-                  (bill.subtotal / (bill.landAreaAcres > 0 ? bill.landAreaAcres : 1))
+                  (bill.subtotal /
+                          (bill.landAreaAcres > 0 ? bill.landAreaAcres : 1))
                       .toStringAsFixed(0),
                 ),
                 subtitle: l10n.govtCanalTariff,
@@ -526,16 +515,8 @@ class _BillDetailPageView extends StatelessWidget {
           Divider(color: colors.billDivider, height: 1),
           const SizedBox(height: AppSpacing.sm),
 
-          _buildBreakdownRow(
-            l10n.baseWaterTariff,
-            bill.subtotal,
-            context,
-          ),
-          _buildBreakdownRow(
-            l10n.govtWaterCessTaxes,
-            bill.taxes,
-            context,
-          ),
+          _buildBreakdownRow(l10n.baseWaterTariff, bill.subtotal, context),
+          _buildBreakdownRow(l10n.govtWaterCessTaxes, bill.taxes, context),
           _buildBreakdownRow(
             l10n.wuaInfrastructureMaint,
             bill.maintenanceCess,
@@ -584,11 +565,11 @@ class _BillDetailPageView extends StatelessWidget {
               children: [
                 Text(
                   l10n.amountPaid,
-                  style: context.bodySmall.withColor(AppColors.success),
+                  style: context.bodySmall.withColor(colors.success),
                 ),
                 Text(
                   '- ${_formatCurrency(bill.paidAmount)}',
-                  style: context.bodySmall.bold.withColor(AppColors.success),
+                  style: context.bodySmall.bold.withColor(colors.success),
                 ),
               ],
             ),
@@ -614,8 +595,8 @@ class _BillDetailPageView extends StatelessWidget {
                   _formatCurrency(bill.isPaid ? 0.0 : bill.outstandingAmount),
                   style: context.titleMedium.bold.withColor(
                     bill.isPaid
-                        ? AppColors.success
-                        : (bill.isOverdue ? AppColors.error : colors.primary),
+                        ? colors.success
+                        : (bill.isOverdue ? colors.error : colors.primary),
                   ),
                 ),
               ],
@@ -645,9 +626,9 @@ class _BillDetailPageView extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(
+                Icon(
                   Icons.verified_rounded,
-                  color: AppColors.success,
+                  color: colors.success,
                   size: 24,
                 ),
                 const SizedBox(width: 10),
@@ -658,11 +639,11 @@ class _BillDetailPageView extends StatelessWidget {
                       Text(
                         l10n.paymentCompleted,
                         style: context.labelMedium.bold.withColor(
-                          AppColors.success,
+                          colors.success,
                         ),
                       ),
                       Text(
-                        l10n.refPrefix(bill.paymentReference ?? 'UPI/WRD/894123'),
+                        l10n.refPrefix(bill.paymentReference ?? 'N/A'),
                         style: context.caption.withSize(11),
                       ),
                     ],
@@ -676,7 +657,7 @@ class _BillDetailPageView extends StatelessWidget {
                 BillReceiptSheet.show(context, bill: bill);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.headerTeal,
+                backgroundColor: colors.billCtaBg,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
@@ -704,7 +685,7 @@ class _BillDetailPageView extends StatelessWidget {
         children: [
           ElevatedButton.icon(
             onPressed: () {
-              UpiAppChooserSheet.show(context, bill: bill);
+              context.pushNamed(RouteNames.paymentCheckout, extra: bill);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: colors.billCtaBg,
@@ -717,24 +698,9 @@ class _BillDetailPageView extends StatelessWidget {
             ),
             icon: const Icon(Icons.payment_rounded, size: 18),
             label: Text(
-              l10n.payAmountViaUpi(_formatCurrency(bill.outstandingAmount)),
+              l10n.payAmountViaEasebuzz(_formatCurrency(bill.outstandingAmount)),
               style: context.buttonText.bold.white,
             ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          OutlinedButton.icon(
-            onPressed: () {
-              context.push('/payments/gateway?mode=netbanking', extra: bill);
-            },
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 13),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
-              ),
-              side: BorderSide(color: colors.cardBorder),
-            ),
-            icon: const Icon(Icons.account_balance_rounded, size: 16),
-            label: Text(l10n.netBankingDebitCard),
           ),
           const SizedBox(height: AppSpacing.sm),
           Row(

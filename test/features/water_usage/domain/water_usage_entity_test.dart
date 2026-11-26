@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:wua_mobile/features/water_usage/data/models/water_usage_model.dart';
 import 'package:wua_mobile/features/water_usage/domain/entities/water_usage_entity.dart';
 
 void main() {
@@ -76,6 +77,36 @@ void main() {
 
       expect(nearLimitQuota.isNearLimit, isTrue);
       expect(nearLimitQuota.isLimitExceeded, isFalse);
+    });
+
+    test('WaterUsage models use N/A and 0 defaults when API fields are missing', () {
+      final quota = WaterQuotaModel.fromJson(const {});
+      expect(quota.season, equals('N/A'));
+      expect(quota.totalQuotaHaCm, equals(0.0));
+      expect(quota.usedQuotaHaCm, equals(0.0));
+      expect(quota.canalName, equals('N/A'));
+      expect(quota.wuaSocietyName, equals('N/A'));
+      expect(quota.farmerName, equals('N/A'));
+      expect(quota.totalTurnsCount, equals(0));
+      expect(quota.completedTurnsCount, equals(0));
+      expect(quota.soilMoistureStatus, equals('N/A'));
+
+      final turn = IrrigationTurnModel.fromJson(const {});
+      expect(turn.turnNumber, equals(0));
+      expect(turn.season, equals('N/A'));
+      expect(turn.outletNo, equals('N/A'));
+      expect(turn.gateNo, equals('N/A'));
+      expect(turn.dischargeCusecs, equals(0.0));
+      expect(turn.waterDeliveredHaCm, equals(0.0));
+      expect(turn.crop, equals('N/A'));
+      expect(turn.fieldParcel, equals('N/A'));
+      expect(turn.inspectorName, equals('N/A'));
+
+      final crop = CropWaterUsageModel.fromJson(const {});
+      expect(crop.cropName, equals('N/A'));
+      expect(crop.areaAcres, equals(0.0));
+      expect(crop.allocatedHaCm, equals(0.0));
+      expect(crop.usedHaCm, equals(0.0));
     });
   });
 }

@@ -761,4 +761,62 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get securedViaWrdGateway =>
       'Secured via WRD Government Payment Gateway';
+
+  @override
+  String payAmountViaEasebuzz(String amount) {
+    return 'Pay $amount via Easebuzz';
+  }
+
+  @override
+  String get paymentAmountPartialFull => 'Payment Amount (Partial / Full)';
+
+  @override
+  String get paymentSuccessfulTitle => 'Payment Successful!';
+
+  @override
+  String get paymentFailedTitle => 'Payment Failed';
+
+  @override
+  String get viewLinkedBill => 'View Linked Bill';
+
+  @override
+  String get fiscalYear => 'Fiscal Year';
+
+  @override
+  String get sortAndFilter => 'Sort & Filter';
+
+  @override
+  String get sortBy => 'Sort By';
+
+  @override
+  String get newestFirst => 'Newest First';
+
+  @override
+  String get oldestFirst => 'Oldest First';
+
+  @override
+  String get amountHighToLow => 'Amount: High to Low';
+
+  @override
+  String get amountLowToHigh => 'Amount: Low to High';
+
+  @override
+  String get filters => 'Filters';
+
+  @override
+  String get allFiscalYears => 'All FY';
+
+  @override
+  String get allSeasons => 'All Seasons';
+
+  @override
+  String get allPaymentModes => 'All Modes';
+
+  @override
+  String get applyFilters => 'Apply';
+
+  @override
+  String showingCountOfTotal(int filtered, int total) {
+    return 'Showing $filtered of $total';
+  }
 }

@@ -1,6 +1,7 @@
+import 'package:wua_mobile/core/utils/json_parse_utils.dart';
 import 'package:wua_mobile/features/payments/domain/entities/payment_entity.dart';
 
-/// Data transfer model for Payment transactions.
+/// Data transfer model for Payment transactions aligned with `receipt_details`.
 class PaymentModel extends PaymentEntity {
   const PaymentModel({
     required super.id,
@@ -21,47 +22,145 @@ class PaymentModel extends PaymentEntity {
     super.gatewayName,
     super.remarks,
     super.metadata,
+    super.farmerMemberId,
+    super.societyId,
+    super.fiscalYear,
+    super.valueDate,
+    super.instrumentType,
+    super.receiptNo,
+    super.bankLedgerId,
+    super.glTranId,
+    super.rawStatus,
   });
 
   factory PaymentModel.fromJson(Map<String, dynamic> json) {
+    final statusStr = JsonParseUtils.parseStringOrNull(json['status']);
+    final sStatus = JsonParseUtils.parseStringOrNull(json['sStatus']);
+    String resolvedStatus;
+    if (sStatus == 'A' || JsonParseUtils.parseBool(json['isPaymentDone'])) {
+      resolvedStatus = PaymentStatus.success;
+    } else if (sStatus == 'P') {
+      resolvedStatus = PaymentStatus.pending;
+    } else if (sStatus == 'F') {
+      resolvedStatus = PaymentStatus.failed;
+    } else if (statusStr != null) {
+      resolvedStatus = statusStr;
+    } else {
+      resolvedStatus = PaymentStatus.success;
+    }
+
+    final rawReceiptNo = JsonParseUtils.parseIntOrNull(
+      json['nReceiptNo'] ?? json['receiptNo'] ?? json['receipt_no'],
+    );
+
     return PaymentModel(
-      id: _parseString(json['id']),
-      paymentNumber: _parseString(
-        json['payment_number'] ?? json['receipt_number'] ?? json['receiptNumber'] ?? json['txnid'],
+      id: JsonParseUtils.parseString(json['id']),
+      paymentNumber: JsonParseUtils.parseString(
+        json['payment_number'] ??
+            json['receipt_number'] ??
+            json['receiptNumber'] ??
+            (rawReceiptNo != null ? 'REC-$rawReceiptNo' : null) ??
+            json['txnid'] ??
+            (json['id'] != null ? 'REC-${json['id']}' : 'REC-000'),
       ),
-      status: _parseString(json['status'], defaultValue: PaymentStatus.success),
-      amount: _parseDouble(json['amount'] ?? json['paid_amount']),
-      paymentDate: _parseDateTime(
-            json['payment_date'] ?? json['paymentDate'] ?? json['created_at'],
-          ) ??
-          DateTime.now(),
-      billId: _parseStringOrNull(json['bill_id'] ?? json['billId']),
-      billNumber: _parseStringOrNull(json['bill_number'] ?? json['billNumber']),
-      consumerId: _parseStringOrNull(json['consumer_id'] ?? json['consumerId']),
-      consumerName: _parseStringOrNull(
-        json['consumer_name'] ?? json['consumerName'] ?? json['customer'],
+      status: resolvedStatus,
+      amount: JsonParseUtils.parseDouble(
+        json['amount'] ?? json['paid_amount'] ?? json['nAmount'],
       ),
-      wuaSocietyName: _parseStringOrNull(
-        json['wua_society_name'] ?? json['society_name'] ?? json['societyName'],
+      paymentDate: JsonParseUtils.parseDateTimeOrNow(
+        json['payment_date'] ??
+            json['paymentDate'] ??
+            json['dReceiptDate'] ??
+            json['dRequestDate'] ??
+            json['dUserDateTime'] ??
+            json['dValueDate'] ??
+            json['dPayDate'] ??
+            json['created_at'],
       ),
-      season: _parseString(json['season'], defaultValue: 'Current Season'),
-      cropType: _parseString(json['crop_type'] ?? json['cropType'], defaultValue: 'Wheat'),
-      paymentMode: _parseString(
-        json['payment_mode'] ?? json['paymentMode'] ?? json['mode'],
-        defaultValue: 'UPI',
+      billId: JsonParseUtils.parseStringOrNull(
+        json['bill_id'] ?? json['billId'] ?? json['billNo'],
       ),
-      gatewayTransactionId: _parseStringOrNull(
-        json['gateway_transaction_id'] ?? json['gatewayTransactionId'] ?? json['reference_id'],
+      billNumber: JsonParseUtils.parseStringOrNull(
+        json['bill_number'] ??
+            json['billNumber'] ??
+            (json['billNo'] != null ? 'BILL-${json['billNo']}' : null),
       ),
-      bankReference: _parseStringOrNull(
-        json['bank_reference'] ?? json['bankReference'] ?? json['bank_ref_no'],
+      consumerId: JsonParseUtils.parseStringOrNull(
+        json['consumer_id'] ?? json['consumerId'] ?? json['iFarmerMemberId'],
       ),
-      gatewayName: _parseString(
-        json['gateway_name'] ?? json['gatewayName'],
-        defaultValue: 'MahaGov WRD Gateway',
+      consumerName: JsonParseUtils.parseStringOrNull(
+        json['consumer_name'] ??
+            json['consumerName'] ??
+            json['customer'] ??
+            json['sFarmerName'],
       ),
-      remarks: _parseStringOrNull(json['remarks'] ?? json['notes']),
-      metadata: json['metadata'] as Map<String, dynamic>?,
+      wuaSocietyName: JsonParseUtils.parseStringOrNull(
+        json['wua_society_name'] ??
+            json['society_name'] ??
+            json['societyName'] ??
+            json['sWuaName'],
+      ),
+      season: JsonParseUtils.parseString(
+        json['season'] ?? json['sSeason'],
+        defaultValue: 'N/A',
+      ),
+      cropType: JsonParseUtils.parseString(
+        json['crop_type'] ?? json['cropType'] ?? json['sCrop'],
+        defaultValue: 'N/A',
+      ),
+      paymentMode: JsonParseUtils.parseString(
+        json['payment_mode'] ??
+            json['paymentMode'] ??
+            json['sInstrumentType'] ??
+            json['sTransactionType'] ??
+            json['mode'],
+        defaultValue: 'N/A',
+      ),
+      gatewayTransactionId: JsonParseUtils.parseStringOrNull(
+        json['gateway_transaction_id'] ??
+            json['gatewayTransactionId'] ??
+            json['reference_id'] ??
+            json['sTransactionId'],
+      ),
+      bankReference: JsonParseUtils.parseStringOrNull(
+        json['bank_reference'] ??
+            json['bankReference'] ??
+            json['bank_ref_no'] ??
+            json['sBranch'],
+      ),
+      gatewayName: JsonParseUtils.parseString(
+        json['gateway_name'] ?? json['gatewayName'] ?? json['sBankName'],
+        defaultValue: 'N/A',
+      ),
+      remarks: JsonParseUtils.parseStringOrNull(
+        json['remarks'] ?? json['notes'] ?? json['sRemarks'],
+      ),
+      metadata: JsonParseUtils.parseMapOrNull(json['metadata']),
+      farmerMemberId: JsonParseUtils.parseIntOrNull(
+        json['iFarmerMemberId'] ?? json['farmerMemberId'] ?? json['farmer_member_id'],
+      ),
+      societyId: JsonParseUtils.parseIntOrNull(
+        json['iSocietyId'] ?? json['societyId'] ?? json['society_id'],
+      ),
+      fiscalYear: JsonParseUtils.parseStringOrNull(
+        json['sFiscalYear'] ?? json['fiscalYear'] ?? json['fiscal_year'],
+      ),
+      valueDate: JsonParseUtils.parseDateTime(
+        json['dValueDate'] ?? json['valueDate'] ?? json['value_date'],
+      ),
+      instrumentType: JsonParseUtils.parseStringOrNull(
+        json['sInstrumentType'] ?? json['instrumentType'] ?? json['payment_mode'],
+      ),
+      receiptNo: rawReceiptNo,
+      bankLedgerId: JsonParseUtils.parseIntOrNull(
+        json['iBankLedgerId'] ?? json['bankLedgerId'] ?? json['bank_ledger_id'],
+      ),
+      glTranId: JsonParseUtils.parseIntOrNull(
+        json['iGlTranId'] ?? json['glTranId'] ?? json['gl_tran_id'],
+      ),
+      rawStatus: JsonParseUtils.parseStringOrNull(
+        json['sStatus'] ?? json['rawStatus'] ?? json['raw_status'],
+      ),
     );
   }
 
@@ -85,32 +184,35 @@ class PaymentModel extends PaymentEntity {
       'gateway_name': gatewayName,
       'remarks': remarks,
       'metadata': metadata,
+      'iFarmerMemberId': farmerMemberId,
+      'iSocietyId': societyId,
+      'sFiscalYear': fiscalYear,
+      'dValueDate': valueDate?.toIso8601String(),
+      'sInstrumentType': instrumentType ?? paymentMode,
+      'nReceiptNo': receiptNo,
+      'iBankLedgerId': bankLedgerId,
+      'iGlTranId': glTranId,
+      'sStatus': rawStatus ?? (isSuccess ? 'A' : 'P'),
     };
   }
 
-  static String _parseString(dynamic value, {String defaultValue = ''}) {
-    if (value == null) return defaultValue;
-    return value.toString().trim();
+  /// Request payload format for `/api/post-receipt-entry/request` (wrd_backend PostReceiptEntryDTO).
+  Map<String, dynamic> toPostReceiptEntryRequestJson() {
+    return {
+      'iFarmerMemberId': farmerMemberId ?? int.tryParse(consumerId ?? ''),
+      'iSocietyId': societyId,
+      'billNo': int.tryParse(billId ?? ''),
+      'dReceiptDate': paymentDate.toIso8601String(),
+      'dValueDate': (valueDate ?? paymentDate).toIso8601String(),
+      'sFiscalYear': fiscalYear,
+      'nAmount': amount,
+      'sInstrumentType': (instrumentType ?? paymentMode).toUpperCase().contains('UPI') ? 'UPI' : 'ONLINE',
+      'sTransactionId': gatewayTransactionId ?? paymentNumber,
+      'sBankName': gatewayName,
+      'sBranch': bankReference,
+      'sRemarks': remarks,
+      'sStatus': rawStatus ?? 'A',
+    };
   }
 
-  static String? _parseStringOrNull(dynamic value) {
-    if (value == null) return null;
-    final str = value.toString().trim();
-    return str.isEmpty ? null : str;
-  }
-
-  static double _parseDouble(dynamic value, {double defaultValue = 0.0}) {
-    if (value == null) return defaultValue;
-    if (value is num) return value.toDouble();
-    if (value is String) return double.tryParse(value) ?? defaultValue;
-    return defaultValue;
-  }
-
-  static DateTime? _parseDateTime(dynamic value) {
-    if (value == null) return null;
-    if (value is DateTime) return value;
-    if (value is String) return DateTime.tryParse(value);
-    return null;
-  }
 }
-

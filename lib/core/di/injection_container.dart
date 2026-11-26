@@ -123,7 +123,7 @@ Future<void> _initAuthenticationFeature() async {
 Future<void> _initBillsFeature() async {
   // Data Sources
   sl.registerLazySingleton<BillRemoteDataSource>(
-    () => BillRemoteDataSourceImpl(apiClient: sl()),
+    () => BillRemoteDataSourceImpl(apiClient: sl(), authLocalDataSource: sl()),
   );
 
   // Repository
@@ -143,8 +143,11 @@ Future<void> _initBillsFeature() async {
 
 Future<void> _initPaymentsFeature() async {
   // Data Sources
+  sl.registerLazySingleton<EasebuzzSdkService>(
+    EasebuzzSdkServiceImpl.new,
+  );
   sl.registerLazySingleton<PaymentRemoteDataSource>(
-    () => PaymentRemoteDataSourceImpl(apiClient: sl()),
+    () => PaymentRemoteDataSourceImpl(apiClient: sl(), authLocalDataSource: sl()),
   );
 
   // Repository
@@ -168,7 +171,7 @@ Future<void> _initPaymentsFeature() async {
 Future<void> _initWaterUsageFeature() async {
   // Data Sources
   sl.registerLazySingleton<WaterUsageRemoteDataSource>(
-    () => WaterUsageRemoteDataSourceImpl(apiClient: sl()),
+    () => WaterUsageRemoteDataSourceImpl(apiClient: sl(), authLocalDataSource: sl()),
   );
 
   // Repository

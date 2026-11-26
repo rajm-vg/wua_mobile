@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:wua_mobile/core/di/injection_container.dart';
 import 'package:wua_mobile/core/extensions/extensions.dart';
+import 'package:wua_mobile/features/authentication/domain/repositories/auth_repository.dart';
 import 'package:wua_mobile/shared/widgets/wua_bottom_sheet.dart';
 
 /// Modal bottom sheet for updating account password securely.
@@ -26,6 +28,7 @@ class _ChangePasswordBottomSheetState extends State<ChangePasswordBottomSheet> {
   bool _obscureCurrent = true;
   bool _obscureNew = true;
   bool _obscureConfirm = true;
+  bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -35,20 +38,43 @@ class _ChangePasswordBottomSheetState extends State<ChangePasswordBottomSheet> {
     super.dispose();
   }
 
-  void _onSubmit() {
-    if (_newPasswordController.text.isEmpty ||
-        _currentPasswordController.text.isEmpty) {
+  Future<void> _onSubmit() async {
+    final currentPassword = _currentPasswordController.text;
+    final newPassword = _newPasswordController.text;
+    final confirmPassword = _confirmPasswordController.text;
+
+    if (newPassword.isEmpty || currentPassword.isEmpty) {
       context.showWarningSnackBar('Please enter all required fields');
       return;
     }
 
-    if (_newPasswordController.text != _confirmPasswordController.text) {
+    if (newPassword.length < 4) {
+      context.showWarningSnackBar(
+        'New password must be at least 4 characters long',
+      );
+      return;
+    }
+
+    if (newPassword != confirmPassword) {
       context.showErrorSnackBar('New passwords do not match');
       return;
     }
 
-    Navigator.of(context).pop();
-    context.showSuccessSnackBar('Password updated successfully!');
+    setState(() => _isSubmitting = true);
+    final result = await sl<AuthRepository>().changePassword(
+      currentPassword: currentPassword,
+      newPassword: newPassword,
+    );
+    if (!mounted) return;
+    setState(() => _isSubmitting = false);
+
+    result.fold(
+      (failure) => context.showErrorSnackBar(failure.message),
+      (_) {
+        Navigator.of(context).pop();
+        context.showSuccessSnackBar('Password updated successfully!');
+      },
+    );
   }
 
   @override
@@ -150,7 +176,7 @@ class _ChangePasswordBottomSheetState extends State<ChangePasswordBottomSheet> {
           SizedBox(
             height: 50,
             child: ElevatedButton(
-              onPressed: _onSubmit,
+              onPressed: _isSubmitting ? null : _onSubmit,
               style: ElevatedButton.styleFrom(
                 backgroundColor: colors.headerBackground,
                 foregroundColor: Colors.white,
@@ -159,10 +185,22 @@ class _ChangePasswordBottomSheetState extends State<ChangePasswordBottomSheet> {
                 ),
                 elevation: 0,
               ),
-              child: const Text(
-                'Update Password',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
+              child: _isSubmitting
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : const Text(
+                      'Update Password',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
             ),
           ),
         ],

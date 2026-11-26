@@ -1,5 +1,4 @@
 import 'package:dartz/dartz.dart';
-import 'package:wua_mobile/core/errors/exceptions.dart';
 import 'package:wua_mobile/core/errors/failures.dart';
 import 'package:wua_mobile/core/network/network_info.dart';
 import 'package:wua_mobile/features/bills/data/datasources/bill_remote_datasource.dart';
@@ -39,11 +38,9 @@ class BillRepositoryImpl implements BillRepository {
       );
 
       return Right(models);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, code: e.statusCode));
     } catch (e) {
       return Left(
-        ServerFailure(message: 'Failed to retrieve bills: ${e.toString()}'),
+        mapExceptionToFailure(e, fallbackPrefix: 'Failed to retrieve bills'),
       );
     }
   }
@@ -62,11 +59,12 @@ class BillRepositoryImpl implements BillRepository {
 
       final model = await remoteDataSource.getBillById(id);
       return Right(model);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, code: e.statusCode));
     } catch (e) {
       return Left(
-        ServerFailure(message: 'Failed to retrieve bill detail: ${e.toString()}'),
+        mapExceptionToFailure(
+          e,
+          fallbackPrefix: 'Failed to retrieve bill detail',
+        ),
       );
     }
   }
@@ -95,11 +93,9 @@ class BillRepositoryImpl implements BillRepository {
         paidAmount: paidAmount,
       );
       return Right(model);
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, code: e.statusCode));
     } catch (e) {
       return Left(
-        ServerFailure(message: 'Failed to mark bill as paid: ${e.toString()}'),
+        mapExceptionToFailure(e, fallbackPrefix: 'Failed to mark bill as paid'),
       );
     }
   }

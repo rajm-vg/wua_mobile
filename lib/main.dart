@@ -30,13 +30,14 @@ Future<void> main() async {
   GlobalErrorHandler.initialize();
 
   // ── Environment ─────────────────────────────────────────────
-  // Change this to switch environments:
-  // AppEnvironment.development | .qa | .uat | .production
-  const environment = AppEnvironment.development;
+  // Pass --dart-define=ENV=dev|qa|uat|prod (defaults to development).
+  final environment = EnvConfig.resolveEnvironment();
   EnvConfig.setEnvironment(environment);
   await dotenv.load(fileName: EnvConfig.envFileName);
 
-  AppLogger.info('Environment: ${EnvConfig.buildFlavor}');
+  AppLogger.info(
+    'Environment: ${EnvConfig.buildFlavor} (${EnvConfig.envFileName})',
+  );
   AppLogger.info('Base URL: ${EnvConfig.baseUrl}');
 
   // ── Dependency Injection ────────────────────────────────────
