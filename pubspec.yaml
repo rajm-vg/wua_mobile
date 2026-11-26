@@ -75,5 +75,6 @@ flutter:
     - .env.dev
     - .env.qa
     - .env.uat
+    - .env.preprod
     - .env.prod
     - assets/images/

@@ -49,7 +49,7 @@ void main() {
       expect(JsonParseUtils.parseDateTime(now), now);
       expect(
         JsonParseUtils.parseDateTime('2026-11-25T10:30:00Z'),
-        DateTime.parse('2026-11-25T10:30:00Z'),
+        DateTime.parse('2026-11-25T10:30:00Z').toLocal(),
       );
       expect(JsonParseUtils.parseDateTime('invalid'), isNull);
       expect(JsonParseUtils.parseDateTime(null), isNull);
@@ -81,6 +81,15 @@ void main() {
           {'2': 'two'},
         ],
       );
+    });
+
+    test('parseDateTime converts UTC ISO strings to device local timezone', () {
+      const utcIso = '2026-11-25T11:30:53Z';
+      final parsed = JsonParseUtils.parseDateTime(utcIso);
+
+      expect(parsed, isNotNull);
+      expect(parsed!.isUtc, isFalse);
+      expect(parsed, equals(DateTime.utc(2026, 11, 25, 11, 30, 53).toLocal()));
     });
   });
 }

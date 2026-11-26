@@ -20,6 +20,8 @@ void main() {
       expect(EnvConfig.resolveEnvironment('qa'), AppEnvironment.qa);
       expect(EnvConfig.resolveEnvironment('QA'), AppEnvironment.qa);
       expect(EnvConfig.resolveEnvironment('uat'), AppEnvironment.uat);
+      expect(EnvConfig.resolveEnvironment('preprod'), AppEnvironment.preprod);
+      expect(EnvConfig.resolveEnvironment('pre-prod'), AppEnvironment.preprod);
       expect(EnvConfig.resolveEnvironment('prod'), AppEnvironment.production);
       expect(
         EnvConfig.resolveEnvironment('production'),
@@ -39,8 +41,24 @@ void main() {
       EnvConfig.setEnvironment(AppEnvironment.uat);
       expect(EnvConfig.envFileName, '.env.uat');
 
+      EnvConfig.setEnvironment(AppEnvironment.preprod);
+      expect(EnvConfig.envFileName, '.env.preprod');
+
       EnvConfig.setEnvironment(AppEnvironment.production);
       expect(EnvConfig.envFileName, '.env.prod');
+    });
+
+    test('loads PreProd variables cleanly from .env.preprod', () {
+      final preprodContent = File('.env.preprod').readAsStringSync();
+      dotenv.loadFromString(envString: preprodContent);
+
+      expect(EnvConfig.buildFlavor, 'preprod');
+      expect(EnvConfig.isPreprod, isTrue);
+      expect(EnvConfig.isQa, isFalse);
+      expect(EnvConfig.isProduction, isFalse);
+      expect(EnvConfig.enableLogging, isTrue);
+      expect(EnvConfig.enableDemoFallback, isFalse);
+      expect(EnvConfig.easebuzzPayMode, 'test');
     });
 
     test('loads QA variables cleanly from .env.qa', () {

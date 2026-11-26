@@ -2,61 +2,76 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "wua_mobile (Dev)",
+            "name": "MahaSinchan WUA (Dev)",
             "request": "launch",
             "type": "dart",
-            "program": "lib/main.dart",
+            "program": "lib/main_dev.dart",
             "toolArgs": [
-                "--dart-define=ENV=dev"
+                "--flavor",
+                "dev"
             ]
         },
         {
-            "name": "wua_mobile (QA)",
+            "name": "MahaSinchan WUA (QA)",
             "request": "launch",
             "type": "dart",
-            "program": "lib/main.dart",
+            "program": "lib/main_qa.dart",
             "toolArgs": [
-                "--dart-define=ENV=qa"
+                "--flavor",
+                "qa"
             ]
         },
         {
-            "name": "wua_mobile (Dev - Profile)",
+            "name": "MahaSinchan WUA (PreProd)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "profile",
-            "program": "lib/main.dart",
+            "program": "lib/main_preprod.dart",
             "toolArgs": [
-                "--dart-define=ENV=dev"
+                "--flavor",
+                "preprod"
             ]
         },
         {
-            "name": "wua_mobile (QA - Profile)",
+            "name": "MahaSinchan WUA (Prod)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "profile",
-            "program": "lib/main.dart",
+            "program": "lib/main_prod.dart",
             "toolArgs": [
-                "--dart-define=ENV=qa"
+                "--flavor",
+                "prod"
             ]
         },
         {
-            "name": "wua_mobile (QA - Release)",
+            "name": "MahaSinchan WUA (QA - Release)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release",
-            "program": "lib/main.dart",
+            "program": "lib/main_qa.dart",
             "toolArgs": [
-                "--dart-define=ENV=qa"
+                "--flavor",
+                "qa"
             ]
         },
         {
-            "name": "wua_mobile (Prod - Release)",
+            "name": "MahaSinchan WUA (PreProd - Release)",
             "request": "launch",
             "type": "dart",
             "flutterMode": "release",
-            "program": "lib/main.dart",
+            "program": "lib/main_preprod.dart",
             "toolArgs": [
-                "--dart-define=ENV=prod"
+                "--flavor",
+                "preprod"
+            ]
+        },
+        {
+            "name": "MahaSinchan WUA (Prod - Release)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "program": "lib/main_prod.dart",
+            "toolArgs": [
+                "--flavor",
+                "prod"
             ]
         }
     ]

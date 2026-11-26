@@ -61,12 +61,12 @@ class WaterMetricsRow extends StatelessWidget {
           ? totalArea.toStringAsFixed(0)
           : totalArea.toStringAsFixed(1);
       balanceText = totalArea > 0
-          ? '$areaLabel Are'
+          ? '$areaLabel Acres'
           : '${activeQuota.cropBreakdown.length} Crops';
       progressValue = 1.0;
       final entryCount = activeQuota.cropBreakdown.length;
       waterSummaryText =
-          '$entryCount crop ${entryCount == 1 ? 'entry' : 'entries'} • ${activeQuota.season}';
+          '$entryCount ${entryCount == 1 ? 'crop' : 'crops'} • ${activeQuota.season}';
     } else {
       balanceText = '0 L';
       progressValue = (activeQuota.percentageUsed / 100.0).clamp(0.0, 1.0);

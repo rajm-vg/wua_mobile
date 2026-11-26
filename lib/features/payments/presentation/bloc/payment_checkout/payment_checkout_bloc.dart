@@ -252,8 +252,11 @@ class PaymentCheckoutBloc
 
       emit(state.copyWith(processingStage: 2));
       final payMode = EnvConfig.easebuzzPayMode;
+      final keyPreview = accessKey.length > 8
+          ? '${accessKey.substring(0, 4)}...${accessKey.substring(accessKey.length - 4)}'
+          : accessKey;
       AppLogger.bloc(
-        '⚡ [PAYMENT CHECKOUT BLOC] Launching Easebuzz SDK (payMode: $payMode)',
+        '⚡ [PAYMENT CHECKOUT BLOC] Launching Easebuzz SDK (payMode: $payMode, accessKey: $keyPreview, len: ${accessKey.length})',
       );
 
       final sdkResult = await sdk.payWithEasebuzz(
@@ -473,8 +476,7 @@ class PaymentCheckoutBloc
       final signature = decoded['signature']?.toString() ?? '';
       final amount = (decoded['amount'] as num?)?.toDouble() ?? 0.0;
       final payload = decoded['payload']?.toString() ?? '{}';
-      final remarks =
-          decoded['remarks']?.toString() ?? 'Settled via Easebuzz';
+      final remarks = decoded['remarks']?.toString() ?? 'Settled via Easebuzz';
 
       if (txnId.isEmpty || amount <= 0) {
         await storage.clearPendingPayment();
@@ -568,8 +570,7 @@ class PaymentCheckoutBloc
         state.copyWith(
           step: PaymentCheckoutStep.methodSelection,
           processingStage: 1,
-          errorMessage:
-              'A previous payment is pending settlement. Tap Pay to retry verification.',
+          errorMessage: 'A previous payment is pending settlement. Tap Pay to retry verification.',
         ),
       );
     }

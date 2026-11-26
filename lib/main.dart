@@ -23,15 +23,20 @@ import 'package:wua_mobile/core/theme/colors.dart';
 /// 5. Configure Bloc observer
 /// 6. Lock orientation
 /// 7. Run app
+/// Default application entry point (uses `--dart-define=ENV=...`, defaulting to `dev`).
 Future<void> main() async {
+  await bootstrap(EnvConfig.resolveEnvironment());
+}
+
+/// Shared flavor bootstrapper invoked by `main_dev.dart`, `main_qa.dart`,
+/// `main_preprod.dart`, `main_prod.dart`, and `main.dart`.
+Future<void> bootstrap(AppEnvironment environment) async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // ── Global Error Handling ───────────────────────────────────
   GlobalErrorHandler.initialize();
 
   // ── Environment ─────────────────────────────────────────────
-  // Pass --dart-define=ENV=dev|qa|uat|prod (defaults to development).
-  final environment = EnvConfig.resolveEnvironment();
   EnvConfig.setEnvironment(environment);
   await dotenv.load(fileName: EnvConfig.envFileName);
 
@@ -84,7 +89,7 @@ class WuaApp extends StatelessWidget {
           valueListenable: appThemeModeNotifier,
           builder: (context, currentThemeMode, _) {
             return MaterialApp.router(
-              title: 'WUA Mobile',
+              title: 'MahaSinchan WUA',
               scaffoldMessengerKey: SnackBarService.scaffoldMessengerKey,
               debugShowCheckedModeBanner: false,
               locale: currentLocale,

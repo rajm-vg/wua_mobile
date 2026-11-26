@@ -201,5 +201,80 @@ void main() {
         throwsA(isA<UnauthorizedException>()),
       );
     });
+
+    test('sums water quota only for active fiscalYear and season', () async {
+      final cropEndpoint = ApiEndpoints.farmerCropUsage(farmerMemberId: 69);
+      final outwardEndpoint = ApiEndpoints.outwardWaterUsages(farmerMemberId: 69);
+      final rotationsEndpoint = ApiEndpoints.canalRotations(societyId: 26);
+
+      when(() => mockApiClient.get<dynamic>(cropEndpoint)).thenAnswer(
+        (_) async => Response(
+          requestOptions: RequestOptions(path: cropEndpoint),
+          statusCode: 200,
+          data: [
+            // Most recent entry: 2026-2027, रब्बी
+            {
+              'id': 20,
+              'fiscalYear': '2026-2027',
+              'season': 'रब्बी',
+              'crop': 'Wheat',
+              'area': 2.0,
+              'waterAllocation': 10.0,
+              'waterUsageArea': 4.0,
+              'status': 'A',
+              'farmerMemberId': 69,
+            },
+            // Previous season in same year: should not be added to active balance
+            {
+              'id': 19,
+              'fiscalYear': '2026-2027',
+              'season': 'खरीप',
+              'crop': 'Soybean',
+              'area': 2.0,
+              'waterAllocation': 12.0,
+              'waterUsageArea': 12.0,
+              'status': 'A',
+              'farmerMemberId': 69,
+            },
+            // Prior fiscal year: should not be added to active balance
+            {
+              'id': 10,
+              'fiscalYear': '2025-2026',
+              'season': 'रब्बी',
+              'crop': 'Gram',
+              'area': 1.5,
+              'waterAllocation': 8.0,
+              'waterUsageArea': 8.0,
+              'status': 'A',
+              'farmerMemberId': 69,
+            },
+          ],
+        ),
+      );
+      when(() => mockApiClient.get<dynamic>(outwardEndpoint)).thenAnswer(
+        (_) async => Response(
+          requestOptions: RequestOptions(path: outwardEndpoint),
+          statusCode: 200,
+          data: const <dynamic>[],
+        ),
+      );
+      when(() => mockApiClient.get<dynamic>(rotationsEndpoint)).thenAnswer(
+        (_) async => Response(
+          requestOptions: RequestOptions(path: rotationsEndpoint),
+          statusCode: 200,
+          data: const <dynamic>[],
+        ),
+      );
+
+      final summary = await dataSource.getWaterUsageSummary();
+
+      expect(summary.quota.season, equals('रब्बी'));
+      expect(summary.quota.fiscalYear, equals('2026-2027'));
+      expect(summary.quota.totalQuotaHaCm, equals(10.0));
+      expect(summary.quota.usedQuotaHaCm, equals(4.0));
+      expect(summary.quota.remainingQuotaHaCm, equals(6.0));
+      expect(summary.quota.percentageUsed, equals(40.0));
+      expect(summary.quota.cropBreakdown.length, equals(3));
+    });
   });
 }

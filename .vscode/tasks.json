@@ -7,7 +7,10 @@
             "command": "flutter",
             "args": [
                 "run",
-                "--dart-define=ENV=dev"
+                "--flavor",
+                "dev",
+                "-t",
+                "lib/main_dev.dart"
             ],
             "problemMatcher": [],
             "presentation": {
@@ -21,7 +24,10 @@
             "command": "flutter",
             "args": [
                 "run",
-                "--dart-define=ENV=qa"
+                "--flavor",
+                "qa",
+                "-t",
+                "lib/main_qa.dart"
             ],
             "problemMatcher": [],
             "presentation": {
@@ -30,13 +36,32 @@
             }
         },
         {
-            "label": "Flutter: Run QA (Release)",
+            "label": "Flutter: Run PreProd",
             "type": "shell",
             "command": "flutter",
             "args": [
                 "run",
-                "--release",
-                "--dart-define=ENV=qa"
+                "--flavor",
+                "preprod",
+                "-t",
+                "lib/main_preprod.dart"
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            }
+        },
+        {
+            "label": "Flutter: Run Prod",
+            "type": "shell",
+            "command": "flutter",
+            "args": [
+                "run",
+                "--flavor",
+                "prod",
+                "-t",
+                "lib/main_prod.dart"
             ],
             "problemMatcher": [],
             "presentation": {
@@ -52,7 +77,10 @@
                 "build",
                 "apk",
                 "--debug",
-                "--dart-define=ENV=dev"
+                "--flavor",
+                "dev",
+                "-t",
+                "lib/main_dev.dart"
             ],
             "group": "build",
             "problemMatcher": []
@@ -65,7 +93,10 @@
                 "build",
                 "apk",
                 "--debug",
-                "--dart-define=ENV=qa"
+                "--flavor",
+                "qa",
+                "-t",
+                "lib/main_qa.dart"
             ],
             "group": {
                 "kind": "build",
@@ -74,14 +105,33 @@
             "problemMatcher": []
         },
         {
-            "label": "Flutter: Build APK (QA - Release)",
+            "label": "Flutter: Build APK (PreProd - Release)",
             "type": "shell",
             "command": "flutter",
             "args": [
                 "build",
                 "apk",
                 "--release",
-                "--dart-define=ENV=qa"
+                "--flavor",
+                "preprod",
+                "-t",
+                "lib/main_preprod.dart"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Flutter: Build APK (Prod - Release)",
+            "type": "shell",
+            "command": "flutter",
+            "args": [
+                "build",
+                "apk",
+                "--release",
+                "--flavor",
+                "prod",
+                "-t",
+                "lib/main_prod.dart"
             ],
             "group": "build",
             "problemMatcher": []
@@ -117,6 +167,55 @@
                 "isDefault": true
             },
             "problemMatcher": []
+        },
+        {
+            "label": "Backend: Run (Docker + MySQL + JDK 21 + Spring Boot)",
+            "type": "shell",
+            "isBackground": true,
+            "options": {
+                "cwd": "${workspaceFolder}/../wrd_backend"
+            },
+            "command": "docker info *> $null; if ($LASTEXITCODE -ne 0) { Write-Host 'Starting Docker Desktop...'; Start-Process 'C:\\Program Files\\Docker\\Docker\\Docker Desktop.exe'; $i = 0; while ($i -lt 30) { Start-Sleep -Seconds 2; docker info *> $null; if ($LASTEXITCODE -eq 0) { break }; $i++ }; if ($LASTEXITCODE -ne 0) { throw 'Docker Desktop did not start in time.' } }; $running = docker ps --filter 'name=^/mysql$' --format '{{.Names}}'; if ($running -ne 'mysql') { Write-Host 'Starting MySQL container...'; docker start mysql }; . .\\use-jdk21.ps1; .\\mvnw.cmd",
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            }
+        },
+        {
+            "label": "Frontend: Run (ng serve)",
+            "type": "shell",
+            "isBackground": true,
+            "options": {
+                "cwd": "${workspaceFolder}/../wrd_frontend"
+            },
+            "command": "npm",
+            "args": [
+                "start"
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            }
+        },
+        {
+            "label": "Frontend: Run QA (ng serve --configuration=qa)",
+            "type": "shell",
+            "isBackground": true,
+            "options": {
+                "cwd": "${workspaceFolder}/../wrd_frontend"
+            },
+            "command": "npm",
+            "args": [
+                "run",
+                "start:qa"
+            ],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated"
+            }
         }
     ]
 }

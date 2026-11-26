@@ -29,6 +29,36 @@ android {
         versionName = flutter.versionName
     }
 
+    buildFeatures {
+        resValues = true
+    }
+
+    flavorDimensions += "environment"
+    productFlavors {
+        create("dev") {
+            dimension = "environment"
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+            resValue("string", "app_name", "MahaSinchan WUA (Dev)")
+        }
+        create("qa") {
+            dimension = "environment"
+            applicationIdSuffix = ".qa"
+            versionNameSuffix = "-qa"
+            resValue("string", "app_name", "MahaSinchan WUA (QA)")
+        }
+        create("preprod") {
+            dimension = "environment"
+            applicationIdSuffix = ".preprod"
+            versionNameSuffix = "-preprod"
+            resValue("string", "app_name", "MahaSinchan WUA (PreProd)")
+        }
+        create("prod") {
+            dimension = "environment"
+            resValue("string", "app_name", "MahaSinchan WUA")
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true

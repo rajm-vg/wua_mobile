@@ -43,11 +43,13 @@ class HomePage extends StatelessWidget {
           ),
         if (sl.isRegistered<WaterUsageBloc>())
           BlocProvider<WaterUsageBloc>(
-            create: (context) => sl<WaterUsageBloc>()..add(const LoadWaterUsageEvent()),
+            create: (context) =>
+                sl<WaterUsageBloc>()..add(const LoadWaterUsageEvent()),
           ),
         if (sl.isRegistered<PaymentsBloc>())
           BlocProvider<PaymentsBloc>(
-            create: (context) => sl<PaymentsBloc>()..add(const LoadPaymentsEvent()),
+            create: (context) =>
+                sl<PaymentsBloc>()..add(const LoadPaymentsEvent()),
           ),
       ],
       child: const _HomePageView(),
@@ -91,7 +93,9 @@ class _HomePageViewState extends State<_HomePageView> {
       context.read<BillsBloc>().add(const LoadBillsEvent(refresh: true));
     }
     if (sl.isRegistered<WaterUsageBloc>()) {
-      context.read<WaterUsageBloc>().add(const LoadWaterUsageEvent(refresh: true));
+      context.read<WaterUsageBloc>().add(
+        const LoadWaterUsageEvent(refresh: true),
+      );
     }
     if (sl.isRegistered<PaymentsBloc>()) {
       context.read<PaymentsBloc>().add(const LoadPaymentsEvent(refresh: true));
@@ -146,18 +150,19 @@ class _HomePageViewState extends State<_HomePageView> {
 
     return Builder(
       builder: (context) {
-        final waterState = hasWater ? context.watch<WaterUsageBloc>().state : null;
+        final waterState = hasWater
+            ? context.watch<WaterUsageBloc>().state
+            : null;
         final billsState = hasBills ? context.watch<BillsBloc>().state : null;
 
-        final quota = waterState is WaterUsageLoaded ? waterState.summary.quota : null;
+        final quota = waterState is WaterUsageLoaded
+            ? waterState.summary.quota
+            : null;
         final totalDues = billsState is BillsLoaded
             ? billsState.totalOutstandingAmount
             : (user?.totalBalance ?? 0.0);
 
-        return WaterMetricsRow(
-          quota: quota,
-          totalDues: totalDues,
-        );
+        return WaterMetricsRow(quota: quota, totalDues: totalDues);
       },
     );
   }
@@ -213,8 +218,8 @@ class _HomePageViewState extends State<_HomePageView> {
                     const SizedBox(height: AppSpacing.md),
 
                     // Next Canal Turn • Wari Card
-                    _buildNextTurnCard(),
-                    const SizedBox(height: AppSpacing.md),
+                    // _buildNextTurnCard(),
+                    // const SizedBox(height: AppSpacing.md),
 
                     // Current Pani Patti Bill Card
                     _buildBillCard(),

@@ -43,3 +43,5 @@
 -keepattributes JavascriptInterface
 -keep class com.easebuzz.** { *; }
 -dontwarn com.easebuzz.**
+-keep class datamodels.** { *; }
+-dontwarn datamodels.**

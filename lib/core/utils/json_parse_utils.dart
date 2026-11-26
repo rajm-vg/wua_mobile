@@ -79,29 +79,26 @@ class JsonParseUtils {
     return null;
   }
 
-  /// Safely parses [value] into a [DateTime], or `null` if unparseable.
+  /// Safely parses [value] into a local-timezone [DateTime], or `null` if unparseable.
   static DateTime? parseDateTime(dynamic value) {
     if (value == null) return null;
-    if (value is DateTime) return value;
+    if (value is DateTime) return value.toLocal();
     if (value is String) {
       final trimmed = value.trim();
       if (trimmed.isEmpty) return null;
-      return DateTime.tryParse(trimmed);
+      return DateTime.tryParse(trimmed)?.toLocal();
     }
     return null;
   }
 
-  /// Safely parses [value] into a [DateTime], returning [fallback] (or `DateTime.now()`) on failure.
+  /// Safely parses [value] into a local-timezone [DateTime], returning [fallback] (or `DateTime.now()`) on failure.
   static DateTime parseDateTimeOrNow(dynamic value, {DateTime? fallback}) =>
-      parseDateTime(value) ?? fallback ?? DateTime.now();
+      parseDateTime(value) ?? fallback?.toLocal() ?? DateTime.now();
 
   /// Safely converts a JSON list into a `List<String>`, skipping null entries.
   static List<String> parseStringList(dynamic value) {
     if (value is! List) return const [];
-    return value
-        .where((e) => e != null)
-        .map((e) => e.toString())
-        .toList();
+    return value.where((e) => e != null).map((e) => e.toString()).toList();
   }
 
   /// Safely converts a JSON map into `Map<String, dynamic>`, or `null` if not a map.
@@ -116,9 +113,6 @@ class JsonParseUtils {
   /// Safely converts a JSON list into `List<Map<String, dynamic>>`, skipping invalid entries.
   static List<Map<String, dynamic>> parseMapList(dynamic value) {
     if (value is! List) return const [];
-    return value
-        .map(parseMapOrNull)
-        .whereType<Map<String, dynamic>>()
-        .toList();
+    return value.map(parseMapOrNull).whereType<Map<String, dynamic>>().toList();
   }
 }

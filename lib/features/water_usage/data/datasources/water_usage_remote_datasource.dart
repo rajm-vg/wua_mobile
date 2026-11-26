@@ -185,13 +185,6 @@ class WaterUsageRemoteDataSourceImpl implements WaterUsageRemoteDataSource {
     }
 
     final next = turns.where((t) => t.isUpcoming || t.isActive).firstOrNull;
-    double totalAllocated = 0.0;
-    double totalUsed = 0.0;
-    for (final c in farmerCrops) {
-      totalAllocated += c.allocatedHaCm;
-      totalUsed += c.usedHaCm;
-    }
-
     final activeOutwardHeaders = outwardById.values.toList();
     final firstHeaderSeason = activeOutwardHeaders.isNotEmpty
         ? activeOutwardHeaders.first['season']?.toString()
@@ -202,13 +195,37 @@ class WaterUsageRemoteDataSourceImpl implements WaterUsageRemoteDataSource {
 
     final resolvedSeason = turns.isNotEmpty
         ? turns.first.season
-        : (farmerCrops.firstOrNull?.season ??
-              firstHeaderSeason ??
-              'N/A');
+        : (farmerCrops.firstOrNull?.season ?? firstHeaderSeason ?? 'N/A');
     final resolvedFiscalYear =
         turns.firstOrNull?.fiscalYear ??
         farmerCrops.firstOrNull?.fiscalYear ??
         firstHeaderFiscalYear;
+
+    // Sum water quota only for individual farmer records matching the active
+    // fiscal year & season so prior years/seasons or society-wide rows are not mixed.
+    double totalAllocated = 0.0;
+    double totalUsed = 0.0;
+    if (farmerMemberId != null) {
+      final activeCrops = farmerCrops.where((c) {
+        final matchesYear =
+            resolvedFiscalYear == null ||
+            resolvedFiscalYear.isEmpty ||
+            c.fiscalYear == null ||
+            c.fiscalYear!.isEmpty ||
+            c.fiscalYear == resolvedFiscalYear;
+        final matchesSeason =
+            resolvedSeason.isEmpty ||
+            resolvedSeason == 'N/A' ||
+            c.season == null ||
+            c.season!.isEmpty ||
+            c.season == resolvedSeason;
+        return matchesYear && matchesSeason;
+      });
+      for (final c in activeCrops) {
+        totalAllocated += c.allocatedHaCm;
+        totalUsed += c.usedHaCm;
+      }
+    }
 
     final firstSurvey = farmerCrops.firstOrNull?.surveyNo;
     final quota = WaterQuotaModel(

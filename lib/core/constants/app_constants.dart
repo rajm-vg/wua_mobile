@@ -3,7 +3,7 @@ class AppConstants {
   AppConstants._();
 
   // App Info
-  static const String appName = 'WUA Mobile';
+  static const String appName = 'MahaSinchan WUA';
   static const String appVersion = '1.0.0';
 
   // Pagination

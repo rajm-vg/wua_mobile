@@ -19,6 +19,8 @@ class EnvConfig {
         _envFileName = '.env.qa';
       case AppEnvironment.uat:
         _envFileName = '.env.uat';
+      case AppEnvironment.preprod:
+        _envFileName = '.env.preprod';
       case AppEnvironment.production:
         _envFileName = '.env.prod';
     }
@@ -42,6 +44,9 @@ class EnvConfig {
         return AppEnvironment.qa;
       case 'uat':
         return AppEnvironment.uat;
+      case 'preprod':
+      case 'pre-prod':
+        return AppEnvironment.preprod;
       case 'prod':
       case 'production':
         return AppEnvironment.production;
@@ -95,6 +100,7 @@ class EnvConfig {
   static bool get isDevelopment => buildFlavor == 'development';
   static bool get isQa => buildFlavor == 'qa';
   static bool get isUat => buildFlavor == 'uat';
+  static bool get isPreprod => buildFlavor == 'preprod';
 }
 
-enum AppEnvironment { development, qa, uat, production }
+enum AppEnvironment { development, qa, uat, preprod, production }
